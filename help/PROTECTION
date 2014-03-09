@@ -1,0 +1,19 @@
+ 
+Protection level can be 0 through 4 where the specific levels
+are as follows:
+ 
+  0   No protection.
+  1   Reop/unban, do nothing to offender.
+  2   Reop/unban, deop offender.
+  3   Reop/unban, kick offender.
+  4   Reop/unban, kickban offender.
+ 
+The channel protection level limits the highest protection
+level that will be enforced. For example, if channel protection
+level is set to 2 and a user has protection level 4, that user
+will still be treated as having only level 2 on that channel.
+ 
+If channel protection level is set to 0 (zero), protection
+will not be enforced at all.
+ 
+See also: setprot, user, userlist

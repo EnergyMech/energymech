@@ -1,0 +1,6 @@
+ 
+Send a command to linked bots. You can specify a single
+bot to execute the command. Authentication is done on
+target bot(s), not the bot you send the command from.
+ 
+See also: link

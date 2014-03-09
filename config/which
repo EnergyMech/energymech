@@ -1,0 +1,14 @@
+bin=$1
+spath="`echo $PATH | sed 's/:/ /g;'`"
+if [ -x $bin ]; then
+  echo $bin
+  exit 
+fi
+for pd in $spath; do
+  if [ -x $pd/$bin ]; then
+    echo $pd/$bin
+    exit
+  fi
+done
+echo 'not found'
+

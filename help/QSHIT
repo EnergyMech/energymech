@@ -1,0 +1,3 @@
+Usage: QSHIT <nick> [reason]  
+   Quick shit. Uses preset defaults for channel and shitlevel.
+   See also: SHIT, RSHIT, SHITLIST

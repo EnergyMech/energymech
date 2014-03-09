@@ -1,0 +1,205 @@
+3.0.99p3 -- July 24th, 2009.
+
+ * Added: Python scripting support (supplied by S.Marquis)
+ * Added: Users are copied to other local bots.
+ * Fixed: Obscure configure options for new features.
+ * Fixed: Updated help files.
+ * Fixed: Local bots should now auto-op eachother (if AOP is set).
+ * Fixed: Filenames for various functions is now sanity checked.
+ * Fixed: Saving greet updates to userfile.
+
+3.0.99p1 -- May 11th, 2009.
+
+ * Added: Scripting hook for dns (only if compiled with rawdns support)
+   Usage(TCL): mech_dns <hostname> <callback_proc>
+ * Added: Scripting hook for commands
+   Usage(TCL): mech_hook command <name_of_command> <tcl_proc_to_run>
+ * Added: DNS command (only if compiled with rawdns support)
+   Usage: DNS <nick|host>
+ * Added: Shit records to debug dump file.
+ * Added: CHANBAN feature
+ * Added: Spy channels can now be created cross-bot.
+   Usage: SPY [STATUS|MESSAGE|RAWIRC|[guid":"|botnick":"] [channel|">" filename]
+ * Added: IRCd extension flags are now recovered in a reset.
+ * Added: BANLIST command also lists +e and +I masks (ircnet)
+ * Added: Recognizes IRCd extensions from the 005 line such as ircnet modes (+e/+I)
+ * Added: SERVERGROUP command and SERVERGROUP setting (per bot setting)
+   Usage: SERVERGROUP [identifier]
+   Usage: SET SERVERGROUP <identifier>
+ * Fixed: async dns should eat less cpu if it bugs.
+ * Fixed: Bot can connect to undernet servers presenting an additional
+   challenge if there is no ident.
+
+3.0.3 - August 27th, 2008.
+
+ * Fixed: DNS query recursion flag was set incorrectly.
+
+3.0.2 -- May 8th, 2006.
+
+ * Fixed: Critical crash bug in parse_notice
+
+3.0.1 -- August 28th, 2005.
+
+ * Fixed: Socket corruption when terminating a DCC or telnet chat.
+ * Fixed: Bouncer using virtual host.
+ * Fixed: Bouncer timeout after irc connection.
+ * Added: Status message for trying a new server.
+ * Fixed: BNCPORT setting now reacts when altering a live port
+ * Added: DIE in config file
+ * Fixed: When users are added or modified, the channel user
+   list will update to reflect the proper user levels.
+ * Fixed: Greet will now display properly in userlist.
+ * Fixed: ALTNICK in sample.conf
+ * Fixed: Cygwin uptime bot type WINMECH
+ * Fixed: Makefile flaws
+ * Fixed: Server removal (server -host)
+ * Fixed: DNS timeout server cycle
+ * Fixed: Channel spy source.
+
+3.0 -- August 1st, 2005.
+
+ * Added: "USER +handle" now works aswell as "USER + handle"
+ * Fixed: bus error on sparc in async dns
+ * Fixed: crash bug in LINK command (faulty arguments)
+ * Fixed: ENFPASS
+ * Fixed: botnet verify
+ * Added: +NS (non shared) and +RO (readonly) user flags.
+ * Added: CMD command
+ * Removed: ADDLINK/DELLINK commands, use LINK +/-
+ * Added: Verify over botnet
+ * Added: botnet spy source
+ * Added: Multiple channels per user record
+ * Added: sendQ for certain command output
+ * Fixed: faulty error message in KB/SITEKB/SCREW
+ * Added: reset recovers server name
+ * Added: Telnet connections are now recovered in reset.
+ * Added: Shitlist output now shows all relevant information.
+ * Added: Action levels to the KS feature.
+ * Fixed: commands that output tables now output better formatted tables
+ * Fixed: bots crashing when they are kicked (themselves)
+ * Fixed: botnet bots given op without matching access 200.
+ * Fixed: a few commands crashing when given no arguments.
+ * Fixed: USER command setting a users access to zero every change.
+ * Added: Auto-detecting MODES setting on networks with 005 reply.
+ * Changed: OPMODES renamed to MODES, affecting how many modes per line.
+ * Removed: BANMODES setting.
+ * Fixed: Compiled OK with GCC 3.4.3
+ * Removed: ADD, DEL commands, use USER +/- instead.
+ * Fixed: ESAY no longer suffers from buffer overflow problems
+ * Fixed: AUB will no longer unban Shits level 3+
+ * Fixed: Session file now saves all (?) new options and settings
+ * Fixed: NCL (Nick flood kicks) now work properly.
+ * Changed: "NETPASS" setting renamed to "LINKPASS"
+ * Changed: file comment char changed to ; (semicolon)
+ * Removed: ADDSERVER, DELSERVER commands, use SERVER +/- instead.
+ * Added: telnet. you can connect to the bot via the botnet listen socket.
+ * Added: Its now possible to use an internal md5 version if your
+   system does not provide one. ./configure --md5=internal
+ * Added: Settings now have access levels associated with them.
+   It should be impossible to view/set/access a setting if your
+   level is insufficient.
+ * Added: USER command now accepts option +/-host
+   Usage: USER <handle> <+HOST|-HOST> <mask>
+ * Removed: HOST command.
+ * Added: the mech now accepts certain chars at the end of its
+   nickname when you give it commands, ex: "mechname," works
+ * Added: Notify no longer loads automatically, you need
+   to put "NOTIFY -RELOAD" in the configuration file.
+ * Added: Notify nicks can now be added and removed online
+   Usage: NOTIFY [+ <nick> [mask(s)] [:comment]]
+   Usage: NOTIFY [- <nick>]
+ * Added: DCC file receive and settings for DCC control
+   Usage: SET DCCANON <number>
+   Usage: SET DCCUSER <number>
+   Usage: SET DCCFILES <mask [...]>
+ * Removed: REPORT command, use `SET [channel]' for the same functionality
+ * Changed: commands can now be disabled permanently (until bot is restarted)
+   Usage: CHACCESS <command> disable
+ * Added: DYNLIMIT string setting to configure the dynlimit feature
+   Usage: SET DYNLIMIT xx:yy:zz
+   where xx is the number of seconds between each mode update, 20-600 seconds
+   where yy is the number to divide the current user number with to get the
+   window size, 5-50 (ex, 100 users on channel divided by 10 = window of +/-10)
+   where zz is the minimum window size, 1-50.
+   default values are 90 seconds, window 10 and minimum 4; "90:10:4"
+ * Removed: DYNLIMIT toggle
+ * Added: userlist sharing over botnet
+ * Added: MD5 bot linking password exchange support
+ * Added: TCL: `hook dcc_complete - callback'
+   callback arguments: to, filename, cps
+ * Fixed: Compiled OK with GCC 3.4.2 (with -fno-strict-aliasing)
+ * Added: internally generated html for /internalstatus.html
+   and /internaldebug.html (if compiled with debug support)
+ * Added: INFO command shows basic statistics for all channels
+ * Changed: SERVERLIST command removed, SERVER command with
+   no arguments now lists all known servers
+ * Added: Support for Undernet WALLCHOPS command (WALL)
+ * Fixed: MODE command now working as intended
+ * Added: tcl_dcc_sendfile <to> <filename>
+   returns filesize on success
+ * Changed: E3 now accepts nicks of any length
+ * Added: DCC filesend: SEND [to] <filename>
+ * Added: now using async/rawdns to lookup uptime hostname
+ * Added: now using async/rawdns to connect to irc servers
+ * Changed: timestamp in log format now includes year, month, date
+ * Fixed: crash bug with `SETPASS <user> none'
+ * Fixed: crash bug with HELP commands having no arguments
+ * Added: ALTNICK setting for desired alternate nicks
+ * Fixed: Removed lingering prototypes in h.h			[ wy|d + Deke ]
+ * Added: MD5 support for password encryption
+ * Fixed: mech.session now gets saved on SHUTDOWN               [ endorphin ]
+ * Added: CTIMEOUT setting for connection timeouts
+ * Added: NOTE command to send notes to users in the userlist
+   Usage: NOTE <handle>
+ * Fixed: Respawn counter now works properly when bot restarts
+ * Added: dynamode.c, dynamic altering of +l limit according
+   to the number of users present in the channel
+ * Fixed: `SETPASS <user> none' bug regarding min pass len
+ * Changed: SeenList is now kept on process level
+ * Added: UMODES setting to control the modes that the bot
+   sets for itself when connecting to servers
+ * Changed: ESAY $tog() has been changed into a full-featured
+   system that handles all settings; $tog() renamed to $var()
+ * Fixed: ESAY $tog() parsing bug causing bad output
+ * Added: Something that still looks like a HTTP interface
+   this is a very sketchy feature sofar tho
+ * Added: Chosen commands {now=HELP,USAGE} can be redirected
+   to other users or channels
+ * Added: ONJOINFILE channel setting, wonder why :]
+ * Added: greets (readded from old times)
+ * Added: Keep debug fd and server sockets when using
+   the RESET command. Even tho it execs, it's never
+   disconnected from the server.
+ * Fixed: Auths not timing out if user was visible in           [ found by endorphin ]
+   an old (kicked/parted) channel userlist
+ * Removed: TOG command, use SET instead
+ * Changed: aliases are now way powerful
+ * Added: All types of SPY can be redirected to
+   channels and/or files.
+   Usage: SPY <channel|STATUS|MESSAGE> [channel|">" filename]
+   Usage: RSPY <channel|STATUS|MESSAGE> [nick|channel|">" filename]
+ * Removed: CHANLOG toggle
+ * Removed: STATMSG, SPYMSG, RSTATMSG, RSPYMSG
+ * Added: Short delay for server reconnect actions
+ * Fixed: Random server disconnects
+ * Removed: USTATS, stupid redundant command
+ * Removed: SHITLVL command, use RSHIT+SHIT instead
+ * Removed: All linking and telnet code is gone and
+   pipeuser code is now broken
+ * Changed: config file is now a list of `real' commands
+ * Changed: CMDCHAR <char> --> SET CMDCHAR <char>
+ * Changed: AUTOLINK --> TOG AUTOLINK <0|1|ON|OFF>
+ * Changed: USERFILE <file> --> SET USERFILE <file>
+ * Changed: HASONOTICE --> TOG ONOTICE <0|1|ON|OFF>
+ * Removed: IWM toggle, didnt do anything useful
+ * Fixed: Random disconnects from DCC
+ * Added: Extra entries in randinsult.e
+ * Fixed: Merged endo's seen-ago patch				[ endorphin ]
+ * Added: Uptime reporting client code
+ * Fixed: WinGate proxy now works again...
+ * Added: Fastnick option hidden in src/config.h
+ * Fixed: Bot not knowing it was opped when joining		[ found by endorphin ]
+   empty channels.
+ * Changed: Split mech.help into ./help/* files
+ * Fixed: No-key-saved in session file plus some small
+   optimizations...

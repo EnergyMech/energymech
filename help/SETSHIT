@@ -1,0 +1,2 @@
+Usage: TOG [channel] SHIT [0|1|on|off]
+   Toggles the kicking of shitlisted users.

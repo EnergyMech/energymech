@@ -1,0 +1,10 @@
+ 
+Show someones access level. If no arguments are given, the bot
+will display your own access level. You may also query the bot
+for the access level required for commands, using:
+ACCESS <commandchar><command>
+ 
+For example: ACCESS -ACCESS
+(If your command char is -)
+ 
+See also: userlist

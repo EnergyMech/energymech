@@ -1,0 +1,24 @@
+ 
+Change a setting. For channel settings you can use * to change
+a setting for all known channels.
+ 
+If no setting and/or channel is specified, show all current
+settings affecting the current/selected channel and bot.
+ 
+For more help on each setting displayed, use "HELP SETxxx"
+where the "xxx" is the setting in question.
+ 
+Channel settings:
+ABK, AOP, AUB, AVOICE, CHANBAN, CKL, CTL, DYNLIMIT, ENFM,
+ENFMODES, FL, FPL, IKT, KS, MAL, MBL, MDL, MKL, MPL, NCL,
+PROT, PUB, RK, SD, SHIT, SO, STATS, TOP
+ 
+Bot settings:
+AAWAY, ALTNICK, CC, CMDCHAR, CTCP, DCCANON, DCCFILES, DCCUSER,
+ENFPASS, IDENT, IRCNAME, ISONDELAY, MODES, NETUSERS, NOIDLE,
+NOTIFYFILE, ONOTICE, RF, RV, SERVERGROUP, SPY, UMODES,
+USERFILE, VIRTUAL, WINGATE, WINGPORT
+ 
+Process settings:
+AUTOLINK, BNCPORT, CTIMEOUT, LINKPASS, LINKPORT, QCHAR, QDELAY,
+QFILE, SEENFILE, UPHOST, UPNICK, UPPORT, WEBPORT

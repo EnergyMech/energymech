@@ -1,0 +1,6 @@
+Usage: SET [channel] MPL <level>    
+   Sets the protection level against massmoders.
+      0 - no action taken against offender
+      1 - kick offender
+      2 - kickban offender
+      3 - kickban and shitlist offender

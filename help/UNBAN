@@ -1,0 +1,4 @@
+Usage: UNBAN [channel] [nick|userhost]
+   Unbans someone on a certain channel
+   Note: If no nick/userhost is given, you are unbanned
+   See also: BAN, BANLIST

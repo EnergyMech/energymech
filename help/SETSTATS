@@ -1,0 +1,6 @@
+Level needed: 80
+Usage: SET [channel] STATS <filename>
+ 
+Set filename to where statistics for the channel is saved.
+ 
+See also: stats

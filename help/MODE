@@ -1,0 +1,5 @@
+ 
+Set or unset channel modes. Can also be used
+to change the modes of the bot.
+ 
+See also: op, deop, voice, unvoice

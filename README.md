@@ -1,4 +1,0 @@
-energymech
-==========
-
-EnergyMech IRC Bot

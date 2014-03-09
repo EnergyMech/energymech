@@ -1,0 +1,5 @@
+Usage: SHOWIDLE [seconds]
+   This will show how long people are idle
+   If a number of seconds is given, it will only show people
+   idle for more than that amount of time
+   See also: IDLE

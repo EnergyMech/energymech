@@ -1,0 +1,34 @@
+Built in levels
+Level   0: Anonymous user.
+   User is ignored by the bot.
+Level  10: Partyline user.
+   Users with this level can verify themselves and communicate at
+   a basic level (help, usage, echo, ...) with the bot including
+   using the DCC partyline.
+Level  20: Informed user.
+   User is allowed to query a few status informations.
+Level  40: Channel operator.
+   User can op/deop/ban/unban other channel users and set topics.
+Level  50: Senior Channel operator.
+   User can manipulate the shitlist.
+Level  60: Channel Maintainer.
+   User can view the bot userlist.
+Level  70: Bot operator.
+   User can add/remove channels and manipulate the bad words list.
+Level  80: Bot master.
+   User may change protected topics, enforced modes, is not checked
+   for massmodes/masskicks/clones/revenge kick, can remove passwords
+   with SETPASS, always gets ctcp ping replies and is not affected
+   by PROT levels of other users. User may force bot to load/save
+   setting to/from files.
+Level  90: Trusted bot master.
+   User may change the bot's nick, spy on channels/messages, change
+   channel settings and commandlevels. User is allowed to add/remove
+   links to other bots.
+Level 100: Superuser.
+   Superuser, what can he *not* do?
+Level 200: Bot.
+   Bots can not execute commands by /msg or in any other way.
+   Is also unaffected by massmodes/kicks/clones/revenge, etc...
+   Only bots added with botlevel (200) will be autoopped as
+   a responce to NEEDOP across network links with other bots.

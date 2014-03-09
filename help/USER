@@ -1,0 +1,41 @@
+ 
+Add/remove users or change their settings.
+ 
+Add a user:
+  USER + <handle> <*|channel> <nick|mask> <level> [password]
+ 
+Remove a user:
+  USER - <handle>
+ 
+Change a users level:
+  USER <handle> +<newlevel>
+ 
+Add/remove a channel:
+  USER <handle> +chan #channel
+  USER <handle> -chan #channel
+ 
+Add/remove a host mask:
+  USER <handle> +host *!*my@*example.com
+  USER <handle> -host *!*my@*example.com
+ 
+Only one channel or one mask can be modified with each USER command.
+ 
+Prefix flags with a "-" to disable them or a "+" to enable them.
+ 
+User flags:
+  AO         auto-op on/off
+  AV         auto-voice on/off
+  BNC        enable a user to use the bouncer feature
+  ECHO       partyline echo on/off
+  P<level>   change protection level (0-4)
+             If disabling (-P), level is not needed.
+
+Botnet user flags:
+  NS         not shared, user is not set to botnet but may be
+             overwritten by incoming shares
+  RO         read only, user is not overwritten by incoming shares
+ 
+Example: USER owner +ao -av
+  Enables user autoop and disables autovoice for user "owner".
+ 
+See also: protection, userlist, setaop, setavoice, setprot

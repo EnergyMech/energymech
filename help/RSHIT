@@ -1,0 +1,3 @@
+Usage: RSHIT <channel> <nick|userhost>
+   Removes someone from the shitlist
+   See also: SHIT, SHITLIST

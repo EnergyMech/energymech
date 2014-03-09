@@ -1,0 +1,8 @@
+Usage: SET [channel] FPL <level>
+   Sets the protection level against floods.
+      0 - no action against offender
+      1 - kick offender
+      2 - kickban offender
+   Note: After 3rd kick within 10 minutes, the person will be
+         sitekickbanned. After the 4th time, the person will
+         be shitlisted.

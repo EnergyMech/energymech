@@ -1,0 +1,5 @@
+ 
+8Ball command randomly gives a positive or negative answer.
+The ! char is also recognized as commandchar.
+ 
+Example: !8ball will I get laid tonight?

@@ -1,0 +1,3 @@
+Usage: SCREW [channel] <nick> [reason]
+   Kickban a user on a channel and place two bans using
+   randomized masks.

@@ -1,0 +1,130 @@
+,-----------------------------------------------------------------.,---------------------------.
+|   ,-----; ,------,     ,-----; ,-------,    ,----,     ,  ,-.   |      ,--------------.      |
+|  /  ,---' |   ,.  \   /  ,---' |   ,--, \  /  ,-. \   /|  |  \  |     /          ,-.   \     |
+| |   |___  |   | \  \ |   |___  |   |__|  ;|   | `~'  / |  |   | |     `---------'   \   \    |
+| |   ,--'  |   |  |  ||   ,--'  |   |--; < |   | ,--./   `-'   | |                   /    \   |
+| |   |__,-,|   |  |  ||   |__,-,|   |  |  ||   | \  |\___.     | |                  /     /   |
+| |        ||   |  |  ||        ||   |  |  ||   `~'  |     \    | |      ,----------'     /    |
+| |        ||   |  | / |        ||   |  | / |        |      |   | |      \            _   \    |
+| `~~~~~`\/ `---'  `/  `~~~~~`\/ `---'  `/  `/~~~~~~'       |,--' |       \_________,' \   \   |
+|          ,---,    ,---,  ,-----;   ,----.    ,-.  ,--.          |                    /    \  |
+|          |    \  /    | /  ,---'  /  ,--'   /  |  |  |          |                   /      | |
+|          |     \/     ||   |___  |   |     |   |__|  |          |                  /       | |
+|          |   |\  /|   ||   ,--'  |   |     |   ,--.  |          |  ______________,'        | |
+|          |   | \/ |   ||   |__,-,|   |   /||   |  |  |          | /                       /  |
+|          |   |    |   ||        ||   `--' ||   |  |  |          | \                      /   |
+|          |   |    |   ||        ||        ||   |  | /           |  \                    /    |
+|          `---'    `---'`~~~~~`\/ `\___/~~~'`---'  `/            |   \_________________,'     |
+`-----------------------------------------------------------------'`---------------------------'
+
+Compiling?
+~~~~~~~~~~
+To compile the source:
+
+1) Uncompress the source code distribution archive.
+
+2) cd emech-3.0.99p3
+-- Since you are reading  this file,  you have most likely already
+   come to this point.
+
+3) ./configure
+-- This script will prompt you for features to include or exclude,
+   going with the default is not a bad idea.
+
+4) make clean install
+
+If  all  went  well  you  should  now  have  an executable  called
+``energymech''.
+
+---*---
+
+Setup?
+~~~~~~
+
+Read the  sample.conf  file to  get  an idea of  the  config  file
+commands and then try to make your own.  A basic setup doesnt need
+much  more than  NICK,  ALTNICK,  SET USERFILE,  JOIN  and  SERVER
+entries, the rest is just tweaks of default values.
+
+Quick steps:
+
+1) cp sample.conf mech.conf
+
+2) pico mech.conf
+-- replace ''pico'' with your favourite text editor,  look through
+   the file for sections to change,  you will have to remove lines
+   in order to get the bot to work. Check the file completely!
+ 
+3) make a userfile
+
+   construct a temporary file (trick.conf) containing;
+   ---------------------------------------------------------------
+   set userfile whateveryouwanttonameit
+   user + handle * *!*yourident@*.yourdomain.com 100 password
+   save
+   shutdown
+   ---------------------------------------------------------------
+
+   then 'run'  this file with  './energymech -f trick.conf'.  this
+   will create a userfile  with the name  you chose ('mech.passwd'
+   is a good descriptive name which I usually use myself).
+
+   re-use the filename  you selected in your  proper configuration
+   file. and remember to 'rm -f mech.session' if you compiled your
+   energymech with session support.
+ 
+4) ./energymech
+
+That should get you running. If you don't see your bot come on IRC
+after a few minutes,  you should try running the bot in debug mode
+to see what's going on with...
+
+  ./energymech -d
+
+If you get an 'Unknown option -d', you need to answer 'Y' to debug
+support when running ./configure from the compiling section above.
+
+---*---
+
+Updated Files?
+~~~~~~~~~~~~~~
+The main distro-site for the EnergyMech is:
+
+   http://www.energymech.net
+
+---*---
+
+More Help?
+~~~~~~~~~~
+
+Read the  website for  goodness sake!  Thats what  its there  for!
+
+		  #emech is not a help channel
+
+If you HAVE to ask  a question in #emech  then make damn sure that
+its not covered by the website  documentation and try to ask it in
+a way so that  we dont have  to type half  a book just to tell you
+the answer.
+
+Do NOT ask to be guided in #emech.  We will under no circumstances
+help you compile, configure or run a bot.
+
+We absolutely hate people who come into the channel asking utterly
+simple  questions like  `Why doesnt  my bot connect',  `Whats  the
+command to add a user', etc.  If you manage to stay in the channel
+after asking something like that its simply because we're too damn
+lazy to kickban your ass.
+
+We will NOT teach  you how to work with UNIX  shells or how to use
+your mech, you have to learn that by yourself. Im noting this here
+since it seems to be a common misconception that we would.
+
+In short:
+
+THIS SOFTWARE IS PROVIDED AS IS. YOU ARE ENTIRELY ON YOUR OWN WHEN
+IT COMES TO CONFIGURING AND USING IT.
+
+---*---
+
+proton, July 24th, 2009.
+<mailto:proton@energymech.net>

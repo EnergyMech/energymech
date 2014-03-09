@@ -1,0 +1,5 @@
+Usage: RSPY <channel> [nick|channel]
+   Stop spying on a certain channel
+   Note: If a nick or channel is given at the end...that person/channel
+         will be removed from spying
+   See also: SPY, SPYMSG, SPYLIST

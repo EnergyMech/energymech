@@ -1,0 +1,3 @@
+ 
+Sets the bot away. If no message is specified, previous
+away status and message (if any) is removed.

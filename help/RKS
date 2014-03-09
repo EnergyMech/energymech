@@ -1,0 +1,3 @@
+Usage: RKS <channel> <pattern of words banned>
+   Removes a kicksay
+   See also: KS, KSLIST

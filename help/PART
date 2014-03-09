@@ -1,0 +1,6 @@
+ 
+Makes the bot part a certain channel. To purge the channel
+completely from memory, use the FORGET command once it has
+parted. 
+ 
+See also: join, forget

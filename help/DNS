@@ -1,0 +1,3 @@
+ 
+Resolve the hostname given or the host of the nick give.
+If the hostname is an IP, a reverse resolve will be attempted.

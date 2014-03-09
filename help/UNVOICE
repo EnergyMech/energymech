@@ -1,0 +1,4 @@
+Usage: UNVOICE [channel] [nick|mask [...]]
+   Removes voice from user or users matching the given
+   nick!user@host mask.
+   See also: VOICE, MODE

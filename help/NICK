@@ -1,0 +1,4 @@
+Usage: NICK <nick>
+   Changes the nick of the bot. If the nick given is already
+   in use, the bot will not change its nickname until the
+   occupied nick is available.

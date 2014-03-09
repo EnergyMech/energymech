@@ -1,0 +1,13 @@
+ 
+Works like SAY with some enhancements. As the bot parses the text
+it replaces predefined variables with their current value:
+  $access     Your own access on the current channel
+  $cc         Current channel
+  $channels   Channels
+  $on         Ontime (same as ontime command)
+  $time       Current time
+  $var(x)     Show current setting for "x"
+  $up         Uptime (same as uptime command)
+  $ver        EnergyMech version
+ 
+See also: say

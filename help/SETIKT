@@ -1,0 +1,9 @@
+Usage: SET [channel] IKT <limit>
+ 
+The maximum number of minutes users are allowed to be idle
+before being kicked off the channel.
+ 
+Default is 0 minutes (idle kick disabled).
+Valid range is 0 to 40320 minutes (4 weeks).
+ 
+See also: idle

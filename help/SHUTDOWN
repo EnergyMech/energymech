@@ -1,0 +1,10 @@
+ 
+Kills all bots and exits. The mech will have to be restarted
+manually hand if you want it to return. If a crontab entry
+exists to keep the bot running, it will restart the bot once
+cron runs it.
+If a session file is in use, SHUTDOWN is the proper method
+to kill the process. DIE will delete the killed bot(s) from
+the session file.
+ 
+See also: die, reset

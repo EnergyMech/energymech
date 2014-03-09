@@ -1,0 +1,4 @@
+Usage: VOICE [channel] [nick|mask [...]]
+   Give voice to a user or users matching the given
+   nick!user@host mask. Defaults to giving you voice
+   on the channel where the command is given.

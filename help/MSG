@@ -1,0 +1,3 @@
+Usage: MSG <nick|channel> <message>
+   Send a message to a person or channel.
+   See also: SAY, ESAY, ME

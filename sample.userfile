@@ -1,0 +1,4 @@
+user	example
+mask	*!*@*.example.com
+chan	*
+opt	u100

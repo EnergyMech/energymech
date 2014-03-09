@@ -1,0 +1,3 @@
+Usage: SET [channel] MBL <level>
+   Sets the the number of bans allowed during a 10 sec time
+   period before it is considered a massban

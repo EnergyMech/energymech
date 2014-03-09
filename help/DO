@@ -1,0 +1,4 @@
+ 
+Sends raw commands to the server.
+ 
+Example: DO PRIVMSG #eggdrop :yer all lame, except guppy =)

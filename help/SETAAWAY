@@ -1,0 +1,6 @@
+Usage: SET AAWAY <value>
+ 
+Setting for how long in minutes the bot waits idle before setting
+AWAY status and a random away message. Any privmsg sent by the bot
+resets the idle-timer to zero.   
+To disable auto-away set a value of 0.

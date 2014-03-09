@@ -1,0 +1,10 @@
+Usage: SET [channel] PROT <number>
+ 
+Max enforced protection level for a channel.
+Valid levels are 0 through 4.
+ 
+Users with a protection level higher than the level
+set for the channel will be treated as if their protection
+level was the same as the level set for the channel.
+ 
+See also: protection

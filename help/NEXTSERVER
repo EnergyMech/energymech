@@ -1,0 +1,5 @@
+Usage: NEXTSERVER
+   Makes the bot go to the next server in the serverlist
+   You can also do 'kill -USR1 <mech_pid>' in the shell
+   to make it switch server.
+   See also: SERVER, ADDSERVER, SERVERLIST

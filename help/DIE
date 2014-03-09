@@ -1,0 +1,7 @@
+ 
+Kills the bot. If session file is in use, use the
+SHUTDOWN command instead to preserve the configurations
+for all bots. If DIE is used, the killed bot(s) will
+not be saved to the session file.
+ 
+See also: reset, shutdown

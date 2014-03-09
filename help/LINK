@@ -1,0 +1,18 @@
+ 
+Add/remove and establish botnet links.
+ 
+Add a new bot to the list:
+  LINK +guid password [host port]
+Host and port is optional, required for making connections to
+the remote bot, but if they are left out, the local bot can still
+accept links incoming from the remote bot.
+ 
+Remove a bot from the list:
+  LINK -guid
+ 
+Attempt to establish a link:
+  LINK guid
+ 
+With no arguments it will list all known bots.
+ 
+See also: cmd, setautolink

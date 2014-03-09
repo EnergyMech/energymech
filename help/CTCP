@@ -1,0 +1,5 @@
+ 
+Send a CTCP request to a user or channel.
+The reply is displayed in the "STATUS" spy channel.
+ 
+See also: spy

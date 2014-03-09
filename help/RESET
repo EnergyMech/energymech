@@ -1,0 +1,6 @@
+ 
+Restarts the bot completely. Same as killing the bot
+and restarting it from the shell. The bot will attempt
+to keep network connections alive (IRC server, DCC).
+ 
+See also: die, shutdown

@@ -1,0 +1,3 @@
+Usage: SET [channel] MAL <level>
+   Sets the mass-action level (the level massdeop, masskick,
+   and masskickban will have no effect on).

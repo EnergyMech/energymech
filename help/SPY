@@ -1,0 +1,22 @@
+ 
+Spy on a certain source of messages. When you join DCC chat,
+the STATUS source is added by default as a spy source for you.
+If no arguments are given, the current list of active spy
+channels is shown. Output is not line buffered and can cause
+excess flood if not careful.
+ 
+  (sources)
+   STATUS     Status messages.
+   MESSAGE    Pivate messages that the bot receives.
+   RAWIRC     Lines received from irc server before processing.
+   guid:      Messages from a bot specified by guid.
+   botnick:   Messages from a bot specified by nick.
+   channel    Activities on the specified channel.
+ 
+  (destinations)
+   (none)     Send output to you (default).
+   channel    Send output to the specified channel.
+   >file      Send output to file. Lines are appended to the end of the file.
+              If the file does not exist, it is created.
+ 
+See also: rspy

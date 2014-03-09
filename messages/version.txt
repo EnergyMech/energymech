@@ -1,0 +1,51 @@
+BitchX-1.0c15+ by panasync - Linux 2.2.16 : Keep it to yourself!
+BitchX-1.0c16+ by panasync - FreeBSD 4.1-STABLE : Keep it to yourself!
+BitchX-75p2-6+ by panasync - IRIX 6.5 : Keep it to yourself!
+2.3b47 US for the Power Macintosh 6100/60 #75. Reg. #00000000
+Ircle 3.0.4 US PPC 02/08/1999 03:40:04 AM. #267E45E342E DB32E036
+MacIRC v0.71a by WindWalkr
+Microsoft Chat 2.5 (4.71.2302) (text mode)
+PIRCH32:WIN 95/WIN NT:Beta Version 0.92:97.01.11
+PIRCH98:WIN 95/98/WIN NT:1.0 (build 1.0.1.1190)
+PLuToNiuM's IRC Client - Accept no imitations :You gotta keep 'em seperated
+PLuToNiuM's IRC Client - Accept no imitations :*** LiCe(v1.3pl1) By =:SrFrog:= (DurandalSK2.00)
+PLuToNiuM's IRC Client - Accept no imitations :Sod off, fucknuts.
+Running [PwR] PoWeR.irc 1.0
+Running PhoEniX v2.33 by Vassago
+Running Phoenix v2.27 by Vassago
+Running KVirc 2.0.0 'Phoenix' by Szymon Stefanek
+Running KVirc 2.0.0 'Phoenix' by Szymon Stefanek, RealityX IRC 1.0.0
+VERSION - unknown command.
+WSIRC 1.14e-G - CopyRight 1994 Caesar M Samsi csamsi@clark.net TEXT CHANNEL
+X-Chat 1.2.1 By ZED - Linux 2.2.14 [i686/334MHz]: http://xchat.org
+X-Chat 1.2.1 By ZED - Linux 2.2.16 [i386/301MHz]: http://xchat.org
+Zircon 1.16 Pl: 0 *IX : tcl 7.4p2 tk 4.0p2 tclX V7.4a patch 1 tclX V7.4a patch 1
+[TextBox] version 6.21 by Crypt Keeper / -+ TEXT -+
+iNFeSTeD WiTH LiCe v1.2pl4 by =SrFrog=
+ircII 2.2.9 *IX :ircII 2.2.7, SL0 Are we bug free yet?
+ircII 2.8+PLuToNiuM.r1 SunOS 5.4 :You gotta keep 'em seperated
+ircII 2.8+PLuToNiuM.r2 Linux 1.3.75 :/kill me!
+ircII 2.8.2 *IX :ircii 2.8: almost there...
+ircII 2.8.2 IRIX 5.3 :*** LiCe(v1.3pl1) By =:SrFrog:= (aigh)
+ircII 2.8.2 Linux 1.3.75 :ircii 2.8.2: almost there...
+ircII 2.8.2+CToolZ_v2.0R03.17.96 + cDCC_v1.2 Linux 1.2.13 : I'm Da Lamest Gangsta
+ircII 2.8.2+CoMSTuDr6 BSD/386 1.1 :The ULTIMATE Client
+ircII 2.8.2-EPIC3.004 SunOS 5.5.1 - All the things phone wont include.....
+ircII 3.1 XLCD121 SunOS 4.1.3 :ircii 2.6: you are the perfect drug...
+ircII EPIC4pre2.003 Linux 2.2.16 - whitecaps toy
+ircII EPIC4pre2.508 Linux 2.2.16 - Accept no limitations.
+ircle 2.2 for the Power Macintosh (#69) by Onno Tijdgat
+ircle 2.2 for the Power Macintosh (#75) by Onno Tijdgat
+mIRC v3.9 Windows IRC Client K.Mardam-Bey
+mIRC16 v3.8 IRC Client K.Mardam-Bey
+mIRC16 v3.92 IRC Client K.Mardam-Bey
+mIRC32 v5.41 K.Mardam-Bey
+mIRC32 v5.5 K.Mardam-Bey
+mIRC32 v5.51 K.Mardam-Bey
+mIRC32 v5.6 K.Mardam-Bey
+mIRC32 v5.61 K.Mardam-Bey
+mIRC32 v5.7 K.Mardam-Bey
+mIRC32 v5.71 K.Mardam-Bey
+rxIRC 2.0 VM/CMS :Survival package for VM-struck humans
+xc! 1.4.0 Linux 2.2.14-5.0smp [i686/548MHz]: http://xchat.org
+xchat 1.5.5 FreeBSD 4.1-RELEASE [i386]

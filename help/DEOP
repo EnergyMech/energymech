@@ -1,0 +1,6 @@
+ 
+Deop a user or users matching the given mask on
+a certain channel. With a mask, only users with
+access below the MAL setting are affected.
+ 
+See also: down, op, mode

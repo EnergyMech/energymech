@@ -1,0 +1,5 @@
+Usage: SET [channel] ENFPASS [0|1|on|off]
+ 
+Require users to have a password set to perform
+commands. Commands attempted by un-passworded users
+will be ignored.

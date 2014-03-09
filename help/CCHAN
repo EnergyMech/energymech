@@ -1,0 +1,5 @@
+ 
+Set the current channel. With no argument,
+the currently set channel is displayed.
+ 
+See also: join, part, channels

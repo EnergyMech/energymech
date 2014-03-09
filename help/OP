@@ -1,0 +1,4 @@
+Usage: OP [channel] [nick|mask]
+   Op someone on a given channel. Defaults to opping
+   you in the channel where the command is given.
+   See also: UP, DEOP, MODE

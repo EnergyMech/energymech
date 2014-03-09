@@ -1,0 +1,8 @@
+ 
+Add or remove DNS servers from the internal list.
++ip to add a new host, -ip to remove an existing host.
+Only IP's can be used, hostnames will not work
+(the resolver cannot resolve itself). With no arguments
+a list of the current known DNS resolver addresses are
+shown, the next host to be used is marked with underline.
+Use `dnsserver -0' to remove all known hosts.

@@ -1,0 +1,12 @@
+ 
+Online help system.
+ 
+  <topic>     Shows help about a specific topic.
+  <command>   Displays help entry for specified command.
+  <level>     Displays all commands available at a specified level.
+  <pattern>   Shows all help entries matching the pattern.
+ 
+If no argument is given, all available commands available are
+listed grouped by access level.
+ 
+See also: usage

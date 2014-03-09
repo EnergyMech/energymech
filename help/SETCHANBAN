@@ -1,0 +1,6 @@
+Level needed: 40
+Usage: SET [channel] CHANBAN [0|1|on|off]
+  
+Enable or disable the chanban feature on a given channel.
+ 
+See also: chanban

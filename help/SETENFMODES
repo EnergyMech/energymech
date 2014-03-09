@@ -1,0 +1,4 @@
+Usage: SET [channel] ENFM <modes>   
+   Enforces modes on a channel if a server changes them or
+   if a non-user changes them.
+   See also: TOGENFM

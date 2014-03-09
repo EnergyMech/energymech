@@ -1,0 +1,6 @@
+ 
+Execute a Python command. This command is only available if
+the PLEASE_HACK_MY_SHELL option was enabled during the
+compiling. It is an extremely risky command to allow.
+ 
+============ CONSIDER YOURSELF WARNED ============

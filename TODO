@@ -1,0 +1,37 @@
+/*
+ *  EnergyMech TODO (May 17th, 2009)
+ */
+
+ - Script timer
+
+ - Genuine telnet protocol support for telnet sessions (?)
+
+ - SOCKS4/5 support (?)
+
+ - Undernet CService support (IMHO, should be channel settings (set=password, tog=enable/disable) /proton)
+
+ - DalNet Nickserv/Chanserv support (needed? they dont tolerate much bots on that network /proton)
+
+ - Update/complete the help files.
+
+ - Mode +/-o commands to check for SO and if SO is set, check userlevel and make sure user has access before sending MODEs.
+
+ - Make it possible to pipe SPY through another bot.
+   Ex: bots = laurel, hardy; /msg laurel -spy #emech hardy!#emech
+   (done: local bot spy's)
+
+ - Mode +v a user who verifies if channel is set to +m
+   (too clever?)
+
+ - Recognize some common forms of channel spamming (eg, `join #blablabla')
+   (can be done with kicksays?)
+
+ - botnet logic so that all linked bots dont end up on the same server(s)
+   prevent losing channels cuz they were all on the same one -- the rebooted one..
+
+/*
+ *  Most of these features are open for discussion on how to
+ *  (or even if) implement them
+ *
+ *  Patches are most welcome
+ */

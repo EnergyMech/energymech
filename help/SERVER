@@ -1,0 +1,7 @@
+ 
+Add or remove a server. If +/- is left out, the bot will
+also attempt to connect to the server. If no argument
+is provided, the list of known servers is displayed.
+Added servers will be put into the current servergroup.
+ 
+See also: cserv, nextserver, servergroup

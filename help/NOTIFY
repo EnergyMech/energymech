@@ -1,0 +1,10 @@
+ 
+Show people online in the notify list.
+ 
+Options can be specified as follows:
+ 
+-all       Show all nicks, online aswell as offline.
+-nomatch   Show online nicks even if they do not match the known mask(s).
+-reload    Reload the notify configuration file.
+-full      Show full details of each nick.
+-seen      Also show nicks that have been seen even if they are currently not online.

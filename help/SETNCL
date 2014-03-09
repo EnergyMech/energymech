@@ -1,0 +1,3 @@
+Usage: SET [channel] NCL <level>
+   Sets the number of nick changes within a 10 second period 
+   before it is considered nickflooding

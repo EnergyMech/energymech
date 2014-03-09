@@ -1,0 +1,3 @@
+Usage: TOPIC [channel] <text>
+   Sets the topic on a certain channel
+   See also: RT, MODE

@@ -1,0 +1,3 @@
+Usage: SAY <channel> <message>
+   Send a message to a channel.
+   See also: ME, ESAY, MSG

@@ -1,0 +1,12 @@
+ 
+Shitlists someone on all channels (*) or a certain channel
+Level - can be 1 through 3
+  1 - doesn't let the person be opped or voiced
+  2 - will kb the person
+  3 - rebans the person when unbanned by anyone
+  4 - add a channel ban (see CHANBAN), requires chanban support
+Expire - the number of days the entry will be good for (default is 30)
+Reason - reason for the shitlist...displays it on kickban
+Note: The bot checks for shitlisted users on join, nick switch, and
+      when the bot is opped
+See also: rshit, qshit, shitlist

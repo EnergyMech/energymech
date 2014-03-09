@@ -1,0 +1,2 @@
+Usage: TOG CC [0|1|on|off]  
+   Toggles the necessity of the command character for doing commands.

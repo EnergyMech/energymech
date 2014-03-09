@@ -1,0 +1,3 @@
+Usage: TOG [channel] ENFM [0|1|on|off]
+   Toggles mode enforcement on a certain channel.
+   See also: SETENFM

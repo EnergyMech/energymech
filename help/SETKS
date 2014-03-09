@@ -1,0 +1,2 @@
+Usage: TOG [channel] KS [0|1|on|off]
+   Toggles kicking on kicksays.

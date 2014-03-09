@@ -1,0 +1,5 @@
+ 
+Ban a user on a channel. If a mask is given, a ban using
+the mask will be placed. The user will not be kicked.
+ 
+See also: unban, siteban, kb, screw

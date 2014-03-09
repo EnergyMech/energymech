@@ -1,0 +1,3 @@
+Usage: SET [channel] MKL <level>
+   Sets the the number of kicks allowed during a 10 sec time
+   period before it is considered a masskick

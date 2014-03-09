@@ -1,0 +1,3 @@
+Usage: USERHOST <nick>
+   Returns the userhost of a person.
+   See also: WHOIS

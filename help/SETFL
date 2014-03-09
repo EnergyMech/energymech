@@ -1,0 +1,3 @@
+Usage: SET [channel] FL <level>
+   Sets the number of lines by the same person within a 10-second
+   period before it is considered a flood

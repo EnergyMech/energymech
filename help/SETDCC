@@ -1,0 +1,6 @@
+Usage: TOG DCC [0|1|on|off]  
+   Toggles the requirement of a user needing to be on the userlist
+   before he/she can DCC CHAT the bot.
+   In other words:
+     When this is on, only users can DCC.
+     When this is off, anyone can DCC.

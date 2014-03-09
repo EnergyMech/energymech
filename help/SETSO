@@ -1,0 +1,3 @@
+Usage: TOG [channel] SO [0|1|on|off]
+   Toggles strict opping. If on, if people not in the userlist
+   are opped, they will be deopped.

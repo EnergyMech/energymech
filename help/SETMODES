@@ -1,0 +1,6 @@
+Usage: SET MODES <value>
+ 
+Number of MODE operations that can be sent to the IRC server
+in a single line. This value can be auto-detected on server
+connect if the bot is compiled with support for 005 replies
+and the server sends them (most big networks today).

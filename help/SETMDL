@@ -1,0 +1,3 @@
+Usage: SET [channel] MDL <level>
+   Sets the the number of deops allowed during a 10 sec time
+   period before it is considered a massdeop

@@ -1,0 +1,12 @@
+ 
+Add a kicksay. The bot kicks users when they say the words.
+The optinal action is a number from 0 to 3;
+  0   on first offence, send the user a warning,
+      on second offence, kick them.
+  1   kick the user.
+  2   kickban the user.
+  3   kickban and shitlist the user.
+ 
+If no arguments are given, the current kicksays will be listed.
+ 
+See also: rks

@@ -1,0 +1,6 @@
+Level needed: 80
+Usage: SET SERVERGROUP <identifier>
+  
+Set which group of servers to use for the current bot.
+ 
+See also: servergroup

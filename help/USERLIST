@@ -1,0 +1,12 @@
+ 
+Shows the userlist.
+ 
+Options:
+  +minlevel   List users with access minlevel or higher
+  -maxlevel   List users with access maxlevel or lower
+  channel     List users with access on channel
+  usermask    List users matching usermask
+  -B          List only bots
+  -C          List users with channel access (no global access)
+ 
+See also: access, user

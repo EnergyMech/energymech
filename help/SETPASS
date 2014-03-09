@@ -1,0 +1,5 @@
+ 
+Sets password for the specified user.
+To remove a password use the string 'none' for password.
+ 
+See also: verify, passwd

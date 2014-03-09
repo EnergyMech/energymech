@@ -1,0 +1,3 @@
+Usage: SITEBAN [channel] <nick|userhost>
+   Sitebans someone on a certain channel
+   See also: BAN, SCREW, SHIT

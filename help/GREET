@@ -1,0 +1,9 @@
+ 
+When a matching user joins a channel, send a text as a greeting
+to the channel or the user. Normal greetings and random line
+greetings are sent to the channel joined as a message. All
+greetings are sent line buffered.
+ 
+greeting     Send "greeting".
+@greetfile   Send the entire contents of greetfile as private NOTICEs.
+%greetfile   Pick a random line from greetfile as greeting.

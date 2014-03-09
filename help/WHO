@@ -1,0 +1,7 @@
+Usage: WHO <channel> [-ops|-nonops] [pattern]  
+   Lists people in a channel that the bot is in now,
+   or was in. The optional parameters can be used to
+   list only ops or only non ops respectively.
+   If a pattern is given, only users matching the pattern
+   will be listed.
+   See also: NAMES

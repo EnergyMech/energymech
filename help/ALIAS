@@ -1,0 +1,21 @@
+ 
+Create or delete a command alias. Arguments like $1 will
+be replaced with the corresponding argument from input.
+ 
+$1     The first argument.
+$1-2   The first and second argument.
+$2-3   The second and third argument.
+$1-    All arguments starting with the first.
+$2-    All arguments starting with the second.
+ 
+Example:
+ALIAS MEEP SAY $2 $1 $3-
+ 
+Would be translated in the following manner:
+MEEP one two three four -> SAY two one three four
+ 
+Aliases may call other aliases and aliases can be used
+to replace built in commands. Aliases can recurse a
+maximum of 20 times (prevents infinite loops).
+ 
+See also: unalias

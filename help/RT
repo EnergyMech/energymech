@@ -1,0 +1,3 @@
+Usage: RT <channel>
+   Sets a random topic.
+   See also: TOPIC

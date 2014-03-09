@@ -1,0 +1,13 @@
+ 
+Add or remove a servergroup. If no argument is given, a list
+of the servergroup identifiers will be displayed including the
+current one. If the identifier already exists it will make it
+the currently active one. Servers that are added, are added to
+the current servergroup. At startup the default servergroup
+is "default". The "default" servergroup cannot be removed.
+By setting the SERVERGROUP setting on a bot, that bot will only
+connect to servers with that same SERVERGROUP. If a bot has no
+SERVERGROUP setting, it will connect to any server regardless
+of which servergroup the server belongs to.
+ 
+See also: server, setservergroup

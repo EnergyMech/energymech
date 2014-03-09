@@ -1,0 +1,6 @@
+ 
+Changes the level needed to do a command.
+ 
+If "disable" is used instead of the level,
+the command will be permanently disabled
+(for as long as the bot remains).

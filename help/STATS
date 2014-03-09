@@ -1,0 +1,3 @@
+Usage: STATS <type> [servername]
+   Show server status lines.
+   See also: LINKS, LUSERS

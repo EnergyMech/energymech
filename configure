@@ -1,0 +1,1144 @@
+#!/bin/sh
+#
+#   EnergyMech, IRC Bot software
+#   Copyright (c) 1997-2009 proton
+#
+#   This program is free software; you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation; either version 2 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program; if not, write to the Free Software
+#   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+
+umask 077
+
+# perl still unsupported
+has_perl=no
+
+for opt
+do
+
+  case "$opt" in
+    -*=*)
+      optarg=`echo $opt | sed 's/.*=//;'` ;;
+    *)
+      optarg= ;;
+  esac
+
+  yesno=
+  case "$opt" in
+    --with=* ) yesno=yes ;;
+    --enable=* ) yesno=yes ;;
+    --without=* ) yesno=no ;;
+    --disable=* ) yesno=no ;;
+  esac
+
+  if [ "$yesno" = yes -o "$yesno" = no ]; then
+    IFSBACKUP=$IFS
+    IFS='=,'
+    notfirst=
+    for nn in $opt
+    do
+      if [ "$notfirst" ]; then
+        case "$nn" in
+          alias )    ft_alias=$yesno ;;
+          botnet )   ft_botnet=$yesno ;;
+          bounce )   ft_bounce=$yesno ;;
+	  chanban )  ft_chanban=$yesno ;;
+          ctcp )     ft_ctcp=$yesno ;;
+          dccfile )  ft_dccfile=$yesno ;;
+          debug )    ft_debug=$yesno ;;
+          dynamode ) ft_dynamode=$yesno ;;
+          dyncmd )   ft_dyncmd=$yesno ;;
+          greet )    ft_greet=$yesno ;;
+          idwrap )   ft_idwrap=$yesno ;;
+          ircd_ext ) ft_ircd_ext=$yesno ;;
+          md5 )      ft_md5=$yesno ;;
+          newbie )   ft_newbie=$yesno ;;
+          note )     ft_note=$yesno ;;
+          notify )   ft_notify=$yesno ;;
+          perl )     ft_perl=$yesno ;;
+	  python )   ft_python=$yesno ;;
+          rawdns )   ft_rawdns=$yesno ;;
+          redirect ) ft_redirect=$yesno ;;
+          seen )     ft_seen=$yesno ;;
+          session )  ft_session=$yesno ;;
+          stats )    ft_stats=$yesno ;;
+          tcl )      ft_tcl=$yesno ;;
+          telnet )   ft_telnet=$yesno ;;
+          toybox )   ft_toybox=$yesno ;;
+          trivia )   ft_trivia=$yesno ;;
+          uptime )   ft_uptime=$yesno ;;
+          web )      ft_web=$yesno ;;
+          wingate )  ft_wingate=$yesno ;;
+        esac
+      else
+        notfirst=yes
+      fi
+    done
+    IFS=$IFSBACKUP
+  fi
+
+  case "$opt" in
+    --enable-*=*)
+      feature=`echo $opt | sed 's/^\-\-enable\-//; s/=.*$//'` ;;
+    --enable-*)
+      feature=`echo $opt | sed 's/^\-\-enable\-//;'` ;;
+    --disable-*)
+      feature=`echo $opt | sed 's/^\-\-disable\-//;'` ;;
+    --with-*=*)
+      feature=`echo $opt | sed 's/^\-\-with\-//; s/=.*$//'` ;;
+    --with-*)
+      feature=`echo $opt | sed 's/^\-\-with\-//;'` ;;
+    --without-*)
+      feature=`echo $opt | sed 's/^\-\-without\-//;'` ;;
+    *)
+      feature=___none___ ;;
+  esac
+
+  case "$feature" in
+    debug | botnet | telnet | alias | seen | session | dyncmd | newbie | wingate | md5 \
+    | ctcp | dccfile | uptime | redirect | greet | perl | profiling | tcl | dynamode | web \
+    | note | notify | trivia | toybox | bounce | stats | rawdns | ircd_ext | idwrap | chanban | python )
+      case _"$optarg"_ in
+        _yes_ | _no_ | __ )
+          ;;
+        *)
+          echo "unknown argument for $feature":" $optarg"
+          echo "Usage: configure [options]"
+          echo "use \"$0 --help\" for help"
+          exit 1
+      esac
+      ;;
+    ___none___ )
+      ;;
+    *)
+      echo "unknown feature: $feature"
+      echo "Usage: configure [options]"
+      echo "use \"$0 --help\" for help"
+      exit 1
+  esac
+
+  case "$opt" in
+    --with=* | --without=* | --enable=* | --disable=* ) ;;
+    --enable-* | --with-*)
+      case "$feature"_"$optarg" in
+        alias_yes | alias_ ) ft_alias=yes ;;
+        alias_no ) ft_alias=no ;;
+        botnet_yes | botnet_ ) ft_botnet=yes ;;
+        botnet_no ) ft_botnet=no ;;
+        bounce_yes | bounce_ ) ft_bounce=yes ;;
+        bounce_no ) ft_bounce=no ;;
+	chanban_yes | chanban_ ) ft_chanban=yes ;;
+	chanban_no ) ft_chanban=no ;;
+        ctcp_yes | ctcp_ ) ft_ctcp=yes ;;
+        ctcp_no ) ft_ctcp=no ;;
+        dccfile_yes | dccfile_ ) ft_dccfile=yes ;;
+        dccfile_no ) ft_dccfile=no ;;
+        debug_yes | debug_ ) ft_debug=yes ;;
+        debug_no ) ft_debug=no ;;
+        dynamode_yes | dynamode_ ) ft_dynamode=yes ;;
+        dynamode_no ) ft_dynamode=no ;;
+        dyncmd_yes | dyncmd_ ) ft_dyncmd=yes ;;
+        dyncmd_no ) ft_dyncmd=no ;;
+        greet_yes | greet_ ) ft_greet=yes ;;
+        greet_no ) ft_greet=no ;;
+        idwrap_yes | idwrap_ ) ft_idwrap=yes ;;
+        idwrap_no ) ft_idwrap=no ;;
+        ircd_ext_yes | ircd_ext_ ) ft_ircd_ext=yes ;;
+        ircd_ext_no ) ft_ircd_ext=no ;;
+        md5_yes | md5_ ) ft_md5=yes ;;
+        md5_no ) ft_md5=no ;;
+        newbie_yes | newbie_ ) ft_newbie=yes ;;
+        newbie_no ) ft_newbie=no ;;
+        note_yes | note_ ) ft_note=yes ;;
+        note_no ) ft_note=no ;;
+        notify_yes | notify_ ) ft_notify=yes ;;
+        notify_no ) ft_notify=no ;;
+        perl_yes | perl_ ) ft_perl=yes ;;
+        perl_no ) ft_perl=no ;;
+	python_yes | python_ ) ft_python=yes ;;
+	python_no ) ft_python=no ;;
+        rawdns_yes | rawdns_ ) ft_rawdns=yes ;;
+        rawdns_no ) ft_rawdns=no ;;
+        redirect_yes | redirect_ ) ft_redirect=yes ;;
+        redirect_no ) ft_redirect=no ;;
+        seen_yes | seen_ ) ft_seen=yes ;;
+        seen_no ) ft_seen=no ;;
+        session_yes | session_ ) ft_session=yes ;;
+        session_no ) ft_session=no ;;
+        stats_yes | stats_ ) ft_stats=yes ;;
+        stats_no ) ft_stats=no ;;
+        tcl_yes | tcl_ ) ft_tcl=yes ;;
+        tcl_no ) ft_tcl=no ;;
+        telnet_yes | telnet_ ) ft_telnet=yes ;;
+        telnet_no ) ft_telnet=no ;;
+        toybox_yes | toybox_ ) ft_toybox=yes ;;
+        toybox_no ) ft_toybox=no ;;
+        trivia_yes | trivia_ ) ft_trivia=yes ;;
+        trivia_no ) ft_trivia=no ;;
+        uptime_yes | uptime_ ) ft_uptime=yes ;;
+        uptime_no ) ft_uptime=no ;;
+        web_yes | web_ ) ft_web=yes ;;
+        web_no ) ft_web=no ;;
+        wingate_yes | wingate_ ) ft_wingate=yes ;;
+        wingate_no ) ft_wingate=no ;;
+        profiling_yes | profiling_ ) ft_prof=yes ;;
+        profiling_no ) ft_prof=no ;;
+      esac
+    ;;
+    --disable-* | --without-*)
+      case "$feature" in
+        alias )        ft_alias=no ;;
+        botnet )       ft_botnet=no ;;
+        bounce )       ft_bounce=no ;;
+	chanban )      ft_chanban=yes ;;
+        ctcp )         ft_ctcp=no ;;
+        dccfile )      ft_dccfile=no ;;
+        debug )        ft_debug=no ;;
+        dynamode )     ft_dynamode=no ;;
+        dyncmd )       ft_dyncmd=no ;;
+        greet )        ft_greet=no ;;
+        idwrap )       ft_idwrap=no ;;
+        ircd_ext )     ft_ircd_ext=no ;;
+        md5 )          ft_md5=no ;;
+        newbie )       ft_newbie=no ;;
+        note )         ft_note=no ;;
+        notify )       ft_notify=no ;;
+        perl )         ft_perl=no ;;
+        profiling )    ft_prof=no ;;
+	python )       ft_python=no ;;
+        rawdns )       ft_rawdns=no ;;
+        redirect )     ft_redirect=no ;;
+        seen )         ft_seen=no ;;
+        session )      ft_session=no ;;
+        stats )        ft_stats=no ;;
+        tcl )          ft_tcl=no ;;
+        telnet )       ft_telnet=no ;;
+        toybox )       ft_toybox=no ;;
+        trivia )       ft_trivia=no ;;
+        uptime )       ft_uptime=no ;;
+        web )          ft_web=no ;;
+        wingate )      ft_wingate=no ;;
+      esac
+    ;;
+    --md5=internal)  ft_md5=internal ;;
+    --use-cpuflags)  cc_arch_opt=yes ;;
+    --no-cpuflags)   cc_arch_opt=no ;;
+    --use-optimize)  cc_optimize_opt=yes ;;
+    --no-optimize)   cc_optimize_opt=no ;;
+    --use-gnudebug)  cc_g_opt=yes ;;
+    --no-gnudebug)   cc_g_opt=no ;;
+    --use-warnflag)  cc_wall_opt=yes ;;
+    --no-warnflag)   cc_wall_opt=no ;;
+    --use-pipeflag)  cc_pipe_opt=yes ;;
+    --no-pipeflag)   cc_pipe_opt=no ;;
+    --use-ofp)       cc_ofp_opt=yes ;;
+    --no-ofp)        cc_ofp_opt=no ;;
+    --yes)           ft_alias=yes
+                     ft_botnet=yes
+		     ft_bounce=yes
+		     ft_chanban=yes
+		     ft_ctcp=yes
+		     ft_dccfile=yes
+                     ft_debug=yes
+		     ft_dynamode=yes
+                     ft_dyncmd=yes
+		     ft_greet=yes
+		     ft_ircd_ext=yes
+		     ft_md5=yes
+                     ft_newbie=yes
+		     ft_note=yes
+		     ft_notify=yes
+		     ft_python=yes
+		     ft_rawdns=yes
+		     ft_redirect=yes
+                     ft_seen=yes
+                     ft_session=yes
+		     ft_stats=yes
+                     ft_tcl=yes
+                     ft_telnet=yes
+		     ft_toybox=yes
+		     ft_trivia=yes
+		     ft_uptime=yes
+		     ft_web=yes
+                     ft_wingate=yes
+                     ;;
+    --help | -h)
+        cat <<__EOT__
+Usage: configure [options]
+Configuration:
+  --help                   print this message
+Features and packages:
+  --disable-FEATURE        do not include FEATURE (same as --enable-FEATURE=no)
+  --enable-FEATURE[=ARG]   include FEATURE [ARG=yes]
+  --with-FEATURE[=ARG]     use FEATURE [ARG=yes]
+  --without-FEATURE        do not use FEATURE (same as --with-FEATURE=no)
+  --md5=internal           Use internal routines for MD5 password hashes instead of system libraries
+#md5 | ctcp | dccfile | uptime | redirect | greet | perl | dynamode | web \
+#note | notify | trivia | toybox | bounce | stats | rawdns | ircd_ext | idwrap | chanban | python )
+  --with-alias             ALIAS support
+  --with-botnet            Botnet support
+  --with-debug             Debug support
+  --with-dyncmd            Dynamic command levels support
+  --with-newbie            Newbie support
+  --with-profiling         Profiling (gcc+gprof)
+  --with-seen              SEEN support
+  --with-session           Session support
+  --with-tcl               Tcl support
+  --with-telnet            Telnet support
+  --with-wingate           Wingate support
+__EOT__
+      exit 0
+      ;;
+    CC=*)
+      CC=`echo $opt | sed 's/.*=//;'`
+      ;;
+    *)
+      echo "unknown option: $opt"
+      echo "Usage: configure [options]"
+      echo "use \"$0 --help\" for help"
+      exit 1
+  esac
+done
+
+if (echo "testing\c"; echo 1,2,3) | grep c > /dev/null; then
+  if (echo -n testing; echo 1,2,3) | sed s/-n/xn/ | grep xn > /dev/null; then
+    ac_n=
+    ac_c='
+'
+    ac_t='	'
+  else
+    ac_n=-n
+    ac_c=
+    ac_t=  
+  fi
+else
+  ac_n=
+  ac_c='\c'
+  ac_t=
+fi
+
+echo $ac_n "checking system type ... "$ac_c
+
+cf_ERR=yes
+UNAME=`config/which uname`     
+test -x $UNAME && cf_ERR=
+
+if test -z "$cf_ERR" && cf_ERR=yes && $UNAME -s 1> /dev/null 2> /dev/null; then
+  cf_SYS=`$UNAME -s`
+  cf_ERR=
+fi
+
+if test -z "$cf_ERR" && cf_ERR=yes && $UNAME -m 1> /dev/null 2> /dev/null; then
+  cf_MACH=`$UNAME -m`
+  cf_ERR=
+fi
+
+case _"$cf_ERR"_ in
+  _yes_ )
+    echo $ac_t unknown
+    echo "Unable to determine system type."
+    echo "Dont know how to compile the EnergyMech."
+    echo "exiting ..."
+    exit 1
+    ;;
+esac
+
+if [ "$cf_SYS" = AIX ]; then
+  cf_MACH=
+  cf_SYSMACH="$cf_SYS"
+else
+  cf_SYSMACH="$cf_SYS"'-'"$cf_MACH"
+fi
+  
+echo $ac_t "$cf_SYSMACH"
+
+#
+#
+#
+
+echo $ac_n "checking for C compiler ... "$ac_c
+if [ "$CC" ]; then
+  CCshort="$CC"
+  CC=`config/which $CC`
+else
+  CCshort=gcc
+  CC=`config/which gcc`
+fi
+if [ ! -x "$CC" ]; then
+  CCshort=cc
+  CC=`config/which cc`
+  if [ ! -x "$CC" ]; then
+    echo $ac_t "not found"
+    echo "A working C compiler is needed to compile the EnergyMech"
+    echo "exiting ..."
+    exit 1
+  fi
+fi
+CClong="$CC"
+CC="$CCshort"
+echo $ac_t "$CC"
+
+# set up things for test compiling
+
+TESTO=./test$$.o
+TESTP=./test$$
+rm -f $TESTO $TESTP
+
+#
+#  does the C compile work?
+#
+
+TESTC=config/cc.c
+
+echo $ac_n "checking whether $CC works or not ... "$ac_c
+$CC -o $TESTP $TESTC 1> /dev/null 2> /dev/null
+WORK=no
+if [ -x "$TESTP" ]; then
+  res=_`$TESTP`_
+  WORK=yes
+  case $res in
+    _yes_ )
+      ;;
+    _gnucc_ )
+      cf_GNUCC=yes
+      ;;
+    _gnucc95_ )
+      cf_GNUCC=95
+      ;;
+    _gnucc33_ )
+      cf_GNUCC=33
+      ;;
+  esac
+fi
+
+rm -f $TESTP
+
+if [ "$WORK" = yes ]; then
+  echo $ac_t yes
+  compiler=$CC
+else
+  echo $ac_t no
+  echo ''
+  echo "A working C compiler is needed to compile the EnergyMech"
+  echo "exiting ..."
+  echo ''
+  exit 1
+fi
+
+#
+#  compiler flags
+#
+
+echo $ac_n "checking C compiler flags ... "$ac_c
+
+#
+#  -g
+#
+if [ -z "$cc_g_opt" ]; then
+  cc_g_opt=no
+  if $CC -g -c -o $TESTO $TESTC 1> /dev/null 2> /dev/null && test -r $TESTO; then
+    cc_g_opt=yes
+    cc_g_flag=-g
+    echo $ac_n "-g "$ac_c
+  fi
+fi
+#
+# GNU GCC
+#
+if [ -n "$cf_GNUCC" ]; then
+  #
+  #  -Wall -Wshadow
+  #
+  if [ -r .use_warn -o -n "$cc_wall_opt" ]; then
+    if [ -z "$cc_wall_opt" -o -z "$cc_wshadow_opt" ]; then
+      if $CC -Wall -Wshadow -S -o - -xc /dev/null 1> /dev/null 2> /dev/null; then
+        cc_wall_flag="-Wall"
+        cc_wshadow_flag="-Wshadow"
+        echo $ac_n "-Wall -Wshadow "$ac_c
+      fi
+    fi
+  fi
+  if [ "$cc_wall_flag" = -Wall -a "$cf_GNUCC" = 33 ]; then
+    cc_fnostrictalias="-fno-strict-aliasing"
+    echo $ac_n "-fno-strict-aliasing "$ac_c
+  fi
+  #
+  #  -march=i386/i486/i586
+  #
+  test -z "$cc_arch_opt" && cc_arch_opt=yes
+  if [ "$cc_arch_opt" = yes ]; then
+    case _"$cf_GNUCC"_"$cf_MACH"_ in
+      _95_i486_ | _33_i486_ )
+        if $CC -march=i486 -S -o - -xc /dev/null 1> /dev/null 2> /dev/null; then
+          cc_arch_flag="-march=i486"
+          echo $ac_n "-march=i486 "$ac_c
+        fi
+        ;;
+      _95_i[56789]86_ | _33_i[56789]86_ )
+        if $CC -march=i586 -S -o - -xc /dev/null 1> /dev/null 2> /dev/null; then
+          cc_arch_flag="-march=i586"
+          echo $ac_n "-march=i586 "$ac_c
+        fi
+        ;;
+    esac
+  fi
+  #
+  #  -fomit-frame-pointer
+  #
+  if [ -z "$cc_ofp_opt" -o "$cc_ofp_opt" = yes ]; then
+    if $CC -fomit-frame-pointer -c -o $TESTO $TESTC 1> /dev/null 2> /dev/null && test -r $TESTO; then
+      cc_ofp_flag=-fomit-frame-pointer
+      echo $ac_n "-fomit-frame-pointer "$ac_c
+    fi
+  fi
+fi
+
+if [ -z "$cc_pipe_opt" ]; then
+  if $CC -pipe -c -o $TESTO $TESTC 1> /dev/null 2> /dev/null && test -r $TESTO; then
+    cc_pipe_flag="-pipe"
+    echo $ac_n "-pipe "$ac_c
+  fi
+fi
+
+if [ -z "$cc_optimize_opt" ]; then
+  if $CC -O2 -o $TESTO $TESTC 1> /dev/null 2> /dev/null; then
+    cc_optimize_flag="-O2"
+    echo $ac_n "-O2 "$ac_c
+  fi
+  if [ -z "$cc_optimize_flag" ]; then
+    if $CC -O -o $TESTO $TESTC 1> /dev/null 2> /dev/null; then
+      cc_optimize_flag="-O"
+      echo $ac_n "-O "$ac_c
+    fi
+  fi
+fi
+
+echo $ac_t ""
+
+if [ "$ft_prof" = yes ]; then
+  echo $ac_n "checking profiling support ... "$ac_c
+  if $CC -pg -o $TESTO $TESTC 1> /dev/null 2> /dev/null; then
+    cc_ofp_flag=
+    cc_pg_flag="-pg"
+    cc_pg_define="-D__profiling__"
+    libpgdl=
+    echo $ac_t yes
+  else
+    if $CC -pg -o $TESTO $TESTC -ldl 1> /dev/null 2> /dev/null; then
+      cc_ofp_flag=
+      cc_pg_flag="-pg"
+      cc_pg_define="-D__profiling__"
+      libpgdl="-ldl"
+      echo $ac_t "-ldl"
+    else
+      echo $ac_t no
+    fi
+  fi
+fi
+
+rm -f $TESTO $TESTP
+
+#
+#  32bit? 64bit?
+#
+
+TESTC=config/ptr_size.c
+
+if [ -z "$ptr_size" ]; then
+  ptr_size=unknown
+  echo $ac_n "checking pointer size ... "$ac_c
+  $CC -o $TESTP $TESTC 1> /dev/null 2> /dev/null
+  if [ -x $TESTP ]; then
+    ptr_size=`$TESTP`
+  fi
+  echo $ac_t "$ptr_size"
+fi
+
+case _"$ptr_size"_ in
+  _8_ )
+    PTSIZE_DEFINE32='#undef PTSIZE_32BIT'
+    PTSIZE_DEFINE64='#define PTSIZE_64BIT'
+    ;;
+  * )
+    PTSIZE_DEFINE32='#define PTSIZE_32BIT'
+    PTSIZE_DEFINE64='#undef PTSIZE_64BIT'
+    ;;
+esac
+
+rm -f $TESTP
+
+#
+#
+#
+
+has_unaligned=no
+UNALIGNED_MEM='#undef UNALIGNED_MEM'
+TESTC=config/unaligned.c
+
+echo $ac_n "checking if cpu can access unaligned memory ... "$ac_c
+
+$CC -o $TESTP $TESTC 1> /dev/null 2> /dev/null
+if [ "`$TESTP`" = yes ]; then
+  has_unaligned=yes
+  UNALIGNED_MEM='#define UNALIGNED_MEM'
+fi
+echo $ac_t "$has_unaligned"
+
+rm -f $TESTP
+
+#
+#  where is inet_addr() ?
+#
+
+has_inet_addr=no
+TESTC=config/inet_addr.c
+
+echo $ac_n "checking for inet_addr() ... "$ac_c
+
+$CC -o $TESTP $TESTC 1> /dev/null 2> /dev/null
+if [ -x $TESTP ]; then
+  has_inet_addr=yes
+else
+  $CC -o $TESTP $TESTC -lnsl 1> /dev/null 2> /dev/null
+  if [ -x $TESTP ]; then
+    has_inet_addr=-lnsl
+    libnsl=-lnsl
+  fi
+fi
+echo $ac_t "$has_inet_addr"
+rm -f $TESTP
+
+#
+#  where is inet_addr() ?
+#
+
+has_inet_aton=no
+TESTC=config/inet_aton.c
+
+echo $ac_n "checking for inet_aton() ... "$ac_c
+
+$CC -o $TESTP $TESTC 1> /dev/null 2> /dev/null
+if [ -x $TESTP ]; then
+  has_inet_aton=yes
+else
+  $CC -o $TESTP $TESTC -lresolv 1> /dev/null 2> /dev/null
+  if [ -x $TESTP ]; then
+    has_inet_aton=-lresolv
+    libresolv=-lresolv
+  fi
+fi
+echo $ac_t "$has_inet_aton"
+rm -f $TESTP
+
+#
+#  where is socket() ?
+#
+
+has_socket=no
+TESTC=config/socket.c
+
+echo $ac_n "checking for socket() ... "$ac_c
+
+$CC -o $TESTP $TESTC 1> /dev/null 2> /dev/null
+if [ -x $TESTP ]; then
+  has_socket=yes
+else
+  $CC -o $TESTP $TESTC -lsocket 1> /dev/null 2> /dev/null
+  if [ -x $TESTP ]; then
+    has_socket=-lsocket
+    libsocket=-lsocket
+  fi
+fi
+echo $ac_t "$has_socket"
+rm -f $TESTP
+
+#
+#  check for MD5 capabilities
+#
+has_md5=no
+has_des=no
+if [ ! "$ft_md5" = no ]; then
+  TESTC=config/pw.c
+  echo $ac_n "checking for crypt() ... "$ac_c
+  md5_internal=
+  crypt_func='-DCRYPT_FUNC=crypt'
+  CRYPT_FUNCTION='#define CRYPT_FUNC crypt'
+  if [ "$ft_md5" = internal ]; then
+    md5_internal=config/md5_internal.c
+    crypt_func='-DCRYPT_FUNC=md5_crypt'
+    CRYPT_FUNCTION='#define CRYPT_FUNC md5_crypt'
+  fi
+  $CC -o $TESTP $TESTC $md5_internal $crypt_func 1> /dev/null 2> /dev/null
+  if [ ! -x $TESTP ]; then
+    libcrypt=-lcrypt
+    has_md5=yes
+    $CC -o $TESTP $TESTC $crypt_func $libcrypt 1> /dev/null 2> /dev/null
+  fi
+  if [ ! -x $TESTP ]; then
+    libcrypt=/usr/lib/libcrypt.so
+    has_md5=yes
+    $CC -o $TESTP $TESTC $crypt_func $libcrypt 1> /dev/null 2> /dev/null
+  fi
+  if [ ! -x $TESTP ]; then
+    has_md5=no
+    libcrypt=
+  fi
+  if [ -x $TESTP ]; then
+    pwhash=`$TESTP`
+    case "$pwhash" in
+      MD5 ) has_md5=yes ;;
+      DES ) has_des=yes ;;
+      DESaMD5 )
+        has_md5=yes
+        has_des=yes
+      ;;
+    esac
+  fi
+  echo $ac_t "$has_md5"
+  [ "$has_md5" = yes -a "$md5_internal" ] && has_md5=internal
+  rm -f $TESTP
+fi
+
+#
+#  check for tcl
+#
+has_tcl=no
+if [ ! "$ft_tcl" = no ]; then
+  echo $ac_n "checking for tcl ... "$ac_c
+  TESTC=config/tcl.c
+  libtcl=
+  for tclver in empty 8.9 8.8 8.7 8.6 8.5 8.4 8.3 8.2 8.1 8.0
+  do
+    if [ -z "$libtcl" ]; then
+      test "$tclver" = "empty" && TCLLIB=-ltcl || TCLLIB=-ltcl$tclver
+      if $CC -o $TESTP $TESTC $TCLLIB 1> /dev/null 2> /dev/null; then
+        libtcl=$TCLLIB
+        has_tcl=$TCLLIB
+        test "$tclver" = "empty" && echo $ac_t "yes" || echo $ac_t "yes (version $tclver)"
+      fi
+    fi
+  done
+  if [ -z "$libtcl" ]; then
+    has_tcl=no
+    echo $ac_t "no"
+  fi
+  rm -f $TESTP
+fi
+
+#
+#  check for python
+#
+has_python=no
+if [ ! "$ft_python" = no ]; then
+  echo $ac_n "checking for python ... "$ac_c
+  TESTC=config/python.c
+  libpython=
+  incpython=
+  for pyver in 2.9 2.8 2.7 2.6 2.5 2.4 2.3 2.2 2.1 2.0
+  do
+    if [ -z "$libpython" ]; then
+      PYINCLUDE=python$pyver/Python.h
+      PYLIB=-lpython$pyver
+      if $CC -o $TESTP $TESTC -include $PYINCLUDE $PYLIB 1> /dev/null 2> /dev/null; then
+        libpython=$PYLIB
+        incpython="-include $PYINCLUDE"
+        has_python=yes
+        echo $ac_t "yes (version $pyver)"
+      fi
+    fi
+  done
+  if [ -z "$libpython" ]; then
+    has_python=no
+    echo $ac_t "no"
+  fi
+  rm -f $TESTP
+fi
+
+#
+#  can we use our custom little ld script?
+#
+ldscript=
+has_ldscript=no
+TESTC=config/ldtest.c
+
+echo $ac_n "checking for friendly ld ... "$ac_c
+
+$CC -o $TESTP $TESTC -Wl,-T,src/ld/mech.ldscript 1> /dev/null 2> /dev/null
+if [ -x $TESTP ]; then
+  if [ `$TESTP` = "yes" ]; then
+    ldscript='-Wl,-T,ld/mech.ldscript'
+    has_ldscript=yes
+  fi
+fi
+echo $ac_t "$has_ldscript"
+rm -f $TESTP
+
+#
+#  idwrap
+#
+has_idwrap=no
+def_idwrap='#undef IDWRAP'
+IDWRAP_PATH='/* nothing */'
+
+if [ -r .use_idwrap -o "$ft_idwrap" = yes ]; then
+  echo $ac_n "checking for idwrap path ... "$ac_c
+  if test -z "$idwrappath"; then
+    idwrappath="/tmp/.ident/"
+  fi
+  if test -d $idwrappath; then
+    IDWRAP_PATH='"'"$idwrappath"'"'
+    has_idwrap="$IDWRAP_PATH"
+    def_idwrap='#define IDWRAP'
+  fi
+  echo $ac_t "$has_idwrap"
+fi
+
+#
+#
+#
+echo $ac_n "checking for objcopy ... "$ac_c
+OBJCOPY=`config/which objcopy`
+echo $ac_t "$OBJCOPY"
+PROGSIZE=
+sizecomment='#'
+if [ -r .use_size ]; then
+  echo $ac_n "checking for size ... "$ac_c
+  PROGSIZE=`config/which size`
+  echo $ac_t "$PROGSIZE"
+  [ ! "$PROGSIZE" = "not found" ] && sizecomment=
+fi
+
+objcomment=
+[ "$OBJCOPY" = "not found" ] && objcomment='#'
+
+MD5_O=
+if [ "$ft_md5" = internal ]; then
+  MD5_O=md5/md5.o
+fi
+
+echo
+echo "Do you want ..."
+echo
+
+def_alias='#undef ALIAS'
+unset ans
+echo $ac_n "Alias support? ............................. [Y/n] "$ac_c
+test "$ft_alias" && echo "$ft_alias" && ans=$ft_alias
+test -z "$ft_alias" && read ans
+test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_alias='#define ALIAS'
+
+def_toybox='#undef TOYBOX'
+unset ans
+echo $ac_n "Amusing misc commands (toybox)? ............ [Y/n] "$ac_c
+test "$ft_toybox" && echo "$ft_toybox" && ans=$ft_toybox
+test -z "$ft_toybox" && read ans
+test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_toybox='#define TOYBOX'
+
+def_rawdns='#undef RAWDNS'
+unset ans
+echo $ac_n "Async DNS support? ......................... [Y/n] "$ac_c
+test "$ft_rawdns" && echo "$ft_rawdns" && ans=$ft_rawdns
+test -z "$ft_rawdns" && read ans
+test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_rawdns='#define RAWDNS'
+
+def_botnet='#undef BOTNET'
+unset ans
+echo $ac_n "Botnet support? ............................ [Y/n] "$ac_c
+test "$ft_botnet" && echo "$ft_botnet" && ans=$ft_botnet
+test -z "$ft_botnet" && read ans
+test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_botnet='#define BOTNET'
+
+def_chanban='#undef CHANBAN'
+unset ans
+echo $ac_n "Channel ban support? ....................... [Y/n] "$ac_c
+test "$ft_chanban" && echo "$ft_chanban" && ans=$ft_chanban
+test -z "$ft_chanban" && read ans
+test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_chanban='#define CHANBAN'
+
+def_ctcp='#undef CTCP'
+unset ans
+echo $ac_n "CTCP? ...................................... [Y/n] "$ac_c
+test "$ft_ctcp" && echo "$ft_ctcp" && ans=$ft_ctcp
+test -z "$ft_ctcp" && read ans
+test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_ctcp='#define CTCP'
+
+def_dccfile='#undef DCC_FILE'
+unset ans
+echo $ac_n "DCC file support? .......................... [Y/n] "$ac_c
+test "$ft_dccfile" && echo "$ft_dccfile" && ans=$ft_dccfile
+test -z "$ft_dccfile" && read ans
+test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_dccfile='#define DCC_FILE'
+
+def_debug='#undef DEBUG'
+unset ans
+echo $ac_n "Debug support? ............................. [y/N] "$ac_c
+test "$ft_debug" && echo "$ft_debug" && ans=$ft_debug
+test -z "$ft_debug" && read ans
+test "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_debug='#define DEBUG'
+
+def_dynamode='#undef DYNAMODE'
+unset ans
+echo $ac_n "Dynamic channel limit (+l)? ................ [Y/n] "$ac_c
+test "$ft_dynamode" && echo "$ft_dynamode" && ans=$ft_dynamode
+test -z "$ft_dynamode" && read ans
+test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_dynamode='#define DYNAMODE'
+
+def_dyncmd='#undef DYNCMD'
+unset ans
+echo $ac_n "Dynamic command levels support? ............ [Y/n] "$ac_c
+test "$ft_dyncmd" && echo "$ft_dyncmd" && ans=$ft_dyncmd
+test -z "$ft_dyncmd" && read ans
+test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_dyncmd='#define DYNCMD'
+
+def_bounce='#undef BOUNCE'
+unset ans
+echo $ac_n "IRC proxy support? ......................... [Y/n] "$ac_c
+test "$ft_bounce" && echo "$ft_bounce" && ans=$ft_bounce
+test -z "$ft_bounce" && read ans
+test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_bounce='#define BOUNCE'
+
+def_ircd_ext='#undef IRCD_EXTENSIONS'
+unset ans
+echo $ac_n "IRCD extensions support? ................... [Y/n] "$ac_c
+test "$ft_ircd_ext" && echo "$ft_ircd_ext" && ans=$ft_ircd_ext
+test -z "$ft_ircd_ext" && read ans
+test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_ircd_ext='#define IRCD_EXTENSIONS'
+
+def_greet='#undef GREET'
+unset ans
+echo $ac_n "Greet support? ............................. [Y/n] "$ac_c
+test "$ft_greet" && echo "$ft_greet" && ans=$ft_greet
+test -z "$ft_greet" && read ans
+test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_greet='#define GREET'
+
+def_web='#undef WEB'
+unset ans
+echo $ac_n "HTTP server support? ....................... [y/N] "$ac_c
+test "$ft_web" && echo "$ft_web" && ans=$ft_web
+test -z "$ft_web" && read ans
+test "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_web='#define WEB'
+
+def_md5='#undef MD5CRYPT'
+unset ans
+echo $ac_n "MD5 password support? ...................... [Y/n] "$ac_c
+if [ "$has_md5" = no ]; then
+  echo 'no (unsupported)'
+else
+  test "$ft_md5" && echo "$ft_md5" && ans=$ft_md5
+  test -z "$ft_md5" && read ans
+  test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes -o "$ans" = internal && def_md5='#define MD5CRYPT'
+fi
+
+def_newbie='#undef NEWBIE'
+unset ans
+echo $ac_n "Newbie support? ............................ [Y/n] "$ac_c
+test "$ft_newbie" && echo "$ft_newbie" && ans=$ft_newbie
+test -z "$ft_newbie" && read ans
+test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_newbie='#define NEWBIE'
+
+def_note='#undef NOTE'
+unset ans
+echo $ac_n "Note support? .............................. [Y/n] "$ac_c
+test "$ft_note" && echo "$ft_note" && ans=$ft_note
+test -z "$ft_note" && read ans
+test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_note='#define NOTE'
+
+def_notify='#undef NOTIFY'
+unset ans
+echo $ac_n "Notify support? ............................ [Y/n] "$ac_c
+test "$ft_notify" && echo "$ft_notify" && ans=$ft_notify
+test -z "$ft_notify" && read ans
+test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_notify='#define NOTIFY'
+
+#
+#  perl support not yet functional (2009-05-11)
+#
+def_perl='#undef PERL'
+# unset ans
+# echo $ac_n "Perl scripting support? .................... [y/N] "$ac_c
+# if [ "$has_perl" = no ]; then
+#   echo 'no (unsupported)'
+# else
+#   test "$ft_perl" && echo "$ft_perl" && ans=$ft_perl
+#   test -z "$ft_perl" && read ans
+#   test "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_perl='#define PERL'
+# fi
+
+def_python='#undef PYTHON'
+unset ans
+echo $ac_n "Python scripting support? .................. [y/N] "$ac_c
+if [ "$has_python" = no ]; then
+  echo 'no (unsupported)'
+else
+  test "$ft_python" && echo "$ft_python" && ans=$ft_python
+  test -z "$ft_python" && read ans
+  test "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_python='#define PYTHON'
+fi
+if [ "$def_python" = '#undef PYTHON' ]; then
+  libpython=
+  incpython=
+fi
+
+def_redirect='#undef REDIRECT'
+unset ans
+echo $ac_n "Command output redirect? ................... [Y/n] "$ac_c
+test "$ft_redirect" && echo "$ft_redirect" && ans=$ft_redirect
+test -z "$ft_redirect" && read ans
+test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_redirect='#define REDIRECT'
+
+def_seen='#undef SEEN'
+unset ans
+echo $ac_n "Seen support? .............................. [y/N] "$ac_c
+test "$ft_seen" && echo "$ft_seen" && ans=$ft_seen
+test -z "$ft_seen" && read ans
+test "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_seen='#define SEEN'
+
+def_session='#undef SESSION'
+unset ans
+echo $ac_n "Session support? ........................... [Y/n] "$ac_c
+test "$ft_session" && echo "$ft_session" && ans=$ft_session
+test -z "$ft_session" && read ans
+test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_session='#define SESSION'
+
+def_stats='#undef STATS'
+unset ans
+echo $ac_n "Statistics support? ........................ [Y/n] "$ac_c
+test "$ft_stats" && echo "$ft_stats" && ans=$ft_stats
+test -z "$ft_stats" && read ans
+test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_stats='#define STATS'
+
+def_tcl='#undef TCL'
+unset ans
+echo $ac_n "Tcl scripting support? ..................... [y/N] "$ac_c
+if [ "$has_tcl" = no ]; then
+  echo 'no (unsupported)'
+else
+  test "$ft_tcl" && echo "$ft_tcl" && ans=$ft_tcl
+  test -z "$ft_tcl" && read ans
+  test "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_tcl='#define TCL'
+fi
+test "$def_tcl" = '#undef TCL' && libtcl=''
+
+def_telnet='#undef TELNET'
+unset ans
+echo $ac_n "Telnet support? ............................ [Y/n] "$ac_c
+test "$ft_telnet" && echo "$ft_telnet" && ans=$ft_telnet
+test -z "$ft_telnet" && read ans
+test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_telnet='#define TELNET'
+
+def_trivia='#undef TRIVIA'
+unset ans
+echo $ac_n "Trivia support? ............................ [y/N] "$ac_c
+test "$ft_trivia" && echo "$ft_trivia" && ans=$ft_trivia
+test -z "$ft_trivia" && read ans
+test "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_trivia='#define TRIVIA'
+
+def_uptime='#undef UPTIME'
+unset ans
+echo $ac_n "Uptime support? ............................ [Y/n] "$ac_c
+test "$ft_uptime" && echo "$ft_uptime" && ans=$ft_uptime
+test -z "$ft_uptime" && read ans
+test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_uptime='#define UPTIME'
+
+def_wingate='#undef WINGATE'
+unset ans
+echo $ac_n "WinGate support? ........................... [Y/n] "$ac_c
+test "$ft_wingate" && echo "$ft_wingate" && ans=$ft_wingate
+test -z "$ft_wingate" && read ans
+test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_wingate='#define WINGATE'
+
+echo ''
+echo "Creating src/Makefile"
+
+O_FLAGS="$cc_optimize_flag $cc_arch_flag $cc_march_flag $cc_ofp_flag"
+W_FLAGS="$cc_wall_flag $cc_wshadow_flag $cc_fnostrictalias"
+libflags="$libcrypt $libtcl $libnsl $libsocket $libresolv $libpython"
+lflags="$cc_g_flag -o"
+cprof="$cc_pg_flag $cc_pg_define"
+lprof="$cc_pg_flag $cc_pg_define $libpgdl"
+
+echo '# This file is generated from Makefile.in' > src/Makefile
+sed "
+s%@CC@%$CCshort%;
+s%@ldscript@%$ldscript%;
+s%@pipeflag@%$cc_pipe_flag%;
+s%@gdbflag@%$cc_g_flag%;
+/@cprof@/     { s,@cprof@,$cprof,;         };
+/@lprof@/     { s,@lprof@,$lprof,;         };
+/@lflags@/    { s,@lflags@,$lflags,;       };
+/@libflags@/  { s,@libflags@,$libflags,;   };
+/@W_FLAGS@/   { s/@W_FLAGS@/$W_FLAGS/;     };
+/@O_FLAGS@/   { s/@O_FLAGS@/$O_FLAGS/;     };
+/@PYINCLUDE@/ { s,@PYINCLUDE@,$incpython,; };
+s|@MD5_O@|$MD5_O|;
+s%@oc@%$objcomment%;
+s%@sz@%$sizecomment%;
+s/[ 	]*\$//g;
+" < src/Makefile.in >> src/Makefile || exit 1
+
+echo "Creating src/config.h"
+
+CRYPT_HAS_MD5='#undef CRYPT_HAS_MD5'
+CRYPT_HAS_DES='#undef CRYPT_HAS_DES'
+[ "$has_md5" = yes ] && CRYPT_HAS_MD5='#define CRYPT_HAS_MD5'
+[ "$has_des" = yes ] && CRYPT_HAS_DES='#define CRYPT_HAS_DES'
+
+echo '/* This file is generated from config.h.in */' > src/config.h
+sed "
+   s|@DEF_ALIAS@|$def_alias|;
+  s|@DEF_BOTNET@|$def_botnet|;
+  s|@DEF_BOUNCE@|$def_bounce|;
+ s|@DEF_CHANBAN@|$def_chanban|;
+    s|@DEF_CTCP@|$def_ctcp|;
+ s|@DEF_DCCFILE@|$def_dccfile|;
+   s|@DEF_DEBUG@|$def_debug|;
+  s|@DEF_DYNCMD@|$def_dyncmd|;
+s|@DEF_DYNAMODE@|$def_dynamode|;
+   s|@DEF_GREET@|$def_greet|;
+  s|@DEF_IDWRAP@|$def_idwrap|;
+s|@DEF_IRCD_EXT@|$def_ircd_ext|;
+     s|@DEF_MD5@|$def_md5|;
+  s|@DEF_NEWBIE@|$def_newbie|;
+    s|@DEF_NOTE@|$def_note|;
+  s|@DEF_NOTIFY@|$def_notify|;
+    s|@DEF_PERL@|$def_perl|;
+  s|@DEF_PYTHON@|$def_python|;
+  s|@DEF_RAWDNS@|$def_rawdns|;
+s|@DEF_REDIRECT@|$def_redirect|;
+    s|@DEF_SEEN@|$def_seen|;
+ s|@DEF_SESSION@|$def_session|;
+   s|@DEF_STATS@|$def_stats|;
+     s|@DEF_TCL@|$def_tcl|;
+  s|@DEF_TELNET@|$def_telnet|;
+  s|@DEF_TOYBOX@|$def_toybox|;
+  s|@DEF_TRIVIA@|$def_trivia|;
+  s|@DEF_UPTIME@|$def_uptime|;
+     s|@DEF_WEB@|$def_web|;
+ s|@DEF_WINGATE@|$def_wingate|;
+
+s|@DEF_CRYPT_FUNCTION@|$CRYPT_FUNCTION|;
+s|@CRYPT_HAS_MD5@|$CRYPT_HAS_MD5|;
+s|@CRYPT_HAS_DES@|$CRYPT_HAS_DES|;
+s|@IDWRAP_PATH@|$IDWRAP_PATH|;
+s|@PTSIZE_DEFINE32@|$PTSIZE_DEFINE32|;
+s|@PTSIZE_DEFINE64@|$PTSIZE_DEFINE64|;
+s|@UNALIGNED_MEM@|$UNALIGNED_MEM|;
+" < src/config.h.in >> src/config.h
+
+echo ''
+echo 'All done. You can now "make clean install"'
+echo ''
+echo 'Send your bugreports to <proton@energymech.net>'
+echo ''
+echo 'You have read the README file I hope?'
+echo ''

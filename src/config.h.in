@@ -1,0 +1,552 @@
+/*
+
+    EnergyMech, IRC bot software
+    Parts Copyright (c) 1997-2004 proton
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+*/
+#ifndef CONFIG_H
+#define CONFIG_H
+
+/*
+ *  DEBUG: extreme amounts of debug code, needed if you want to use the -d commandline switch
+ */
+@DEF_DEBUG@
+
+/*
+ *  BOTNET: support for connecting bots to eachother in a botnet
+ */
+@DEF_BOTNET@
+
+/*
+ *  TELNET: connecting to the partyline via telnet
+ */
+@DEF_TELNET@
+#define TELNET_TIMEOUT		60	/* 60 seconds to enter password */
+
+/*
+ *  ALIAS: create aliases for commands
+ */
+@DEF_ALIAS@
+#define MAXALIASRECURSE 20
+
+/*
+ *  Support for SEEN command, undefined by default
+ *  because it consumes a lardass amount of memory
+ */
+@DEF_SEEN@
+
+/*
+ *  sessions support (mech.session)
+ */
+@DEF_SESSION@
+
+/*
+ *  Support to alter commandlevels on the fly. undefine
+ *  for static command levels (as defined in gencmd.c)
+ */
+@DEF_DYNCMD@
+
+/*
+ *  NEWBIE: support for some newbie spanking routines
+ */
+@DEF_NEWBIE@
+
+/*
+ *  WINGATE: support for proxy connections through wingates
+ */
+@DEF_WINGATE@
+
+/*
+ *  MD5CRYPT: support use of MD5 to hash passwords
+ */
+@DEF_MD5@
+
+/*
+ *  Standard CTCP replies (PING, FINGER, VERSION), and commands (CTCP, PING).
+ *  DCC CHAT and the CHAT command still works even if this is undefined.
+ */
+@DEF_CTCP@
+#define CTCP_SLOTS	6		/* how many slots we have to send out CTCP replies */
+#define CTCP_TIMEOUT	60		/* how long before a used slot expires and can be used again */
+
+/*
+ *
+ */
+@DEF_DCCFILE@
+#define DCC_PUBLICFILES		"public/"
+#define DCC_PUBLICINCOMING	DCC_PUBLICFILES "incoming/"
+#define DCC_FILETIMEOUT		90
+
+/*
+ *  UPTIME: send uptime packets to uptime.energymech.net
+ */
+@DEF_UPTIME@
+
+/*
+ *  REDIRECT: send command output from certain commands to a different target
+ */
+@DEF_REDIRECT@
+
+/*
+ *  GREET: greet known users when they join a channel
+ */
+@DEF_GREET@
+
+/*
+ *  PERL: scripting using the perl language (may not be supported on all hosts)
+ */
+@DEF_PERL@
+
+/*
+ *  TCL: scripting using the TCL language (may not be supported on all hosts)
+ */
+@DEF_TCL@
+
+/*
+ *  PYTHON: scripting using the Python language (may not be supported on all hosts)
+ */
+@DEF_PYTHON@
+
+/*
+ *  DYNAMODE: dynamic updating of the +l channel user limit
+ */
+@DEF_DYNAMODE@
+
+/*
+ *  WEB: serving documents via HTTP
+ */
+@DEF_WEB@
+
+/*
+ *  NOTE: enable commands to leave notes for users to read at a later time
+ */
+@DEF_NOTE@
+
+/*
+ *  NOTIFY: notify list with filtering and online logging
+ */
+@DEF_NOTIFY@
+
+/*
+ *  IDWRAP: support for idwrap ident spoofing
+ */
+@DEF_IDWRAP@
+#define IDWRAP_PATH	@IDWRAP_PATH@
+
+/*
+ *  TRIVIA: support for playing trivia game
+ */
+@DEF_TRIVIA@
+
+/*
+ *  TOYBOX: various amusing commands
+ */
+@DEF_TOYBOX@
+
+/*
+ *  BOUNCE: support for `standalone' irc proxy
+ */
+@DEF_BOUNCE@
+
+/*
+ *  STATS: channel statistics
+ */
+@DEF_STATS@
+
+/*
+ *  RAWDNS: support for asynchronous hostname lookups
+ */
+@DEF_RAWDNS@
+
+/*
+ *  IRCD_EXTENSIONS: support some special features of new ircds
+ */
+@DEF_IRCD_EXT@
+#ifdef IRCD_EXTENSIONS
+@DEF_CHANBAN@
+#else
+#undef CHANBAN
+#endif /* IRCD_EXTENSIONS */
+
+/*
+ *  FASTNICK: faster nick regain if the nick is seen when released
+ *  Enables code that is potentially dangerous if an attacker aquires
+ *  the nick that the bot wants
+ */
+#undef FASTNICK
+
+/*
+ *  NEWUSER_SPAM: notify new users when they are added.
+ *  Spamming added users with their access levels, etc.
+ *  (it only spams when a nick is specified for ADD)
+ */
+#define NEWUSER_SPAM
+
+/*
+ *  assume that sockets have default options
+ */
+#define ASSUME_SOCKOPTS
+
+/*
+ *  very dangerous features that allow execution of commands on the shell
+ *  dont define this unless you know exactly what you're doing
+ */
+#undef PLEASE_HACK_MY_SHELL
+
+/*
+ *  define SCRIPTING if either PERL, TCL or PYTHON is enabled
+ */
+#if defined(PERL) || defined(TCL) || defined(PYTHON)
+#define SCRIPTING
+#endif
+
+/*
+ *
+ */
+@DEF_CRYPT_FUNCTION@
+@CRYPT_HAS_MD5@
+@CRYPT_HAS_DES@
+
+/*
+ *  Easier to include ALL header files here and
+ *  then include only *this* file elsewhere.
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdarg.h>
+#include <unistd.h>
+#include <sys/socket.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/resource.h>
+#include <sys/wait.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <termios.h>
+#include <signal.h>
+#include <fcntl.h>
+#include <time.h>
+#include <errno.h>
+
+/*
+ *  stuff under here shouldnt be changed
+ *  unless you really know what you're doing
+ */
+#define str_bold(x)			"\002" x "\002"
+#define str_underline(x)		"\037" x "\037"
+
+#define COMMENT_CHAR			';'
+#define COMMENT_STRCHR			";"
+
+#define BOTDIR				""
+#define MECHBASENAME			"mech"
+
+#define RANDDIR				"messages/"
+#define HELPDIR				"help/"
+#define CFGFILE				BOTDIR MECHBASENAME ".conf"
+#define PIDFILE				BOTDIR MECHBASENAME ".pid"
+#define MSGFILE				BOTDIR MECHBASENAME ".msg"
+#define SESSIONFILE			BOTDIR MECHBASENAME ".session"
+#define TRIVIASCOREFILE			BOTDIR MECHBASENAME ".trivscore"
+
+#define AWAYFILE 			RANDDIR "away.txt"
+#define NICKSFILE			RANDDIR "nick.txt"
+#define RANDKICKSFILE			RANDDIR "kick.txt"
+#define RANDTOPICSFILE			RANDDIR "say.txt"
+#define RANDSAYFILE 			RANDDIR "say.txt"
+#define RANDINSULTFILE			RANDDIR "insult.txt"
+#define RANDPICKUPFILE			RANDDIR	"pickup.txt"
+#define RAND8BALLFILE			RANDDIR "8ball.txt"
+#define SIGNOFFSFILE			RANDDIR "signoff.txt"
+#define VERSIONFILE			RANDDIR "version.txt"
+
+#define DEFAULT_IRC_PORT		6667
+
+#define DEFAULTSHITLEVEL 		2
+#define DEFAULTSHITLENGTH 		30	/* in days */
+
+#define EXVERSION			"EnergyMech 3"
+#define EXFINGER			EXVERSION
+
+#define AWAYFORM			"AWAY :%s (since %s)\n"
+
+#define KILLSOCKTIMEOUT			30
+#define WAITTIMEOUT			30
+
+#define NICKFLOODTIME			120	/* 240 second window for floods ( 240 / 2 = 120 ) */
+
+#define PINGSENDINTERVAL		210
+#define RESETINTERVAL			90
+
+#define SRSIZE				200
+#define MRSIZE				200
+
+#define DCC_INPUT_LIMIT			2000
+#define DCC_INPUT_DECAY			200	/* 2000 (limit) / 200 (per second) = 10 seconds */
+
+#define LINKTIME			120
+#define AUTOLINK_DELAY			240	/* should be greater than link timeout ...	*/
+
+#define REJOIN_DELAY			8	/* seconds between each channel joined		*/
+#define NEEDOP_DELAY			10	/* seconds between each neeop request		*/
+
+#define SEEN_TIME			14	/* how long in DAYS to keep track of a record?	*/
+
+#define JOINLEVEL			70	/* affects invites				*/
+#define ASSTLEVEL			80
+#define OWNERLEVEL			100
+#define BOTLEVEL			200
+
+#define DEFAULT_KS_LEVEL		1
+#define MAX_KS_LEVEL			3
+
+#define MAXPROTLEVEL			4
+#define SELFPROTLEVEL			1	/* protlevel for the bot itself			*/
+
+#define PASSLEN				20
+#define PASSBUF				PASSLEN+1
+
+#define NAMELEN				79
+#define NAMEBUF				NAMELEN+1
+
+#define MINPASSCHARS			4
+#define MAXPASSCHARS			50
+
+#define MAXHOSTLEN			64
+#define NUHLEN				128
+#define MSGLEN				512
+#define MAXLEN				800
+
+#define LASTCMDSIZE			20
+
+#ifndef TRUE
+#define TRUE				1
+#endif
+#ifndef FALSE
+#define FALSE				0
+#endif
+
+#define NEWFILEMODE			0644
+#define SECUREFILEMODE			0600	/* files that might contain priviliged information
+						   (eg, plaintext passwords in the debug log)		*/
+
+/*
+ *  Defines for commandlist parsing
+ */
+
+#define DCC	0x00100		/* requires DCC						*/
+#define CC	0x00200		/* requires commandchar					*/
+#define PASS	0x00400		/* requires password / authentication			*/
+#define CARGS	0x00800		/* requires args					*/
+#define NOPUB	0x01000		/* ignore in channel (for password commands)		*/
+#define NOCMD	0x02000		/* not allowed to be executed thru CMD			*/
+#define GAXS	0x04000		/* check global access					*/
+#define CAXS	0x08000		/* check channel access					*/
+#define REDIR	0x10000		/* may be redirected					*/
+#define LBUF	0x20000		/* should be linebuffered to server			*/
+#define CBANG	0x40000		/* command may be prefixed with a bang (!)		*/
+#define ACCHAN  0x80000		/* needs an active channel				*/
+
+#define CLEVEL	0x000ff
+
+/*
+ *  integer only version of RANDOM()
+ */
+#define RANDOM(min,max)			(min + (rand() / (RAND_MAX / (max - min + 1))))
+
+/* unaligned memory access */
+@UNALIGNED_MEM@
+
+/* 32bit machines */
+@PTSIZE_DEFINE32@
+
+/* 64bit machines */
+@PTSIZE_DEFINE64@
+
+/*
+ *  How to make things non-portable:
+ */
+#ifdef PTSIZE_32BIT
+
+#define	mx_ptr		unsigned int
+#define mx_pfmt		"%.8x"
+
+#endif
+
+#ifdef PTSIZE_64BIT
+
+#define	mx_ptr		long long
+#define mx_pfmt		"%.16Lx"
+
+#endif
+
+/*
+ *  String of compile-time options:
+ */
+#define	OPT_COMMA	""
+#define OPT_COREONLY	1
+
+#ifdef MAIN_C
+
+#ifdef LIBRARY
+static
+#endif
+const char __mx_opts[] =	""
+
+#ifdef ALIAS
+			OPT_COMMA "alias"
+#undef	OPT_COMMA
+#define OPT_COMMA	", "
+#undef	OPT_COREONLY
+#endif /* ALIAS */
+
+#ifdef BOUNCE
+			OPT_COMMA "bounce"
+#undef	OPT_COMMA
+#define OPT_COMMA	", "
+#undef	OPT_COREONLY
+#endif /* BOUNCE */
+
+#ifdef CHANBAN
+			OPT_COMMA "chanban"
+#undef	OPT_COMMA
+#define OPT_COMMA	", "
+#undef	OPT_COREONLY
+#endif /* CHANBAN */
+
+#ifdef DEBUG
+			OPT_COMMA "debug"
+#undef	OPT_COMMA
+#define OPT_COMMA	", "
+#undef	OPT_COREONLY
+#endif /* DEBUG */
+
+#ifdef DYNCMD
+			OPT_COMMA "dyn"
+#undef	OPT_COMMA
+#define OPT_COMMA	", "
+#undef	OPT_COREONLY
+#endif /* DYNCMD */
+
+#ifdef MD5CRYPT
+			OPT_COMMA "md5"
+#undef	OPT_COMMA
+#define OPT_COMMA	", "
+#undef	OPT_COREONLY
+#endif /* MD5CRYPT */
+
+#ifdef BOTNET
+			OPT_COMMA "net"
+#undef	OPT_COMMA
+#define OPT_COMMA	", "
+#undef	OPT_COREONLY
+#endif /* BOTNET */
+
+#ifdef NEWBIE
+			OPT_COMMA "newbie"
+#undef	OPT_COMMA
+#define OPT_COMMA	", "
+#undef	OPT_COREONLY
+#endif /* NEWBIE */
+
+#ifdef PYTHON
+			OPT_COMMA "python"
+#undef OPT_COMMA
+#define OPT_COMMA ", "
+#undef OPT_COREONLY
+#endif /* PYTHON */
+
+#ifdef RAWDNS
+			OPT_COMMA "rawdns"
+#undef	OPT_COMMA
+#define OPT_COMMA	", "
+#undef	OPT_COREONLY
+#endif /* RAWDNS */
+
+#ifdef SEEN
+			OPT_COMMA "seen"
+#undef	OPT_COMMA
+#define OPT_COMMA	", "
+#undef	OPT_COREONLY
+#endif /* SEEN */
+
+#ifdef SESSION
+			OPT_COMMA "session"
+#undef	OPT_COMMA
+#define OPT_COMMA	", "
+#undef	OPT_COREONLY
+#endif /* SESSION */
+
+#ifdef TCL
+			OPT_COMMA "tcl"
+#undef	OPT_COMMA
+#define OPT_COMMA	", "
+#undef	OPT_COREONLY
+#endif /* TCL */
+
+#ifdef TELNET
+			OPT_COMMA "telnet"
+#undef	OPT_COMMA
+#define OPT_COMMA	", "
+#undef	OPT_COREONLY
+#endif /* TELNET */
+
+#ifdef WINGATES
+			OPT_COMMA "wingate"
+#undef	OPT_COMMA
+#define OPT_COMMA	", "
+#undef	OPT_COREONLY
+#endif /* WINGATES */
+
+#ifdef OPT_COREONLY
+			"(core only)"
+#endif /* OPT_COREONLY */
+		;
+
+/*
+ *  end of the option ID string
+ */
+
+#else /* MAIN_C */
+
+extern char __mx_opts[];
+
+#endif /* MAIN_C */
+
+#ifndef ulong
+#define ulong				unsigned long
+#endif
+
+#ifndef uchar
+#define uchar				unsigned char
+#endif
+
+#ifndef INT_MAX
+#define INT_MAX				((int)(((unsigned int)-3) >> 1))
+#endif
+
+#define	TIME_MAX	2147483647
+
+/*
+ *  why are you looking here?
+ */
+#undef I_HAVE_A_LEGITIMATE_NEED_FOR_MORE_THAN_4_BOTS
+
+#endif /* CONFIG_H */
