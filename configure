@@ -846,10 +846,10 @@ test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$
 
 def_rawdns='#undef RAWDNS'
 unset ans
-echo $ac_n "Async DNS support? ......................... [Y/n] "$ac_c
+echo $ac_n "Async DNS support? ......................... [y/N] "$ac_c
 test "$ft_rawdns" && echo "$ft_rawdns" && ans=$ft_rawdns
 test -z "$ft_rawdns" && read ans
-test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_rawdns='#define RAWDNS'
+test "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_rawdns='#define RAWDNS'
 
 def_botnet='#undef BOTNET'
 unset ans
