@@ -21,7 +21,10 @@ Compiling?
 ~~~~~~~~~~
 To compile the source:
 
-1) Uncompress the source code distribution archive.
+1) git clone https://github.com/MadCamel/energymech.git
+-- If you don't have git, you can still download the source:
+   wget https://github.com/MadCamel/energymech/archive/master.tar.gz
+   tar xvf master.tar.gz
 
 2) cd energymech
 -- Since you are reading  this file,  you have most likely already
