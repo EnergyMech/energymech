@@ -1,0 +1,20 @@
+# emech .gitignore
+
+energymech
+
+src/Makefile
+src/config.h
+src/*.o
+src/energymech
+src/gencmd
+src/mcmd.h
+src/usercombo.h
+
+*~
+*.bak
+*.passwd
+mech.conf
+mech.pid
+root.zone*
+trick.conf
+
