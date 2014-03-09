@@ -244,6 +244,7 @@
 #include <fcntl.h>
 #include <time.h>
 #include <errno.h>
+#include <limits.h>
 
 /*
  *  stuff under here shouldnt be changed
