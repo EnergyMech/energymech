@@ -204,8 +204,11 @@ int Strlen2(const char *one, const char *two)
 {
 	const char *s1,*s2;
 
-	for(s1=one;*s1;s1++);
-	for(s2=two;*s2;s2++);
+	if (one)
+		for(s1=one;*s1;s1++);
+	if (two)
+		for(s2=two;*s2;s2++);
+
 	return((s1 - one) + (s2 - two));
 }
 
