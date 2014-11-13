@@ -30,6 +30,7 @@ GDBFLAG =	@gdbflag@
 WARNFLAG =	@W_FLAGS@
 OPTIMIZE =	@O_FLAGS@
 PYINCLUDE =	@PYINCLUDE@
+TCLINCLUDE =	@TCLINCLUDE@
 
 CFLAGS =	$(PIPEFLAG) $(GDBFLAG) $(WARNFLAG) $(OPTIMIZE)
 LFLAGS =	$(PIPEFLAG) $(GDBFLAG)
@@ -74,7 +75,7 @@ $(INSTALLNAME):	$(OFILES)
 @sz@		size $(INSTALLNAME)
 
 mega:		$(SRCFILES) $(INCS) usage.h
-		$(CC) $(CFLAGS) -o $(INSTALLNAME) mega.c $(LPROF) $(LIBS) $(LDSCRIPT) $(PYINCLUDE)
+		$(CC) $(CFLAGS) -o $(INSTALLNAME) mega.c $(LPROF) $(LIBS) $(LDSCRIPT) $(PYINCLUDE) $(TCLINCLUDE)
 @oc@		objcopy -R .note -R .comment $(INSTALLNAME)
 @sz@		size $(INSTALLNAME)
 
@@ -88,7 +89,7 @@ $(INSTALLNAME)-static:	$(OFILES)
 @sz@		size $(INSTALLNAME)
 
 mega-static:	$(SRCFILES) $(INCS) usage.h
-		$(CC) $(CFLAGS) -o $(INSTALLNAME) mega.c $(LPROF) $(LIBS) $(LDSCRIPT) $(PYINCLUDE) -static
+		$(CC) $(CFLAGS) -o $(INSTALLNAME) mega.c $(LPROF) $(LIBS) $(LDSCRIPT) $(PYINCLUDE) $(TCLINCLUDE) -static
 @oc@		objcopy -R .note -R .comment $(INSTALLNAME)
 @sz@		size $(INSTALLNAME)
 
@@ -193,7 +194,7 @@ stats.o:	stats.c $(INCS)
 		$(CC) $(CFLAGS) -c $< $(CPROF)
 
 tcl.o:		tcl.c $(INCS)
-		$(CC) $(CFLAGS) -c $< $(CPROF)
+		$(CC) $(CFLAGS) -c $< $(CPROF) $(TCLINCLUDE)
 
 telnet.o:	telnet.c $(INCS)
 		$(CC) $(CFLAGS) -c $< $(CPROF)
