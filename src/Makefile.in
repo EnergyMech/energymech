@@ -1,4 +1,4 @@
-#   
+#
 #   EnergyMech, IRC bot software
 #   Copyright (c) 1997-2009 proton
 #
@@ -69,13 +69,13 @@ clean:		FORCE
 		$(RM) $(INSTALLNAME) gencmd mcmd.h core $(OFILES)
 
 $(INSTALLNAME):	$(OFILES)
-		$(CC) $(LFLAGS) -o $(INSTALLNAME) $(OFILES) $(LPROF) $(LIBS) $(LDSCRIPT)
-@oc@		objcopy -R .note -R .comment $(INSTALLNAME)
+		$(CROSS_COMPILE)$(CC) $(LFLAGS) -o $(INSTALLNAME) $(OFILES) $(LPROF) $(LIBS) $(LDSCRIPT)
+@oc@		$(CROSS_COMPILE)objcopy -R .note -R .comment $(INSTALLNAME)
 @sz@		size $(INSTALLNAME)
 
 mega:		$(SRCFILES) $(INCS) usage.h
-		$(CC) $(CFLAGS) -o $(INSTALLNAME) mega.c $(LPROF) $(LIBS) $(LDSCRIPT) $(PYINCLUDE)
-@oc@		objcopy -R .note -R .comment $(INSTALLNAME)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -o $(INSTALLNAME) mega.c $(LPROF) $(LIBS) $(LDSCRIPT) $(PYINCLUDE)
+@oc@		$(CROSS_COMPILE)objcopy -R .note -R .comment $(INSTALLNAME)
 @sz@		size $(INSTALLNAME)
 
 #
@@ -83,13 +83,13 @@ mega:		$(SRCFILES) $(INCS) usage.h
 #
 
 $(INSTALLNAME)-static:	$(OFILES)
-		$(CC) $(LFLAGS) -o $(INSTALLNAME) $(OFILES) $(LPROF) $(LIBS) $(LDSCRIPT) -static
-@oc@		objcopy -R .note -R .comment $(INSTALLNAME)
+		$(CROSS_COMPILE)$(CC) $(LFLAGS) -o $(INSTALLNAME) $(OFILES) $(LPROF) $(LIBS) $(LDSCRIPT) -static
+@oc@		$(CROSS_COMPILE)objcopy -R .note -R .comment $(INSTALLNAME)
 @sz@		size $(INSTALLNAME)
 
 mega-static:	$(SRCFILES) $(INCS) usage.h
-		$(CC) $(CFLAGS) -o $(INSTALLNAME) mega.c $(LPROF) $(LIBS) $(LDSCRIPT) $(PYINCLUDE) -static
-@oc@		objcopy -R .note -R .comment $(INSTALLNAME)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -o $(INSTALLNAME) mega.c $(LPROF) $(LIBS) $(LDSCRIPT) $(PYINCLUDE) -static
+@oc@		$(CROSS_COMPILE)objcopy -R .note -R .comment $(INSTALLNAME)
 @sz@		size $(INSTALLNAME)
 
 #
@@ -97,126 +97,126 @@ mega-static:	$(SRCFILES) $(INCS) usage.h
 #
 
 alias.o:	alias.c $(INCS)
-		$(CC) $(CFLAGS) -c $< $(CPROF)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
 auth.o:		auth.c $(INCS)
-		$(CC) $(CFLAGS) -c $< $(CPROF)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
 bounce.o:	bounce.c $(INCS)
-		$(CC) $(CFLAGS) -c $< $(CPROF)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
 chanban.o:	chanban.c $(INCS)
-		$(CC) $(CFLAGS) -c $< $(CPROF)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
 channel.o:	channel.c $(INCS)
-		$(CC) $(CFLAGS) -c $< $(CPROF)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
 core.o:		core.c $(INCS) settings.h
-		$(CC) $(CFLAGS) -c $< $(CPROF)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
 ctcp.o:		ctcp.c $(INCS)
-		$(CC) $(CFLAGS) -c $< $(CPROF)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
 debug.o:	debug.c $(INCS) settings.h
-		$(CC) $(CFLAGS) -c $< $(CPROF) $(PYINCLUDE)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF) $(PYINCLUDE)
 
 dns.o:		dns.c $(INCS)
-		$(CC) $(CFLAGS) -c $< $(CPROF)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
 dynamode.o:	dynamode.c $(INCS)
-		$(CC) $(CFLAGS) -c $< $(CPROF)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
 function.o:	function.c $(INCS)
-		$(CC) $(CFLAGS) -c $< $(CPROF)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
 greet.o:	greet.c $(INCS)
-		$(CC) $(CFLAGS) -c $< $(CPROF)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
 help.o:		help.c $(INCS) usage.h
-		$(CC) $(CFLAGS) -c $< $(CPROF)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
 irc.o:		irc.c $(INCS)
-		$(CC) $(CFLAGS) -c $< $(CPROF)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
 kicksay.o:	kicksay.c $(INCS)
-		$(CC) $(CFLAGS) -c $< $(CPROF)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
 main.o:		main.c $(INCS)
-		$(CC) $(CFLAGS) -c $< $(CPROF) $(PYINCLUDE)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF) $(PYINCLUDE)
 
 net.o:		net.c $(INCS)
-		$(CC) $(CFLAGS) -c $< $(CPROF)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
 net_chan.o:	net_chan.c $(INCS)
-		$(CC) $(CFLAGS) -c $< $(CPROF)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
 note.o:		note.c $(INCS)
-		$(CC) $(CFLAGS) -c $< $(CPROF)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
 notify.o:	notify.c $(INCS)
-		$(CC) $(CFLAGS) -c $< $(CPROF)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
 ons.o:		ons.c $(INCS)
-		$(CC) $(CFLAGS) -c $< $(CPROF)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
 parse.o:	parse.c $(INCS)
-		$(CC) $(CFLAGS) -c $< $(CPROF)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
 perl.o:		perl.c $(INCS)
-		$(CC) $(CFLAGS) -c $< $(CPROF)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
 prot.o:		prot.c $(INCS)
-		$(CC) $(CFLAGS) -c $< $(CPROF)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
 python.o:	python.c $(INCS)
-		$(CC) $(CFLAGS) -c $< $(CPROF) $(PYINCLUDE)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF) $(PYINCLUDE)
 
 redirect.o:	redirect.c $(INCS)
-		$(CC) $(CFLAGS) -c $< $(CPROF)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
 reset.o:	reset.c $(INCS)
-		$(CC) $(CFLAGS) -c $< $(CPROF)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
 seen.o:		seen.c $(INCS)
-		$(CC) $(CFLAGS) -c $< $(CPROF)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
 shit.o:		shit.c $(INCS)
-		$(CC) $(CFLAGS) -c $< $(CPROF)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
 socket.o:	socket.c $(INCS)
-		$(CC) $(CFLAGS) -c $< $(CPROF)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
 spy.o:		spy.c $(INCS)
-		$(CC) $(CFLAGS) -c $< $(CPROF)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
 stats.o:	stats.c $(INCS)
-		$(CC) $(CFLAGS) -c $< $(CPROF)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
 tcl.o:		tcl.c $(INCS)
-		$(CC) $(CFLAGS) -c $< $(CPROF)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
 telnet.o:	telnet.c $(INCS)
-		$(CC) $(CFLAGS) -c $< $(CPROF)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
 toybox.o:	toybox.c $(INCS)
-		$(CC) $(CFLAGS) -c $< $(CPROF)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
 trivia.o:	trivia.c $(INCS)
-		$(CC) $(CFLAGS) -c $< $(CPROF)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
 uptime.o:	uptime.c $(INCS)
-		$(CC) $(CFLAGS) -c $< $(CPROF)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
 user.o:		user.c $(INCS)
-		$(CC) $(CFLAGS) -c $< $(CPROF)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
 vars.o:		vars.c $(INCS) settings.h
-		$(CC) $(CFLAGS) -c $< $(CPROF)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
 web.o:		web.c $(INCS)
-		$(CC) $(CFLAGS) -c $< $(CPROF)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
 md5/md5.o:	md5/md5.c $(INCS)
-		$(CC) $(CFLAGS) -c $< -o $@ -Imd5 $(CPROF)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< -o $@ -Imd5 $(CPROF)
 
 FORCE:
