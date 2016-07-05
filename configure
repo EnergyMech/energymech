@@ -716,13 +716,34 @@ has_tcl=no
 if [ ! "$ft_tcl" = no ]; then
   echo $ac_n "checking for tcl ... "$ac_c
   TESTC=config/tcl.c
+  tclconfig=
+  if [ -f /usr/lib/tclConfig.sh ]; then
+    tclconfig=tclconfig
+    . /usr/lib/tclConfig.sh
+  fi
   libtcl=
-  for tclver in empty 8.9 8.8 8.7 8.6 8.5 8.4 8.3 8.2 8.1 8.0
+  inctcl=
+  for tclver in $tclconfig empty 8.9 8.8 8.7 8.6 8.5 8.4 8.3 8.2 8.1 8.0
   do
     if [ -z "$libtcl" ]; then
-      test "$tclver" = "empty" && TCLLIB=-ltcl || TCLLIB=-ltcl$tclver
-      if $CC -o $TESTP $TESTC $TCLLIB 1> /dev/null 2> /dev/null; then
+      case "$tclver" in
+        "tclconfig")
+          TCLLIB=$TCL_LIB_FLAG
+          TCLINCLUDE=$TCL_INCLUDE_SPEC
+          tclver=$TCL_VERSION
+          ;;
+        "empty")
+          TCLLIB=-ltcl
+          TCLINCLUDE=
+          ;;
+        *)
+          TCLLIB=-ltcl$tclver
+          TCLINCLUDE=
+          ;;
+      esac
+      if $CC -o $TESTP $TESTC $TCLLIB $TCLINCLUDE 1> /dev/null 2> /dev/null; then
         libtcl=$TCLLIB
+        inctcl=$TCLINCLUDE
         has_tcl=$TCLLIB
         test "$tclver" = "empty" && echo $ac_t "yes" || echo $ac_t "yes (version $tclver)"
       fi
@@ -1027,7 +1048,10 @@ else
   test -z "$ft_tcl" && read ans
   test "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_tcl='#define TCL'
 fi
-test "$def_tcl" = '#undef TCL' && libtcl=''
+if [ "$def_tcl" = '#undef TCL' ]; then
+  libtcl=
+  inctcl=
+fi
 
 def_telnet='#undef TELNET'
 unset ans
@@ -1080,6 +1104,7 @@ s%@gdbflag@%$cc_g_flag%;
 /@W_FLAGS@/   { s/@W_FLAGS@/$W_FLAGS/;     };
 /@O_FLAGS@/   { s/@O_FLAGS@/$O_FLAGS/;     };
 /@PYINCLUDE@/ { s,@PYINCLUDE@,$incpython,; };
+/@TCLINCLUDE@/ { s,@TCLINCLUDE@,$inctcl,; };
 s|@MD5_O@|$MD5_O|;
 s%@oc@%$objcomment%;
 s%@sz@%$sizecomment%;
