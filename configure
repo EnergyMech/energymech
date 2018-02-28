@@ -1163,7 +1163,7 @@ s|@UNALIGNED_MEM@|$UNALIGNED_MEM|;
 echo ''
 echo 'All done. You can now "make clean install"'
 echo ''
-echo 'Send your bugreports to <proton@joonicks.eu>'
+echo 'Submit your bugreports at https://github.com/MadCamel/energymech/issues'
 echo ''
 echo 'You have read the README file I hope?'
 echo ''
