@@ -61,7 +61,6 @@ int perl_parse_jump(char *from, char *rest, Hook *hook)
 
 	SPAGAIN;	/* Rehash stack, it's probably been clobbered */
 	return(POPi);	/* Pop an int */
-	
 }
 
 /*
@@ -83,7 +82,7 @@ XS(XS_perl_parse_hook)
 
 	/*
 	 *  translate *name and *sub from perl variables to C strings
-	 *  SvPV(ST(0)) returns a string(char) pointer to the first arg. 
+	 *  SvPV(ST(0)) returns a string(char) pointer to the first arg.
 	 *  but I don't know if it's safe to point directly in to perl
 	 *  space like that.
 	 */
@@ -100,7 +99,7 @@ XS(XS_perl_parse_hook)
 	 *  make a Hook struct and link it into the parse hook list
 	 */
 	set_mallocdoer(perl_parse_hook);
-	hook = (Hook*)Calloc(sizeof(Hook) + Strlen2(name,sub));
+	hook = (Hook*)Calloc(sizeof(Hook) + Strlen2(name,sub)); // sub is never NULL
 	hook->func = perl_parse_jump;
 	hook->next = hooklist;
 	hooklist = hook;

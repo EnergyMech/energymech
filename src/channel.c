@@ -295,8 +295,7 @@ Ban *make_ban(Ban **banlist, char *from, char *banmask, time_t when)
 			return(NULL);
 	}
 
-	sz = sizeof(Ban) + Strlen2(from,banmask);
-	//sz = sizeof(Ban) + strlen(from) + strlen(banmask);
+	sz = sizeof(Ban) + Strlen2(from,banmask); // banmask is never NULL
 
 	set_mallocdoer(make_ban);
 	new = (Ban*)Calloc(sz);
@@ -478,7 +477,7 @@ void channel_massmode(Chan *chan, char *pattern, int filtmode, char mode, char t
 
 		if (i)
 		{
-			if ((Strlen2(deopstring,burst)) >= MSGLEN-2)
+			if ((Strlen2(deopstring,burst)) >= MSGLEN-2) // burst is never NULL
 			{
 				write(current->sock,burst,strlen(burst));
 #ifdef DEBUG

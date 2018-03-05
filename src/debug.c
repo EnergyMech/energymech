@@ -154,7 +154,7 @@ LS struct
 #ifdef PYTHON
 {	python_hook,			"python_hook"			},
 {	python_unhook,			"python_unhook"			},
-#endif /* PYTHON */ 
+#endif /* PYTHON */
 #ifdef RAWDNS
 {	rawdns,				"rawdns"			},
 {	parse_query,			"parse_query"			},
@@ -196,12 +196,12 @@ LS const DEFstruct SCRIPTdefs[] =
 { HOOK_BOTNET,		"HOOK_BOTNET"		},
 { HOOK_DCC_COMPLETE,	"HOOK_DCC_COMPLETE"	},
 #ifdef TCL
-{ (int)tcl_timer_jump,	"tcl_timer_jump"	},
-{ (int)tcl_parse_jump,	"tcl_parse_jump"	},
+{ .v.func=tcl_timer_jump,	"tcl_timer_jump"	},
+{ .v.func=tcl_parse_jump,	"tcl_parse_jump"	},
 #endif /* TCL */
 #ifdef PYTHON
-{ (int)python_timer_jump, "python_timer_jump"	},
-{ (int)python_parse_jump, "python_parse_jump"	},
+{ .v.func=python_timer_jump, "python_timer_jump"	},
+{ .v.func=python_parse_jump, "python_parse_jump"	},
 #endif /* PYTHON */
 { 0, }};
 #endif /* SCRIPTING */
@@ -301,9 +301,9 @@ void strflags(char *dst, const DEFstruct *flagsstruct, int flags)
 	int	i;
 
 	*dst = 0;
-	for(i=0;(flagsstruct[i].id);i++)
+	for(i=0;(flagsstruct[i].v.id);i++)
 	{
-		if (flagsstruct[i].id & flags)
+		if (flagsstruct[i].v.id & flags)
 		{
 			if (*dst)
 				Strcat(dst,"|");
@@ -318,7 +318,19 @@ const char *strdef(const DEFstruct *dtab, int num)
 
 	for(i=0;(dtab[i].idstr);i++)
 	{
-		if (dtab[i].id == num)
+		if (dtab[i].v.id == num)
+			return(dtab[i].idstr);
+	}
+	return("UNKNOWN");
+}
+
+const char *funcdef(const DEFstruct *dtab, void *func)
+{
+	int	i;
+
+	for(i=0;(dtab[i].idstr);i++)
+	{
+		if (dtab[i].v.func == func)
 			return(dtab[i].idstr);
 	}
 	return("UNKNOWN");
@@ -468,7 +480,7 @@ void debug_settings(UniVar *setting, int type)
 		}
 
 		tpad = STREND(tabs);
-		n = 24 - (Strlen2(pad,VarName[i].name) + 2);
+		n = 24 - (Strlen2(pad,VarName[i].name) + 2); // VarName[i].name is never NULL
 		while(n >= 8)
 		{
 			n = n - 8;
@@ -1161,7 +1173,7 @@ void debug_rawdns(void)
 
 #endif /* RAWDNS */
 
-#if defined(TCL) || defined(PYTHON) 
+#if defined(TCL) || defined(PYTHON)
 
 #if 0
 typedef struct
@@ -1174,7 +1186,7 @@ typedef struct
         ulong           minute2;        //:30;
         ulong           hour;           //:24;
         ulong           weekday;        //:7;
-                        
+
 } HookTimer;
 #endif /* 0 */
 
@@ -1213,7 +1225,7 @@ void debug_scripthook(void)
 	for(h=hooklist;h;h=h->next)
 	{
 		memtouch(h);
-		debug("  ; func\t\t"mx_pfmt" %s\n",(mx_ptr)h->func,strdef(SCRIPTdefs,(int)h->func));
+		debug("  ; func\t\t"mx_pfmt" %s\n",(mx_ptr)h->func,funcdef(SCRIPTdefs,h->func));
 		debug("  ; guid\t\t%i\n",h->guid);
 		debug("  ; flags\t\t%s (%i)\n",strdef(SCRIPTdefs,h->flags),h->flags);
 		if (h->flags == HOOK_TIMER)

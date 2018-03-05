@@ -716,7 +716,7 @@ User *add_user(char *handle, char *pass, int axs)
 #endif /* DEBUG */
 
 	set_mallocdoer(add_user);
-	user = (User*)Calloc(sizeof(User) + Strlen2(handle,pass));
+	user = (User*)Calloc(sizeof(User) + Strlen(handle,pass,NULL)); // Strlen() tolerates pass being NULL, Strlen2() does not.
 	user->x.x.access = axs;
 	user->next = current->userlist;
 	current->userlist = user;

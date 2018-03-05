@@ -156,7 +156,7 @@ int dcc_sendfile(char *target, char *filename)
 	struct	sockaddr_in sai;
 	Client	*client;
 	int	s,f,sz;
-	char	tempfile[Strlen2(filename,DCC_PUBLICFILES)+2];
+	char	tempfile[strlen(filename)+strlen(DCC_PUBLICFILES)+2]; // strlen(DCC_PUBLICFILES) evaluates at compile time to a constant.
 
 	Strcpy(tempfile,DCC_PUBLICFILES);
 	Strcat(tempfile,filename);
@@ -177,7 +177,7 @@ int dcc_sendfile(char *target, char *filename)
 	}
 
 	set_mallocdoer(dcc_sendfile);
-	client = (Client*)Calloc(sizeof(Client) + Strlen2(filename,target));
+	client = (Client*)Calloc(sizeof(Client) + Strlen2(filename,target)); // target is never NULL
 
 	client->fileno = f;
 	client->sock = s;
@@ -608,7 +608,7 @@ void ctcp_dcc(char *from, char *to, char *rest)
 
 		if (1)
 		{
-			char tempname[Strlen2(filename,DCC_PUBLICINCOMING)+1];
+			char tempname[strlen(filename)+strlen(DCC_PUBLICINCOMING)+1]; // strlen(DCC_PUBLICINCOMING) evaluates to a constant during compile.
 
 			Strcpy(Strcpy(tempname,DCC_PUBLICINCOMING),filename);
 
@@ -620,7 +620,7 @@ void ctcp_dcc(char *from, char *to, char *rest)
 				return;
 			}
 			set_mallocdoer(ctcp_dcc);
-			client = (Client*)Calloc(sizeof(Client) + Strlen2(filename,from));
+			client = (Client*)Calloc(sizeof(Client) + Strlen2(filename,from)); // from is never NULL
 			client->fileno = f;
 			client->fileend = filesz;
 			client->sock = s;

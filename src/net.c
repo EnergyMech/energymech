@@ -338,7 +338,7 @@ void basicAuth(BotNet *bn, char *rest)
 	case BNAUTH_MD5:
 		if (linkpass && *linkpass)
 		{
-			char	*enc,temppass[24 + Strlen2(pass,linkpass)];
+			char	*enc,temppass[24 + Strlen2(pass,linkpass)]; // linkpass is never NULL
 
 			/* "mypass theirpass REMOTEsid LOCALsid" */
 			sprintf(temppass,"%s %s %i %i",linkpass,pass,bn->rsid,bn->lsid);
@@ -546,7 +546,7 @@ void basicBanner(BotNet *bn, char *rest)
 			if (cfg->pass && *cfg->pass)
 			{
 				char	*enc,salt[8];
-				char	temppass[24 + Strlen2(cfg->pass,linkpass)];
+				char	temppass[24 + Strlen2(cfg->pass,linkpass)]; // linkpass(procvar) is not NULL
 
 				/* "theirpass mypass LOCALsid REMOTEsid" */
 				sprintf(temppass,"%s %s %i %i",cfg->pass,linkpass,bn->lsid,bn->rsid);
@@ -1498,7 +1498,7 @@ usage:
 			goto usage;
 
 		set_mallocdoer(do_link);
-		cfg = (NetCfg*)Calloc(sizeof(NetCfg) + Strlen2(pass,host));
+		cfg = (NetCfg*)Calloc(sizeof(NetCfg) + Strlen(pass,host,NULL)); // host might be NULL, Strlen() handles NULLs, Strlen2() does not.
 
 		cfg->guid = iguid;
 		cfg->port = iport;

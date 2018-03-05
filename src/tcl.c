@@ -173,8 +173,7 @@ int tcl_parse_jump(char *from, char *rest, Hook *hook)
 		Tcl_GetIntFromObj(energymech_tcl,tcl_result,&i);
 	}
 #ifdef DEBUG
-	if (energymech_tcl->result && *energymech_tcl->result)
-		debug("(tcl_parse_jump) result = %s\n",nullstr(energymech_tcl->result));
+	debug("(tcl_parse_jump) result = %i\n",i);
 #endif /* DEBUG */
 	return(i);
 }
@@ -199,8 +198,7 @@ void tcl_dcc_complete(Client *client, int cps)
 			Tcl_ObjSetVar2(energymech_tcl,vname,NULL,obj,TCL_GLOBAL_ONLY);
 			Tcl_VarEval(energymech_tcl,hook->self," $_filetarget $_filename $_cps",NULL);
 #ifdef DEBUG
-			if (energymech_tcl->result && *energymech_tcl->result)
-				debug("(tcl_dcc_complete) result = %s\n",nullstr(energymech_tcl->result));
+			debug("(tcl_dcc_complete) filetarget %s, filename %s\n",client->whom,client->filename);
 #endif /* DEBUG */
 		}
 	}
@@ -335,7 +333,7 @@ int tcl_debug(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[])
 		return(TCL_ERROR);
 
 	debug("(tcl_debug) %s\n",text);
-	
+
 	return(TCL_OK);
 }
 
@@ -476,8 +474,7 @@ int tcl_dns_jump(char *host, char *resolved, Hook *hook)
 		Tcl_GetIntFromObj(energymech_tcl,tcl_result,&i);
 	}
 #ifdef DEBUG
-	if (energymech_tcl->result && *energymech_tcl->result)
-		debug("(tcl_dns_jump) result = %s\n",nullstr(energymech_tcl->result));
+	debug("(tcl_dns_jump) result = %i\n",i);
 #endif /* DEBUG */
 	return(i);
 }

@@ -23,7 +23,7 @@
 
 #define ischannel(x)		(*x == '#')
 
-#define nullstr(x)		(x) ? x : NULLSTR
+#define nullstr(x)		((x)) ? (x) : NULLSTR
 #define nullbuf(x)		(x && *x) ? x : NULLSTR
 
 #define chkhigh(x)		if (x > hisock) { hisock = x; }
@@ -107,6 +107,7 @@
 
 #endif /* DEBUG */
 
+LS Chan *find_channel(char *, int)				__attr(CORE_SEG, __regparm (2) );
 LS Chan *find_channel_ac(char *)				__attr(CORE_SEG, __regparm (1) );
 LS Chan *find_channel_ny(char *)				__attr(CORE_SEG, __regparm (1) );
 LS ChanUser *find_chanuser(Chan *, const char *)		__attr(CORE_SEG, __regparm (2) );
@@ -208,8 +209,8 @@ LS ulong stringhash(char *)					__page(CORE_SEG);
  */
 LS void *Calloc(int)						__attr(CORE_SEG, __regparm (1) );
 LS void Free(char **)						__attr(CORE_SEG, __regparm (1) );
-LS int Strlen(const char *, ...)				__page(CORE_SEG);
-LS int Strlen2(const char *, const char *)			__attr(CORE_SEG, __regparm (2) );
+LS const int Strlen(const char *, ...)				__page(CORE_SEG);
+LS const int Strlen2(const char *, const char *)		__attr(CORE_SEG, __regparm (2) );
 LS int matches(const char *, const char *)			__att2(CORE_SEG, const, __regparm (2) );
 LS int num_matches(const char *, const char *)			__att2(CORE_SEG, const, __regparm (2) );
 LS int a2i(char *)						__attr(CORE_SEG, __regparm (1) );
@@ -527,6 +528,7 @@ LS void select_bounce(void)					__page(CORE_SEG);
 
 LS void do_chanban(COMMAND_ARGS)				__page(CMD1_SEG);
 LS void process_chanbans(void)					__page(CORE_SEG);
+LS void chanban_action(char *, char *, Shit *)			__page(CORE_SEG);
 
 #endif /* CHANBAN */
 

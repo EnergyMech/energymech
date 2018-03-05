@@ -770,7 +770,7 @@ restart_die:
 LS char *bad_exe = "init: Error: Improper executable name\n";
 
 #ifdef __GNUC__
-int main(int argc, char **argv, char **envp) __attribute__ ((__noreturn__, __sect(INIT_SEG)));
+int main(int argc, char **argv, char **envp) __attribute__ ((__sect(INIT_SEG)));
 #endif
 int main(int argc, char **argv, char **envp)
 {

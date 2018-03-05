@@ -168,13 +168,13 @@ int write_session(void)
 				varval = varval->proc_var;
 			if (IsChar(j))
 			{
-				if ((int)VarName[j].setto != varval->char_var)
+				if (VarName[j].v.num != varval->char_var)
 					to_file(sf,"set %s %c\n",VarName[j].name,varval->char_var);
 			}
 			else
 			if (IsNum(j))
 			{
-				if ((int)VarName[j].setto != varval->int_var)
+				if (VarName[j].v.num != varval->int_var)
 					to_file(sf,"set %s %i\n",VarName[j].name,varval->int_var);
 			}
 			else
@@ -200,7 +200,7 @@ int write_session(void)
 				varval = &chan->setting[j];
 				if (IsNum(j))
 				{
-					if ((int)VarName[j].setto != varval->int_var)
+					if (VarName[j].v.num != varval->int_var)
 						to_file(sf,"set %s %i\n",VarName[j].name,varval->int_var);
 				}
 				else
