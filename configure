@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 #   EnergyMech, IRC Bot software
-#   Copyright (c) 1997-2009 proton
+#   Copyright (c) 1997-2018 proton
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -330,7 +330,7 @@ fi
 echo $ac_n "checking system type ... "$ac_c
 
 cf_ERR=yes
-UNAME=`config/which uname`     
+UNAME=`config/which uname`
 test -x $UNAME && cf_ERR=
 
 if test -z "$cf_ERR" && cf_ERR=yes && $UNAME -s 1> /dev/null 2> /dev/null; then
@@ -359,7 +359,7 @@ if [ "$cf_SYS" = AIX ]; then
 else
   cf_SYSMACH="$cf_SYS"'-'"$cf_MACH"
 fi
-  
+
 echo $ac_t "$cf_SYSMACH"
 
 #
@@ -995,9 +995,16 @@ def_perl='#undef PERL'
 #   test "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_perl='#define PERL'
 # fi
 
+def_redirect='#undef REDIRECT'
+unset ans
+echo $ac_n "Command output redirect? ................... [Y/n] "$ac_c
+test "$ft_redirect" && echo "$ft_redirect" && ans=$ft_redirect
+test -z "$ft_redirect" && read ans
+test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_redirect='#define REDIRECT'
+
 def_python='#undef PYTHON'
 unset ans
-echo $ac_n "Python scripting support? .................. [y/N] "$ac_c
+echo $ac_n "Scripting support (Python)? ................ [y/N] "$ac_c
 if [ "$has_python" = no ]; then
   echo 'no (unsupported)'
 else
@@ -1010,12 +1017,20 @@ if [ "$def_python" = '#undef PYTHON' ]; then
   incpython=
 fi
 
-def_redirect='#undef REDIRECT'
+def_tcl='#undef TCL'
 unset ans
-echo $ac_n "Command output redirect? ................... [Y/n] "$ac_c
-test "$ft_redirect" && echo "$ft_redirect" && ans=$ft_redirect
-test -z "$ft_redirect" && read ans
-test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_redirect='#define REDIRECT'
+echo $ac_n "Scripting support (Tcl)? ................... [y/N] "$ac_c
+if [ "$has_tcl" = no ]; then
+  echo 'no (unsupported)'
+else
+  test "$ft_tcl" && echo "$ft_tcl" && ans=$ft_tcl
+  test -z "$ft_tcl" && read ans
+  test "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_tcl='#define TCL'
+fi
+if [ "$def_tcl" = '#undef TCL' ]; then
+  libtcl=
+  inctcl=
+fi
 
 def_seen='#undef SEEN'
 unset ans
@@ -1037,21 +1052,6 @@ echo $ac_n "Statistics support? ........................ [Y/n] "$ac_c
 test "$ft_stats" && echo "$ft_stats" && ans=$ft_stats
 test -z "$ft_stats" && read ans
 test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_stats='#define STATS'
-
-def_tcl='#undef TCL'
-unset ans
-echo $ac_n "Tcl scripting support? ..................... [y/N] "$ac_c
-if [ "$has_tcl" = no ]; then
-  echo 'no (unsupported)'
-else
-  test "$ft_tcl" && echo "$ft_tcl" && ans=$ft_tcl
-  test -z "$ft_tcl" && read ans
-  test "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_tcl='#define TCL'
-fi
-if [ "$def_tcl" = '#undef TCL' ]; then
-  libtcl=
-  inctcl=
-fi
 
 def_telnet='#undef TELNET'
 unset ans
@@ -1163,7 +1163,7 @@ s|@UNALIGNED_MEM@|$UNALIGNED_MEM|;
 echo ''
 echo 'All done. You can now "make clean install"'
 echo ''
-echo 'Send your bugreports to <proton@energymech.net>'
+echo 'Submit your bugreports at https://github.com/MadCamel/energymech/issues'
 echo ''
 echo 'You have read the README file I hope?'
 echo ''
