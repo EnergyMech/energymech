@@ -79,7 +79,7 @@ void copy_vars(UniVar *dst, UniVar *src)
 		{
 			dst[i].int_var = src[i].int_var;
 		}
-	}	
+	}
 }
 
 void set_binarydefault(UniVar *dst)
@@ -87,7 +87,7 @@ void set_binarydefault(UniVar *dst)
 	int	i;
 
 	for(i=0;VarName[i].name;i++)
-		dst[i].str_var = VarName[i].setto;
+		dst[i].str_var = VarName[i].v.str;
 }
 
 void delete_vars(UniVar *vars, int which)
@@ -388,7 +388,7 @@ second_pass:
 
 			varval = (IsProc(i)) ? current->setting[i].proc_var : &univar[i];
 
-			sz = Strlen2(tmp,VarName[i].name);
+			sz = Strlen2(tmp,VarName[i].name); // VarName[i].name is never NULL
 
 			if (IsStr(i))
 			{

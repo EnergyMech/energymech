@@ -132,7 +132,7 @@ struct
 	{ 0, "READ",		"do_read",		40	| CCPW					},
 #endif /* NOTE */
 #ifdef STATS
-	{ 0, "INFO",		"do_info",		40	| CCPW	| CAXS | DCC			},
+	{ 0, "INFO",		"do_info",		40	| CCPW	| REDIR | CAXS | DCC		},
 #endif /* STATS */
 
 	/*
@@ -227,7 +227,7 @@ struct
 	{ 0, "DNSSERVER",	"do_dnsserver",		100	| CCPW  | GAXS				},
 	{ 0, "DNSROOT",		"do_dnsroot",		100	| CCPW	| GAXS | CARGS			},
 #endif /* RAWDNS */
-	{ 0, "CORE",		"do_core",		100	| CCPW	| DCC				},
+	{ 0, "CORE",		"do_core",		100	| CCPW	| REDIR | DCC			},
 	{ 0, "DIE",		"do_die",		100	| CCPW	| GAXS				},
 	{ 0, "RESET",		"do_reset",		100	| CCPW	| GAXS | NOCMD			},
 	{ 0, "SHUTDOWN",	"do_shutdown",		100	| CCPW	| GAXS | NOPUB | NOCMD		},
@@ -235,7 +235,7 @@ struct
 	{ 0, "DEBUG",		"do_debug",		100	| CCPW	| GAXS				},
 #endif /* DEBUG */
 #ifdef PYTHON
-#ifdef PLEASE_HACK_MY_SHELL 
+#ifdef PLEASE_HACK_MY_SHELL
 	{ 0, "PYTHON",		"do_python",		100	| CCPW	| GAXS | CARGS			},
 #endif /* PLEASE_HACK_MY_SHELL */
 	{ 0, "PYTHONSCRIPT",	"do_pythonscript",	100	| CCPW	| GAXS | CARGS			},

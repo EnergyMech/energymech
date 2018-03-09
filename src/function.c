@@ -176,7 +176,7 @@ void Free(char **mem)
 
 #endif /* DEBUG */
 
-int Strlen(const char *first, ...)
+const int Strlen(const char *first, ...)
 {
 	const char *s,*o;
 	int n;
@@ -200,7 +200,7 @@ int Strlen(const char *first, ...)
 }
 
 __attr(CORE_SEG,__regparm(2))
-int Strlen2(const char *one, const char *two)
+const int Strlen2(const char *one, const char *two)
 {
 	const char *s1,*s2;
 

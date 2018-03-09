@@ -68,7 +68,7 @@ char *cipher(char *arg)
 
 	if (!arg || !*arg)
 		return(NULL);
-	
+
 	B1a = B2a = B3a = B4a = 0;
 	B1b = B2b = B3b = B4b = 0;
 	ptr = arg;

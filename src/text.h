@@ -129,10 +129,16 @@
 #define TEXT_SIGUSR1		"QUIT :Switching servers... (SIGUSR1)\n"
 
 #define TEXT_USAGE		"Usage: %s [switches [args]]\n"
-#define TEXT_FSWITCH		" -f <file>   read configuration from <file>\n"
-#define TEXT_CSWITCH		" -c          make core file instead of coredebug/reset\n"
-#define TEXT_HSWITCH		" -h          show this help\n"
-#define TEXT_VSWITCH		" -v          show EnergyMech version\n"
+#define TEXT_FSWITCH		" -f <file>     read configuration from <file>\n"
+#define TEXT_CSWITCH		" -c            make core file instead of coredebug/reset\n"
+#define TEXT_HSWITCH		" -h            show this help\n"
+#define TEXT_VSWITCH		" -v            show EnergyMech version\n"
+#define TEXT_PSWITCH1		" -p <string>   encrypt <string> using the password hashing algorithm,\n"
+#define TEXT_PSWITCH2		"               output the result and then quit.\n"
+
+#define TEXT_DSWITCH		" -d            start mech in debug mode\n"
+#define TEXT_OSWITCH		" -o <file>     write debug output to <file>\n"
+#define TEXT_XSWITCH		" -X            write a debug file before exit\n"
 
 #define TEXT_HDR_VERS		"EnergyMech %s, %s\n"
 #define TEXT_HDR_DATE		"Compiled on " __DATE__ " " __TIME__ "\n"

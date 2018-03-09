@@ -138,7 +138,11 @@ int write_session(void)
 #ifdef RAWDNS
 	Strp	*p;
 #endif /* RAWDNS */
+#ifdef ALIAS
+	Alias	*alias;
+#endif /* ALIAS */
 	Server	*sp;
+	Spy	*spy;
 	Chan	*chan;
 	Mech	*bot;
 	UniVar	*varval;
@@ -155,94 +159,12 @@ int write_session(void)
 			to_file(sf,"dnsserver %s\n",inet_ntoa(ia_ns[j]));
 #endif /* RAWDNS */
 
-	for(bot=botlist;bot;bot=bot->next)
-	{
-		to_file(sf,"nick %i %s\n",bot->guid,bot->wantnick);
-		/*
-		 *  current->setting contains channel defaults and global vars
-		 */
-		for(j=0;VarName[j].name;j++)
-		{
-			varval = &bot->setting[j];
-			if (IsProc(j))
-				varval = varval->proc_var;
-			if (IsChar(j))
-			{
-				if ((int)VarName[j].setto != varval->char_var)
-					to_file(sf,"set %s %c\n",VarName[j].name,varval->char_var);
-			}
-			else
-			if (IsNum(j))
-			{
-				if ((int)VarName[j].setto != varval->int_var)
-					to_file(sf,"set %s %i\n",VarName[j].name,varval->int_var);
-			}
-			else
-			if (IsStr(j))
-			{
-				/*
-				 *  There are no default string settings
-				 */
-				if (varval->str_var)
-					to_file(sf,"set %s %s\n",VarName[j].name,varval->str_var);
-			}
-		}
-		for(chan=bot->chanlist;chan;chan=chan->next)
-		{
-			if (!chan->active && !chan->rejoin)
-				continue;
-			to_file(sf,"join %s %s\n",chan->name,(chan->key) ? chan->key : "");
-			/*
-			 *  using CHANSET_SIZE: only the first settings contain stuff
-			 */
-			for(j=0;j<CHANSET_SIZE;j++)
-			{
-				varval = &chan->setting[j];
-				if (IsNum(j))
-				{
-					if ((int)VarName[j].setto != varval->int_var)
-						to_file(sf,"set %s %i\n",VarName[j].name,varval->int_var);
-				}
-				else
-				if (IsStr(j))
-				{
-					/*
-					 *  There are no default string settings
-					 */
-					if (varval->str_var)
-						to_file(sf,"set %s %s\n",VarName[j].name,varval->str_var);
-				}
-			}
-		}
-	}
-
 	to_file(sf,"set ctimeout %i\n",ctimeout);
 	for(sp=serverlist;sp;sp=sp->next)
 	{
 		to_file(sf,"server %s %i %s\n",sp->name,(sp->port) ? sp->port : 6667,
 			(sp->pass[0]) ? sp->pass : "");
 	}
-
-#ifdef TRIVIA
-	if (triv_qfile)
-		to_file(sf,"set qfile %s\n",triv_qfile);
-	to_file(sf,"set qdelay %i\n",triv_qdelay);
-	to_file(sf,"set qchar %c\n",triv_qchar);
-#endif /* TRIVIA */
-
-#ifdef UPTIME
-	if (uptimehost && Strcasecmp(uptimehost,defaultuptimehost))
-		to_file(sf,"set uphost %s\n",uptimehost);
-	if (uptimeport)
-		to_file(sf,"set upport %i\n",uptimeport);
-	if (uptimenick)
-		to_file(sf,"set upnick %s\n",uptimenick);
-#endif /* UPTIME */
-
-#ifdef SEEN
-	if (seenfile)
-		to_file(sf,"set seenfile %s\n",seenfile);
-#endif /* SEEN */
 
 #ifdef BOTNET
 	if (linkpass)
@@ -270,6 +192,27 @@ int write_session(void)
 		to_file(sf,"set webport %i\n",webport);
 #endif /* WEB */
 
+#ifdef UPTIME
+	if (uptimehost && Strcasecmp(uptimehost,defaultuptimehost))
+		to_file(sf,"set uphost %s\n",uptimehost);
+	if (uptimeport)
+		to_file(sf,"set upport %i\n",uptimeport);
+	if (uptimenick)
+		to_file(sf,"set upnick %s\n",uptimenick);
+#endif /* UPTIME */
+
+#ifdef TRIVIA
+	if (triv_qfile)
+		to_file(sf,"set qfile %s\n",triv_qfile);
+	to_file(sf,"set qdelay %i\n",triv_qdelay);
+	to_file(sf,"set qchar %c\n",triv_qchar);
+#endif /* TRIVIA */
+
+#ifdef SEEN
+	if (seenfile)
+		to_file(sf,"set seenfile %s\n",seenfile);
+#endif /* SEEN */
+
 #ifdef DYNCMD
 	/*
 	 *  because of "chaccess XXX disable" its best to save chaccess last
@@ -285,6 +228,87 @@ int write_session(void)
 		}
 	}
 #endif /* DYNCMD */
+
+#ifdef ALIAS
+	for(alias=aliaslist;alias;alias=alias->next)
+	{
+		to_file(sf,"alias %s %s\n",alias->alias,alias->format);
+	}
+#endif /* ALIAS */
+
+	for(bot=botlist;bot;bot=bot->next)
+	{
+		to_file(sf,"nick %i %s\n",bot->guid,bot->wantnick);
+		/*
+		 *  current->setting contains channel defaults and global vars
+		 */
+		for(j=0;VarName[j].name;j++)
+		{
+			varval = &bot->setting[j];
+			if (IsProc(j))
+				varval = varval->proc_var;
+			if (IsChar(j))
+			{
+				if (VarName[j].v.num != varval->char_var)
+					to_file(sf,"set %s %c\n",VarName[j].name,varval->char_var);
+			}
+			else
+			if (IsNum(j))
+			{
+				if (VarName[j].v.num != varval->int_var)
+					to_file(sf,"set %s %i\n",VarName[j].name,varval->int_var);
+			}
+			else
+			if (IsStr(j))
+			{
+				/*
+				 *  There are no default string settings
+				 */
+				if (varval->str_var)
+					to_file(sf,"set %s %s\n",VarName[j].name,varval->str_var);
+			}
+		}
+		for(chan=bot->chanlist;chan;chan=chan->next)
+		{
+			if (!chan->active && !chan->rejoin)
+				continue;
+			to_file(sf,"join %s %s\n",chan->name,(chan->key) ? chan->key : "");
+			/*
+			 *  using CHANSET_SIZE: only the first settings contain stuff
+			 */
+			for(j=0;j<CHANSET_SIZE;j++)
+			{
+				varval = &chan->setting[j];
+				if (IsNum(j))
+				{
+					if (VarName[j].v.num != varval->int_var)
+						to_file(sf,"set %s %i\n",VarName[j].name,varval->int_var);
+				}
+				else
+				if (IsStr(j))
+				{
+					/*
+					 *  There are no default string settings
+					 */
+					if (varval->str_var)
+						to_file(sf,"set %s %s\n",VarName[j].name,varval->str_var);
+				}
+			}
+		}
+		// SPY files
+		for(spy=bot->spylist;spy;spy=spy->next)
+		{
+			if (spy->t_dest == SPY_FILE)
+			{
+				if (spy->src && spy->dest)
+					to_file(sf,"spy %s > %s\n",spy->src,spy->dest);
+#ifdef DEBUG
+				else
+					debug("spy to session fail\n");
+#endif /* DEBUG */
+			}
+		}
+	}
 
 	close(sf);
 	return(TRUE);

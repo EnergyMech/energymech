@@ -18,3 +18,9 @@ mech.pid
 root.zone*
 trick.conf
 
+conf
+debug*
+*.log
+*.stats
+*.session
+energymech.userfile

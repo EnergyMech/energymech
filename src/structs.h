@@ -82,7 +82,12 @@ typedef struct
 
 typedef struct DEFstruct
 {
-	int		id;
+	union
+	{
+		int	id;
+		void	*func;
+
+	} v;
 	char		*idstr;
 
 } DEFstruct;
@@ -168,7 +173,16 @@ typedef struct Setting
 	uchar		type;
 	uchar		uaccess;		/* user access to touch/view this setting */
 	short		min;
-	void		*setto;			/* type-casted to whatever */
+	union
+	{
+			int	num;
+			int	*numptr;
+			char	chr;
+			char	*str;
+			char	**strptr;
+
+	} v;
+	//void		*setto;			/* type-casted to whatever */
 	char		*name;
 	int		max;
 	void		(*func)(const struct Setting *);
@@ -565,7 +579,7 @@ typedef struct Mech
 
 #ifdef IDWRAP
 	char		*identfile;
-#endif /* IDWRAP */		
+#endif /* IDWRAP */
 
 	/* big buffers at the end */
 	UniVar		setting[SIZE_VARS];	/* global vars + channel defaults */

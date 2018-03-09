@@ -1,3 +1,13 @@
+3.0.99p4 -- WORK IN PROGRESS (~February, 2018)
+
+ * Fixed: Potential memory corruption bug in do_user().
+ * Fixed: Aliases saves to session file.
+ * Added: CORE & INFO (statistics) can now be output redirected.
+ * Added: SPY to files saved in sessions.
+ * Fixed: HELP command should now be working properly again.
+ * Fixed: Strlen/Strlen2 code cleanup.
+ * Fixed: Various compiler warnings.
+
 3.0.99p3 -- July 24th, 2009.
 
  * Added: Python scripting support (supplied by S.Marquis)

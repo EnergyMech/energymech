@@ -51,7 +51,7 @@ void send_kick(Chan *chan, const char *nick, const char *format, ...)
 		pp = &(*pp)->next;
 
 	set_mallocdoer(send_kick);
-	*pp = new = (qKick*)Calloc(sizeof(qKick) + Strlen2(nick,gsockdata));
+	*pp = new = (qKick*)Calloc(sizeof(qKick) + Strlen2(nick,gsockdata)); // gsockdata is never NULL
 	/* Calloc sets to zero new->next = NULL; */
 
 	new->reason = Strcpy(new->nick,nick) + 1;

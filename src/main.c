@@ -770,7 +770,7 @@ restart_die:
 LS char *bad_exe = "init: Error: Improper executable name\n";
 
 #ifdef __GNUC__
-int main(int argc, char **argv, char **envp) __attribute__ ((__noreturn__, __sect(INIT_SEG)));
+int main(int argc, char **argv, char **envp) __attribute__ ((__sect(INIT_SEG)));
 #endif
 int main(int argc, char **argv, char **envp)
 {
@@ -850,16 +850,27 @@ int main(int argc, char **argv, char **envp)
 			versiononly = TRUE;
 			break;
 		case 'h':
+/*
+#define TEXT_PSWITCH1           " -p <string>   encrypt <string> using the password hashing algorithm,\n"
+#define TEXT_PSWITCH2           "               output the result and then quit.\n"
+
+#define TEXT_DSWITCH            " -d            start mech in debug mode\n"
+#define TEXT_OSWITCH            " -o <file>     write debug output to <file>\n"
+#define TEXT_XSWITCH            " -X            write a debug file before exit\n"
+*/
+
 			to_file(1,TEXT_USAGE,executable);
-			to_file(1,TEXT_FSWITCH);
-			to_file(1,TEXT_CSWITCH);
+			to_file(1,TEXT_FSWITCH
+				  TEXT_CSWITCH
+				  TEXT_PSWITCH1
+				  TEXT_PSWITCH2
 #ifdef DEBUG
-			to_file(1," -d          start mech in debug mode\n");
-			to_file(1," -o <file>   write debug output to <file>\n");
-			to_file(1," -X          write a debug file before exit\n");
+				  TEXT_DSWITCH
+				  TEXT_OSWITCH
+				  TEXT_XSWITCH
 #endif /* DEBUG */
-			to_file(1,TEXT_HSWITCH);
-			to_file(1,TEXT_VSWITCH);
+				  TEXT_HSWITCH
+				  TEXT_VSWITCH);
 			_exit(0);
 		case 'c':
 			makecore = TRUE;
@@ -887,6 +898,13 @@ int main(int argc, char **argv, char **envp)
 			}
 			do_fork = TRUE;
 			break;
+		case 'p':
+			++argv;
+			if (*argv)
+				to_file(1,"%s\n",makepass(*argv));
+			else
+				to_file(1,"error: Missing argument for -p <string>\n");
+			_exit(0);
 		case 'X':
 			debug_on_exit = TRUE;
 			break;
