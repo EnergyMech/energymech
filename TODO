@@ -1,12 +1,16 @@
 /*
- *  EnergyMech TODO (May 17th, 2009)
+ *  EnergyMech TODO (March 9th, 2018)
  */
+
+ - URL grabber/log
+
+ - SSL support for irc server/botnet
+
+ - IPv6 support
 
  - Script timer
 
  - Genuine telnet protocol support for telnet sessions (?)
-
- - SOCKS4/5 support (?)
 
  - Undernet CService support (IMHO, should be channel settings (set=password, tog=enable/disable) /proton)
 

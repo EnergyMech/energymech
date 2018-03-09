@@ -71,6 +71,7 @@ do
           redirect ) ft_redirect=$yesno ;;
           seen )     ft_seen=$yesno ;;
           session )  ft_session=$yesno ;;
+          sha )      ft_sha=$yesno ;;
           stats )    ft_stats=$yesno ;;
           tcl )      ft_tcl=$yesno ;;
           telnet )   ft_telnet=$yesno ;;
@@ -105,7 +106,7 @@ do
   esac
 
   case "$feature" in
-    debug | botnet | telnet | alias | seen | session | dyncmd | newbie | wingate | md5 \
+    debug | botnet | telnet | alias | seen | session | dyncmd | newbie | wingate | md5 | sha \
     | ctcp | dccfile | uptime | redirect | greet | perl | profiling | tcl | dynamode | web \
     | note | notify | trivia | toybox | bounce | stats | rawdns | ircd_ext | idwrap | chanban | python )
       case _"$optarg"_ in
@@ -175,6 +176,8 @@ do
         seen_no ) ft_seen=no ;;
         session_yes | session_ ) ft_session=yes ;;
         session_no ) ft_session=no ;;
+        sha_yes | sha_ ) ft_seen=yes ;;
+        sha_no ) ft_sha=no ;;
         stats_yes | stats_ ) ft_stats=yes ;;
         stats_no ) ft_stats=no ;;
         tcl_yes | tcl_ ) ft_tcl=yes ;;
@@ -220,6 +223,7 @@ do
         redirect )     ft_redirect=no ;;
         seen )         ft_seen=no ;;
         session )      ft_session=no ;;
+        sha )          ft_sha=yes ;;
         stats )        ft_stats=no ;;
         tcl )          ft_tcl=no ;;
         telnet )       ft_telnet=no ;;
@@ -231,6 +235,7 @@ do
       esac
     ;;
     --md5=internal)  ft_md5=internal ;;
+    --sha=internal)  ft_sha=internal ;;
     --use-cpuflags)  cc_arch_opt=yes ;;
     --no-cpuflags)   cc_arch_opt=no ;;
     --use-optimize)  cc_optimize_opt=yes ;;
@@ -263,6 +268,7 @@ do
 		     ft_redirect=yes
                      ft_seen=yes
                      ft_session=yes
+                     ft_sha=yes
 		     ft_stats=yes
                      ft_tcl=yes
                      ft_telnet=yes
@@ -283,6 +289,7 @@ Features and packages:
   --with-FEATURE[=ARG]     use FEATURE [ARG=yes]
   --without-FEATURE        do not use FEATURE (same as --with-FEATURE=no)
   --md5=internal           Use internal routines for MD5 password hashes instead of system libraries
+  --sha=internal           Use internal routines for SHA password hashes instead of system libraries
 #md5 | ctcp | dccfile | uptime | redirect | greet | perl | dynamode | web \
 #note | notify | trivia | toybox | bounce | stats | rawdns | ircd_ext | idwrap | chanban | python )
   --with-alias             ALIAS support
@@ -578,7 +585,7 @@ esac
 rm -f $TESTP
 
 #
-#
+#  Some processors like Sparc, will cause a bus error (SIGBUS) if you try to access unaligned memory
 #
 
 has_unaligned=no
@@ -619,7 +626,7 @@ echo $ac_t "$has_inet_addr"
 rm -f $TESTP
 
 #
-#  where is inet_addr() ?
+#  where is inet_aton() ?
 #
 
 has_inet_aton=no
@@ -663,13 +670,59 @@ echo $ac_t "$has_socket"
 rm -f $TESTP
 
 #
-#  check for MD5 capabilities
+#  check for SHA capabilities in libc/glibc/libcrypt
 #
+has_sha=no
 has_md5=no
-has_des=no
-if [ ! "$ft_md5" = no ]; then
+if [ ! "$ft_sha" = no ]; then
   TESTC=config/pw.c
-  echo $ac_n "checking for crypt() ... "$ac_c
+  echo $ac_n "checking for SHA in crypt() ... "$ac_c
+  sha_internal=
+  crypt_func='-DCRYPT_FUNC=crypt'
+  CRYPT_FUNCTION='#define CRYPT_FUNC crypt'
+  if [ "$ft_sha" = internal ]; then
+    sha_internal=config/sha_internal.c
+    crypt_func='-DCRYPT_FUNC=sha_crypt'
+    CRYPT_FUNCTION='#define CRYPT_FUNC sha_crypt'
+  fi
+  $CC -o $TESTP $TESTC $sha_internal $crypt_func 1> /dev/null 2> /dev/null
+  if [ ! -x $TESTP ]; then
+    libcrypt=-lcrypt
+    has_sha=yes
+    $CC -o $TESTP $TESTC $crypt_func $libcrypt 1> /dev/null 2> /dev/null
+  fi
+  if [ ! -x $TESTP ]; then
+    libcrypt=/usr/lib/libcrypt.so
+    has_sha=yes
+    $CC -o $TESTP $TESTC $crypt_func $libcrypt 1> /dev/null 2> /dev/null
+  fi
+  if [ ! -x $TESTP ]; then
+    has_sha=no
+    libcrypt=
+  fi
+  if [ -x $TESTP ]; then
+    pwhash=`$TESTP`
+    case "$pwhash" in
+      MD5 ) has_md5=yes ;;
+      SHAMD5 )
+        has_md5=yes
+        has_sha=yes
+      ;;
+    esac
+  fi
+  echo $ac_t "$has_sha"
+  [ "$has_sha" = yes -a "$sha_internal" ] && has_sha=internal
+  rm -f $TESTP
+fi
+
+#
+#  check for MD5 capabilities in libc/glibc/libcrypt
+#
+if [ "$has_md5" = yes ]; then
+  echo "checking for MD5 in crypt() ... (cached) yes"
+elif [ ! "$ft_md5" = no ]; then
+  TESTC=config/pw.c
+  echo $ac_n "checking for MD5 in crypt() ... "$ac_c
   md5_internal=
   crypt_func='-DCRYPT_FUNC=crypt'
   CRYPT_FUNCTION='#define CRYPT_FUNC crypt'
@@ -697,11 +750,6 @@ if [ ! "$ft_md5" = no ]; then
     pwhash=`$TESTP`
     case "$pwhash" in
       MD5 ) has_md5=yes ;;
-      DES ) has_des=yes ;;
-      DESaMD5 )
-        has_md5=yes
-        has_des=yes
-      ;;
     esac
   fi
   echo $ac_t "$has_md5"
@@ -847,6 +895,11 @@ if [ "$ft_md5" = internal ]; then
   MD5_O=md5/md5.o
 fi
 
+SHA_O=
+if [ "$ft_sha" = internal ]; then
+  SHA_O=sha/sha.o
+fi
+
 echo
 echo "Do you want ..."
 echo
@@ -958,6 +1011,17 @@ else
   test "$ft_md5" && echo "$ft_md5" && ans=$ft_md5
   test -z "$ft_md5" && read ans
   test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes -o "$ans" = internal && def_md5='#define MD5CRYPT'
+fi
+
+def_sha='#undef SHACRYPT'
+unset ans
+echo $ac_n "SHA password support? ...................... [Y/n] "$ac_c
+if [ "$has_sha" = no ]; then
+  echo 'no (unsupported)'
+else
+  test "$ft_sha" && echo "$ft_sha" && ans=$ft_sha
+  test -z "$ft_sha" && read ans
+  test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes -o "$ans" = internal && def_sha='#define SHACRYPT'
 fi
 
 def_newbie='#undef NEWBIE'
@@ -1106,6 +1170,7 @@ s%@gdbflag@%$cc_g_flag%;
 /@PYINCLUDE@/ { s,@PYINCLUDE@,$incpython,; };
 /@TCLINCLUDE@/ { s,@TCLINCLUDE@,$inctcl,; };
 s|@MD5_O@|$MD5_O|;
+s|@SHA_O@|$SHA_O|;
 s%@oc@%$objcomment%;
 s%@sz@%$sizecomment%;
 s/[ 	]*\$//g;
@@ -1113,8 +1178,10 @@ s/[ 	]*\$//g;
 
 echo "Creating src/config.h"
 
+CRYPT_HAS_SHA='#undef CRYPT_HAS_SHA'
 CRYPT_HAS_MD5='#undef CRYPT_HAS_MD5'
 CRYPT_HAS_DES='#undef CRYPT_HAS_DES'
+[ "$has_sha" = yes ] && CRYPT_HAS_SHA='#define CRYPT_HAS_SHA'
 [ "$has_md5" = yes ] && CRYPT_HAS_MD5='#define CRYPT_HAS_MD5'
 [ "$has_des" = yes ] && CRYPT_HAS_DES='#define CRYPT_HAS_DES'
 
@@ -1133,6 +1200,7 @@ s|@DEF_DYNAMODE@|$def_dynamode|;
   s|@DEF_IDWRAP@|$def_idwrap|;
 s|@DEF_IRCD_EXT@|$def_ircd_ext|;
      s|@DEF_MD5@|$def_md5|;
+     s|@DEF_SHA@|$def_sha|;
   s|@DEF_NEWBIE@|$def_newbie|;
     s|@DEF_NOTE@|$def_note|;
   s|@DEF_NOTIFY@|$def_notify|;
@@ -1152,6 +1220,7 @@ s|@DEF_REDIRECT@|$def_redirect|;
  s|@DEF_WINGATE@|$def_wingate|;
 
 s|@DEF_CRYPT_FUNCTION@|$CRYPT_FUNCTION|;
+s|@CRYPT_HAS_SHA@|$CRYPT_HAS_SHA|;
 s|@CRYPT_HAS_MD5@|$CRYPT_HAS_MD5|;
 s|@CRYPT_HAS_DES@|$CRYPT_HAS_DES|;
 s|@IDWRAP_PATH@|$IDWRAP_PATH|;

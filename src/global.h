@@ -1,7 +1,7 @@
 /*
 
     EnergyMech, IRC bot software
-    Copyright (c) 1997-2009 proton
+    Copyright (c) 1997-2018 proton
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@
 #define MECHUSERLOGIN			"v3.energymech.net"
 
 BEG const char VERSION[]		MDEF("3.0.99p4");
-BEG const char SRCDATE[]		MDEF("March 5th, 2018");
+BEG const char SRCDATE[]		MDEF("March 9th, 2018");
 #ifdef __CYGWIN__
 BEG const char BOTCLASS[]		MDEF("WinMech");
 #else /* ! CYGWIN */

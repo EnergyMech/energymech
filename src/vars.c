@@ -133,6 +133,11 @@ void ec_access(char *from, char *to)
 	nobo_strcpy(num);
 }
 
+void ec_capabilities(char *from, char *to)
+{
+	nobo_strcpy(__mx_opts);
+}
+
 void ec_cc(char *from, char *to)
 {
 	nobo_strcpy((current->activechan) ? current->activechan->name : TEXT_NONE);
@@ -272,16 +277,17 @@ LS const struct
 
 } ecmd[] =
 {
-	{ ec_access,	"$access",	7	},
-	{ ec_cc,	"$cc",		3	},
-	{ ec_channels,	"$channels",	9	},
-	{ ec_time,	"$time",	5	},
-	{ ec_set,	"$var(",	5	},
-	{ ec_on,	"$on",		3	},
-	{ ec_server,	"$server",	7	},
-	{ ec_up,	"$up",		3	},
-	{ ec_ver,	"$ver",		4	},
-	{ NULL,		"",		0	},
+	{ ec_access,		"$access",	7	},
+	{ ec_capabilities,	"$cap",		4	},
+	{ ec_cc,		"$cc",		3	},
+	{ ec_channels,		"$channels",	9	},
+	{ ec_time,		"$time",	5	},
+	{ ec_set,		"$var(",	5	},
+	{ ec_on,		"$on",		3	},
+	{ ec_server,		"$server",	7	},
+	{ ec_up,		"$up",		3	},
+	{ ec_ver,		"$ver",		4	},
+	{ NULL,			"",		0	},
 };
 
 /*
