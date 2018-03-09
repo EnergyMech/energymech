@@ -257,7 +257,7 @@ LS void cfg_shit(char *)					__page(CFG1_SEG);
 LS void cfg_user(char *)					__page(CFG1_SEG);
 void mirror_user(User *)					__page(CORE_SEG);
 void mirror_userlist(void)					__page(CORE_SEG);
-LS void addtouser(Strp **, const char *)			__attr(CORE_SEG, __regparm (2) );
+LS void addtouser(Strp **, const char *, int)			__attr(CORE_SEG, __regparm (3) );
 LS int remfromuser(Strp **, const char *)			__attr(CORE_SEG, __regparm (2) );
 
 /*

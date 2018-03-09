@@ -447,9 +447,3 @@ listcheck:
 	}
 	to_user(from,"You are now officially immortal");
 }
-
-#ifdef MD5CRYPT
-void do_md5(COMMAND_ARGS)
-{
-}
-#endif /* MD5CRYPT */

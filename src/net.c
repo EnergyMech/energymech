@@ -1016,7 +1016,7 @@ void ushareUser(BotNet *bn, char *rest)
 #ifdef DEBUG
 					debug("(ushareUser) user %s ++ mask/chan %s\n",user->name,rest);
 #endif /* DEBUG */
-					addtouser((c == '*') ? &user->mask : &user->chan,rest);
+					addtouser((c == '*') ? &user->mask : &user->chan,rest,TRUE);
 				}
 			}
 		}

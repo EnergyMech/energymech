@@ -138,7 +138,11 @@ int write_session(void)
 #ifdef RAWDNS
 	Strp	*p;
 #endif /* RAWDNS */
+#ifdef ALIAS
+	Alias	*alias;
+#endif /* ALIAS */
 	Server	*sp;
+	Spy	*spy;
 	Chan	*chan;
 	Mech	*bot;
 	UniVar	*varval;
@@ -154,6 +158,83 @@ int write_session(void)
 		if (ia_ns[j].s_addr > 0)
 			to_file(sf,"dnsserver %s\n",inet_ntoa(ia_ns[j]));
 #endif /* RAWDNS */
+
+	to_file(sf,"set ctimeout %i\n",ctimeout);
+	for(sp=serverlist;sp;sp=sp->next)
+	{
+		to_file(sf,"server %s %i %s\n",sp->name,(sp->port) ? sp->port : 6667,
+			(sp->pass[0]) ? sp->pass : "");
+	}
+
+#ifdef BOTNET
+	if (linkpass)
+		to_file(sf,"set linkpass %s\n",linkpass);
+	if (linkport)
+		to_file(sf,"set linkport %i\n",linkport);
+	if (autolink)
+		to_file(sf,"set autolink 1\n");
+	for(cfg=netcfglist;cfg;cfg=cfg->next)
+	{
+		to_file(sf,"link %i %s",cfg->guid,(cfg->pass) ? cfg->pass : MATCH_ALL);
+		if (cfg->host)
+			to_file(sf," %s %i",cfg->host,cfg->port);
+		to_file(sf,"\n");
+	}
+#endif /* BOTNET */
+
+#ifdef BOUNCE
+	if (bounce_port)
+		to_file(sf,"set bncport %i\n",bounce_port);
+#endif /* BOUNCE */
+
+#ifdef WEB
+	if (webport)
+		to_file(sf,"set webport %i\n",webport);
+#endif /* WEB */
+
+#ifdef UPTIME
+	if (uptimehost && Strcasecmp(uptimehost,defaultuptimehost))
+		to_file(sf,"set uphost %s\n",uptimehost);
+	if (uptimeport)
+		to_file(sf,"set upport %i\n",uptimeport);
+	if (uptimenick)
+		to_file(sf,"set upnick %s\n",uptimenick);
+#endif /* UPTIME */
+
+#ifdef TRIVIA
+	if (triv_qfile)
+		to_file(sf,"set qfile %s\n",triv_qfile);
+	to_file(sf,"set qdelay %i\n",triv_qdelay);
+	to_file(sf,"set qchar %c\n",triv_qchar);
+#endif /* TRIVIA */
+
+#ifdef SEEN
+	if (seenfile)
+		to_file(sf,"set seenfile %s\n",seenfile);
+#endif /* SEEN */
+
+#ifdef DYNCMD
+	/*
+	 *  because of "chaccess XXX disable" its best to save chaccess last
+	 */
+	for(j=0;mcmd[j].name;j++)
+	{
+		if (acmd[j] != mcmd[j].defaultaccess)
+		{
+			if (acmd[j] == 250)
+				to_file(sf,"chaccess %s disable\n",mcmd[j].name);
+			else
+				to_file(sf,"chaccess %s %i\n",mcmd[j].name,(int)acmd[j]);
+		}
+	}
+#endif /* DYNCMD */
+
+#ifdef ALIAS
+	for(alias=aliaslist;alias;alias=alias->next)
+	{
+		to_file(sf,"alias %s %s\n",alias->alias,alias->format);
+	}
+#endif /* ALIAS */
 
 	for(bot=botlist;bot;bot=bot->next)
 	{
@@ -214,77 +295,20 @@ int write_session(void)
 				}
 			}
 		}
-	}
-
-	to_file(sf,"set ctimeout %i\n",ctimeout);
-	for(sp=serverlist;sp;sp=sp->next)
-	{
-		to_file(sf,"server %s %i %s\n",sp->name,(sp->port) ? sp->port : 6667,
-			(sp->pass[0]) ? sp->pass : "");
-	}
-
-#ifdef TRIVIA
-	if (triv_qfile)
-		to_file(sf,"set qfile %s\n",triv_qfile);
-	to_file(sf,"set qdelay %i\n",triv_qdelay);
-	to_file(sf,"set qchar %c\n",triv_qchar);
-#endif /* TRIVIA */
-
-#ifdef UPTIME
-	if (uptimehost && Strcasecmp(uptimehost,defaultuptimehost))
-		to_file(sf,"set uphost %s\n",uptimehost);
-	if (uptimeport)
-		to_file(sf,"set upport %i\n",uptimeport);
-	if (uptimenick)
-		to_file(sf,"set upnick %s\n",uptimenick);
-#endif /* UPTIME */
-
-#ifdef SEEN
-	if (seenfile)
-		to_file(sf,"set seenfile %s\n",seenfile);
-#endif /* SEEN */
-
-#ifdef BOTNET
-	if (linkpass)
-		to_file(sf,"set linkpass %s\n",linkpass);
-	if (linkport)
-		to_file(sf,"set linkport %i\n",linkport);
-	if (autolink)
-		to_file(sf,"set autolink 1\n");
-	for(cfg=netcfglist;cfg;cfg=cfg->next)
-	{
-		to_file(sf,"link %i %s",cfg->guid,(cfg->pass) ? cfg->pass : MATCH_ALL);
-		if (cfg->host)
-			to_file(sf," %s %i",cfg->host,cfg->port);
-		to_file(sf,"\n");
-	}
-#endif /* BOTNET */
-
-#ifdef BOUNCE
-	if (bounce_port)
-		to_file(sf,"set bncport %i\n",bounce_port);
-#endif /* BOUNCE */
-
-#ifdef WEB
-	if (webport)
-		to_file(sf,"set webport %i\n",webport);
-#endif /* WEB */
-
-#ifdef DYNCMD
-	/*
-	 *  because of "chaccess XXX disable" its best to save chaccess last
-	 */
-	for(j=0;mcmd[j].name;j++)
-	{
-		if (acmd[j] != mcmd[j].defaultaccess)
+		// SPY files
+		for(spy=bot->spylist;spy;spy=spy->next)
 		{
-			if (acmd[j] == 250)
-				to_file(sf,"chaccess %s disable\n",mcmd[j].name);
-			else
-				to_file(sf,"chaccess %s %i\n",mcmd[j].name,(int)acmd[j]);
+			if (spy->t_dest == SPY_FILE)
+			{
+				if (spy->src && spy->dest)
+					to_file(sf,"spy %s > %s\n",spy->src,spy->dest);
+#ifdef DEBUG
+				else
+					debug("spy to session fail\n");
+#endif /* DEBUG */
+			}
 		}
 	}
-#endif /* DYNCMD */
 
 	close(sf);
 	return(TRUE);
