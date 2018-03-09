@@ -1255,7 +1255,7 @@ void do_user(COMMAND_ARGS)
 		addtouser(&user->mask,tmpmask,FALSE);	// does not run rehash_chanusers(), does not clobber nuh_buf
 		addtouser(&user->chan,chan,TRUE);	// clobbers nuh_buf
 #ifdef DEBUG
-		debug("(do_user) from %s, handle %s,\n\tmask %s (arg %s),\n\tuser->mask %s, chan %s\n",from,handle,mask,nick,user->mask,chan);
+		debug("(do_user) from %s, handle %s,\n\tmask %s, chan %s\n",from,handle,tmpmask,chan);
 #endif /* DEBUG */
 		to_user(from,"%s has been added as %s on %s",handle,tmpmask,chan);
 		to_user(from,"Access level: %i%s%s",newaccess,(pass) ? "  Password: " : "",(pass) ? pass : "");
@@ -1525,7 +1525,14 @@ void do_echo(COMMAND_ARGS)
 void change_pass(User *user, char *pass)
 {
 	User	*new,**uptr;
+	char	*enc;
 
+	enc = makepass(pass);
+	if (strlen(user->pass) <= strlen(enc))
+	{
+		Strcpy(user->pass,enc);
+		user->modcount++;
+	}
 	/*
 	 *  password is stuck in a solid malloc in a linked list
 	 *  add_user() touches current->ul_save for us

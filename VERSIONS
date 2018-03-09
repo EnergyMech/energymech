@@ -1,5 +1,7 @@
-3.0.99p4 -- WORK IN PROGRESS (~February, 2018)
+3.0.99p4 -- WORK IN PROGRESS (~March, 2018)
 
+ * Added: Support for SHA password hashes.
+ * Added: ESAY $cap will display compile time capabilities.
  * Fixed: Potential memory corruption bug in do_user().
  * Fixed: Aliases saves to session file.
  * Added: CORE & INFO (statistics) can now be output redirected.

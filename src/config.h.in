@@ -71,6 +71,11 @@
 @DEF_WINGATE@
 
 /*
+ *  SHACRYPT: support use of SHA to hash passwords
+ */
+@DEF_SHA@
+
+/*
  *  MD5CRYPT: support use of MD5 to hash passwords
  */
 @DEF_MD5@
@@ -218,6 +223,7 @@
  *
  */
 @DEF_CRYPT_FUNCTION@
+@CRYPT_HAS_SHA@
 @CRYPT_HAS_MD5@
 @CRYPT_HAS_DES@
 
@@ -445,6 +451,13 @@ const char __mx_opts[] =	""
 #define OPT_COMMA	", "
 #undef	OPT_COREONLY
 #endif /* DYNCMD */
+
+#ifdef SHACRYPT
+			OPT_COMMA "sha"
+#undef	OPT_COMMA
+#define OPT_COMMA	", "
+#undef	OPT_COREONLY
+#endif /* SHACRYPT */
 
 #ifdef MD5CRYPT
 			OPT_COMMA "md5"
