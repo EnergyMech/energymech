@@ -668,8 +668,9 @@ typedef struct BotNet
 
 	struct
 	{
-	ulong		pta:1;		/* plain text auth	*/
-	ulong		md5:1;		/* md5 */
+	ulong		pta:1,		/* plain text auth	*/
+			sha:1,		/* SHA */
+			md5:1;		/* MD5 */
 
 	} opt;
 

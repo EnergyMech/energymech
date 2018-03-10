@@ -30,12 +30,18 @@
 #include "text.h"
 #include "mcmd.h"
 
-#ifdef MD5CRYPT
-#define md5banneropt " MD5"
+#if defined(SHACRYPT) || defined(MD5CRYPT)
 char *CRYPT_FUNC(const char *, const char *);
-#else
-#define md5banneropt
+#endif
+
+const char banneropt[] = "BB%i %i PTA"
+#ifdef SHACRYPT
+	" SHA"
+#endif /* SHACRYPT */
+#ifdef MD5CRYPT
+	" MD5"
 #endif /* MD5CRYPT */
+	"\n";
 
 #ifdef TELNET
 char *telnetprompt = TEXT_ENTERNICKNAME;
@@ -307,6 +313,10 @@ void basicAuth(BotNet *bn, char *rest)
 	{
 		if (!Strcmp(pass,"PTA"))
 			authtype = BNAUTH_PLAINTEXT;
+#ifdef SHACRYPT
+		if (!Strcmp(pass,"SHA"))
+			authtype = BNAUTH_SHA;
+#endif /* SHACRYPT */
 #ifdef MD5CRYPT
 		if (!Strcmp(pass,"MD5"))
 			authtype = BNAUTH_MD5;
@@ -334,6 +344,26 @@ void basicAuth(BotNet *bn, char *rest)
 		if (Strcmp(pass,rest))
 			goto badpass;
 		break;
+#ifdef SHACRYPT
+	case BNAUTH_SHA:
+		if (linkpass && *linkpass)
+		{
+			char	*enc,temppass[24 + Strlen2(pass,linkpass)]; // linkpass is never NULL
+
+			/* "mypass theirpass REMOTEsid LOCALsid" */
+			sprintf(temppass,"%s %s %i %i",linkpass,pass,bn->rsid,bn->lsid);
+#ifdef DEBUG
+			debug(">> sha pass exchange: \"%s\"\n",temppass);
+#endif /* DEBUG */
+			enc = CRYPT_FUNC(temppass,rest);
+#ifdef DEBUG
+			debug("(basicAuth) their = %s, mypass = %s :: sha = %s\n",
+				pass,linkpass,enc);
+#endif /* DEBUG */
+			if (!Strcmp(enc,rest))
+				break;
+		}
+#endif /* SHACRYPT */
 #ifdef MD5CRYPT
 	case BNAUTH_MD5:
 		if (linkpass && *linkpass)
@@ -492,6 +522,10 @@ void basicBanner(BotNet *bn, char *rest)
 	{
 		if (!Strcmp(p,"PTA"))
 			bn->opt.pta = TRUE;
+#ifdef SHACRYPT
+		if (!Strcmp(p,"SHA"))
+			bn->opt.sha = TRUE;
+#endif /* SHACRYPT */
 #ifdef MD5CRYPT
 		if (!Strcmp(p,"MD5"))
 			bn->opt.md5 = TRUE;
@@ -510,7 +544,7 @@ void basicBanner(BotNet *bn, char *rest)
 	if (bn->status == BN_UNKNOWN)
 	{
 		bn->controller = netbot = get_netbot();
-		to_file(bn->sock,"BB%i %i PTA" md5banneropt "\n",netbot->guid,bn->lsid);
+		to_file(bn->sock,banneropt,netbot->guid,bn->lsid);
 		bn->status = BN_WAITAUTH;
 		return;
 	}
@@ -533,12 +567,37 @@ void basicBanner(BotNet *bn, char *rest)
 	if (bn->opt.md5 && (BNAUTH_MD5 > authtype))
 		authtype = BNAUTH_MD5;
 #endif /* MD5CRYPT */
+#ifdef SHACRYPT
+	if (bn->opt.sha && (BNAUTH_SHA > authtype))
+		authtype = BNAUTH_SHA;
+#endif /* SHACRYPT */
 
 	switch(authtype)
 	{
 	case BNAUTH_PLAINTEXT:
 		to_file(bn->sock,"BAPTA %s\n",linkpass);
 		break;
+#ifdef SHACRYPT
+	case BNAUTH_SHA:
+		if ((cfg = find_netcfg(guid)))
+		{
+			if (cfg->pass && *cfg->pass)
+			{
+				char	*enc,salt[8];
+				char	temppass[24 + Strlen2(cfg->pass,linkpass)]; // linkpass(procvar) is not NULL
+
+				/* "theirpass mypass LOCALsid REMOTEsid" */
+				sprintf(temppass,"%s %s %i %i",cfg->pass,linkpass,bn->lsid,bn->rsid);
+#ifdef DEBUG
+				debug(">> sha pass exchange: \"%s\"\n",temppass);
+#endif /* DEBUG */
+				sprintf(salt,"$6$%04x",(rand() >> 16));
+				enc = CRYPT_FUNC(temppass,salt);
+				to_file(bn->sock,"BASHA %s\n",enc);
+				break;
+			}
+		}
+#endif /* SHACRYPT */
 #ifdef MD5CRYPT
 	case BNAUTH_MD5:
 		if ((cfg = find_netcfg(guid)))
@@ -1320,7 +1379,7 @@ void process_botnet(void)
 		{
 			bn->lsid = rand();
 			bn->controller = netbot = get_netbot();
-			if (to_file(bn->sock,"BB%i %i PTA" md5banneropt "\n",netbot->guid,bn->lsid) < 0)
+			if (to_file(bn->sock,banneropt,netbot->guid,bn->lsid) < 0)
 			{
 				botnet_deaduplink(bn);
 			}

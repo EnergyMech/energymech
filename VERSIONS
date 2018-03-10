@@ -1,5 +1,7 @@
 3.0.99p4 -- WORK IN PROGRESS (~March, 2018)
 
+ * Fixed: RawDNS, again...
+ * Fixed: Save procvars only once in session file.
  * Added: Support for SHA password hashes.
  * Added: ESAY $cap will display compile time capabilities.
  * Fixed: Potential memory corruption bug in do_user().

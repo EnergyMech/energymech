@@ -1,7 +1,7 @@
 /*
 
     EnergyMech, IRC bot software
-    Copyright (c) 2000-2009 proton
+    Copyright (c) 2000-2018 proton
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -74,9 +74,8 @@
 #define TEXT_SERVERDELETED	"Server has been deleted: %s:%i"
 #define TEXT_MANYSERVMATCH	"Several entries for %s exists, please specify port also"
 /* do_core() */
-#define TEXT_CURRNICKWANT	"Current nick\t%s (Wanted: %s)"
-#define TEXT_CURRNICKHAS	"Current nick\t%s"
-#define TEXT_CURRGUID		"Guid\t%i"
+#define TEXT_CURRNICKWANT	"Current nick\t%s (Wanted: %s) [#%i]"
+#define TEXT_CURRNICKHAS	"Current nick\t%s [#%i]"
 #define TEXT_USERLISTSTATS	"Users in userlist\t%i (%i Superuser%s, %i Bot%s)"
 #define TEXT_ACTIVECHANS	"Active channels\t%s"
 #define TEXT_MOREACTIVECHANS	"\t%s"
@@ -87,6 +86,8 @@
 
 #define TEXT_CURRSERVER		"Current Server\t%s:%i"
 #define TEXT_CURRSERVERNOT	"Current Server\t" TEXT_NOTINSERVLIST
+#define TEXT_TRYNEWSERVER	"Trying new server, brb..."
+#define TEXT_SWITCHSERVER	"Switching servers..."
 #define TEXT_SERVERONTIME	"Server Ontime\t%s"
 #define TEXT_BOTMODES		"Mode\t+%s"
 

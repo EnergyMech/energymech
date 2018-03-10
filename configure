@@ -585,6 +585,40 @@ esac
 rm -f $TESTP
 
 #
+#  big/little endian
+#
+
+TESTC=config/endian.c
+
+if [ -z "$endian" ]; then
+  endian=unknown
+  echo $ac_n "checking endianness ... "$ac_c
+  $CC -o $TESTP $TESTC 1> /dev/null 2> /dev/null
+  if [ -x $TESTP ]; then
+    endian=`$TESTP`
+    if [ "$endian" == "1" ]; then
+      endian="little"
+    else
+      endian="big"
+    fi
+  fi
+  echo $ac_t "$endian endian"
+fi
+
+case "$endian" in
+  little )
+    LIT_END="#define LITTLE_ENDIAN"
+    BIG_END="#undef BIG_ENDIAN"
+    ;;
+  * )
+    LIT_END="#undef LITTLE_ENDIAN"
+    BIG_END="#define BIG_ENDIAN"
+    ;;
+esac
+
+rm -f $TESTP
+
+#
 #  Some processors like Sparc, will cause a bus error (SIGBUS) if you try to access unaligned memory
 #
 
@@ -1219,6 +1253,8 @@ s|@DEF_REDIRECT@|$def_redirect|;
      s|@DEF_WEB@|$def_web|;
  s|@DEF_WINGATE@|$def_wingate|;
 
+s|@LIT_END@|$LIT_END|;
+s|@BIG_END@|$BIG_END|;
 s|@DEF_CRYPT_FUNCTION@|$CRYPT_FUNCTION|;
 s|@CRYPT_HAS_SHA@|$CRYPT_HAS_SHA|;
 s|@CRYPT_HAS_MD5@|$CRYPT_HAS_MD5|;

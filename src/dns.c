@@ -1,7 +1,7 @@
 /*
 
     EnergyMech, IRC bot software
-    Copyright (c) 1997-2009 proton
+    Copyright (c) 1997-2018 proton
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -64,25 +64,7 @@ LS int dnsserver = 0;
 
 #ifdef DEBUG
 char *type_textlist[] =
-{
-NULL,
-"A",
-"NS",
-"MD",
-"MF",
-"CNAME",
-"SOA",
-"MB",
-"MG",
-"MR",
-"NULL",
-"WKS",
-"PTR",
-"HINFO",
-"MINFO",
-"MX",
-"TXT",
-};
+{ NULL, "A", "NS", "MD", "MF", "CNAME", "SOA", "MB", "MG", "MR", "NULL", "WKS", "PTR", "HINFO", "MINFO", "MX", "TXT", };
 #endif /* DEBUG */
 
 void init_rawdns(void)
@@ -164,17 +146,17 @@ const char *get_dns_token(const char *src, const char *packet, char *dst, int sz
 
 int make_query(char *packet, const char *hostname)
 {
+	dnsQuery *h;
 	char	*size,*dst;
 
 	/*
 	 *  make a packet
 	 */
-	packet[0] = rand() >> 24;
-	packet[1] = rand() >> 24;
-	packet[2] = 1; // RD, recursion desired flag
-	packet[3] = 0;
-	((ulong*)packet)[1] = htonl(0x10000);
-	((ulong*)packet)[2] = 0;
+	memset(packet,0,12);
+	h = (dnsQuery*)packet;
+	h->qid = rand() & 0xffff;
+	h->flags = htons(0x0100);; // Query = 0, Recursion Desired = 1
+	h->questions = htons(1);
 	size = packet + 12;
 	dst  = size + 1;
 	while(*hostname)
@@ -932,7 +914,10 @@ flipstep:
 		return;
 	}
 
-	make_ireq(PA_DNS,from,host);
+	if (to && *to == '#')
+		make_ireq(PA_DNS,to,host);
+	else
+		make_ireq(PA_DNS,from,host);
 	rawdns(host);
 }
 

@@ -163,8 +163,8 @@ struct
 {
 	char	*idstring;
 	int	typenum;
-	
-} spy_source_list[] = 
+
+} spy_source_list[] =
 {
 { SPYSTR_STATUS,	SPY_STATUS	},
 { SPYSTR_MESSAGE,	SPY_MESSAGE	},
@@ -471,7 +471,15 @@ rspy_usage:
 			 *  Dont just open anything.
 			 */
 			if (!is_safepath(dest))
+#ifdef NEWBIE
+			{
+				usage(from);
+				to_user(from,"File/path does not exist or is inaccessible");
+				return;
+			}
+#else
 				goto rspy_usage;
+#endif /* NEWBIE */
 			t_dest = SPY_FILE;
 			goto rspy_dest_ok;
 		}

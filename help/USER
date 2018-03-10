@@ -21,6 +21,11 @@ Add/remove a host mask:
 Only one channel or one mask can be modified with each USER command.
  
 Prefix flags with a "-" to disable them or a "+" to enable them.
+
+Bots can be added to the userlist to be recognized by other bots.
+Use the special access level 200. No password is set for bots and is
+not needed because level 200 users can not execute any commands.
+They can not access bots by telnet either.
  
 User flags:
   AO         auto-op on/off

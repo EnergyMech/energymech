@@ -1,6 +1,6 @@
 #
 #   EnergyMech, IRC bot software
-#   Copyright (c) 1997-2009 proton
+#   Copyright (c) 1997-2018 proton
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@ OFILES =	alias.o auth.o bounce.o chanban.o channel.o core.o \
 		kicksay.o main.o net.o net_chan.o note.o notify.o ons.o parse.o \
 		perl.o prot.o python.o redirect.o reset.o seen.o shit.o socket.o \
 		spy.o stats.o tcl.o telnet.o toybox.o trivia.o uptime.o \
-		user.o vars.o web.o @MD5_O@
+		user.o vars.o web.o @MD5_O@ @SHA_O@
 
 SRCFILES =	alias.c auth.c bounce.c chanban.c channel.c core.c \
 		ctcp.c debug.c dns.c dynamode.c function.c greet.c help.c irc.c \
@@ -58,7 +58,12 @@ SRCFILES =	alias.c auth.c bounce.c chanban.c channel.c core.c \
 
 all:		$(INSTALLNAME)
 
-mcmd.h:		gencmd.c config.h structs.h ;
+#
+#   mcmd.h is generated at compile time to wrap up all command attributes more efficiently,
+#   instead of doing extra parsing and handling while the bot is running.
+#
+
+mcmd.h:		gencmd.c config.h structs.h
 		$(CC) $(LFLAGS) -o gencmd gencmd.c
 		./gencmd > mcmd.h
 
@@ -74,17 +79,24 @@ $(INSTALLNAME):	$(OFILES)
 @oc@		$(CROSS_COMPILE)objcopy -R .note -R .comment $(INSTALLNAME)
 @sz@		size $(INSTALLNAME)
 
-mega:		$(SRCFILES) $(INCS) usage.h
-		$(CROSS_COMPILE)$(CC) $(CFLAGS) -o $(INSTALLNAME) mega.c $(LPROF) $(LIBS) $(LDSCRIPT) $(PYINCLUDE) $(TCLINCLUDE)
+$(INSTALLNAME)-static:	$(OFILES)
+		$(CROSS_COMPILE)$(CC) $(LFLAGS) -o $(INSTALLNAME) $(OFILES) $(LPROF) $(LIBS) $(LDSCRIPT) -static
 @oc@		$(CROSS_COMPILE)objcopy -R .note -R .comment $(INSTALLNAME)
 @sz@		size $(INSTALLNAME)
 
+
 #
-# static targets
+#  'mega' versions
+#  compiling the C files all at once (having all the code "visible" during the whole process) enables GCC to make more optimizations,
+#  resulting in a smaller, more efficient, binary. this process uses lots more memory at compile time.
 #
 
-$(INSTALLNAME)-static:	$(OFILES)
-		$(CROSS_COMPILE)$(CC) $(LFLAGS) -o $(INSTALLNAME) $(OFILES) $(LPROF) $(LIBS) $(LDSCRIPT) -static
+mega-install:	mega $(SRCFILES) $(INCS) usage.h
+		$(CHMOD) $(INSTALLMODE) $(INSTALLNAME)
+		$(MV) $(INSTALLNAME) $(INSTALLDIR)
+
+mega:		$(SRCFILES) $(INCS) usage.h
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -o $(INSTALLNAME) mega.c $(LPROF) $(LIBS) $(LDSCRIPT) $(PYINCLUDE) $(TCLINCLUDE)
 @oc@		$(CROSS_COMPILE)objcopy -R .note -R .comment $(INSTALLNAME)
 @sz@		size $(INSTALLNAME)
 
@@ -219,5 +231,8 @@ web.o:		web.c $(INCS)
 
 md5/md5.o:	md5/md5.c $(INCS)
 		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< -o $@ -Imd5 $(CPROF)
+
+sha/sha1.o:	sha/sha1.c $(INCS)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< -o $@ -Isha1 $(CPROF)
 
 FORCE:

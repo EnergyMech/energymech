@@ -378,6 +378,15 @@
  */
 #define RANDOM(min,max)			(min + (rand() / (RAND_MAX / (max - min + 1))))
 
+/* endianness */
+#ifndef LITTLE_ENDIAN
+@LIT_END@
+#endif /* LITTLE_ENDIAN */
+
+#ifndef BIG_ENDIAN
+@BIG_END@
+#endif /* BIG_ENDIAN */
+
 /* unaligned memory access */
 @UNALIGNED_MEM@
 

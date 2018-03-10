@@ -244,9 +244,9 @@ int write_session(void)
 		 */
 		for(j=0;VarName[j].name;j++)
 		{
-			varval = &bot->setting[j];
 			if (IsProc(j))
-				varval = varval->proc_var;
+				continue;
+			varval = &bot->setting[j];
 			if (IsChar(j))
 			{
 				if (VarName[j].v.num != varval->char_var)
@@ -1208,8 +1208,10 @@ void do_core(COMMAND_ARGS)
 	}
 
 	i = Strcmp(current->nick,current->wantnick);
-	table_buffer((i) ? TEXT_CURRNICKWANT : TEXT_CURRNICKHAS,current->nick,current->wantnick);
-	table_buffer(TEXT_CURRGUID,current->guid);
+	if (i)
+		table_buffer(TEXT_CURRNICKWANT,current->nick,current->wantnick,current->guid);
+	else
+		table_buffer(TEXT_CURRNICKHAS,current->nick,current->guid);
 	table_buffer(TEXT_USERLISTSTATS,u,su,EXTRA_CHAR(su),bu,EXTRA_CHAR(bu));
 
 	pt = tmp;
@@ -1382,12 +1384,12 @@ void do_server(COMMAND_ARGS)
 	ServerGroup *sg;
 	Server	*sp,*dp,**spp;
 	char	*server,*aport,*pass;
-	char	addc,*last,*quitmsg = "Trying new server, brb...";
+	char	addc,*last,*quitmsg = TEXT_TRYNEWSERVER;
 	int	n,iport,sgi;
 
 	if (CurrentCmd->name == C_NEXTSERVER)
 	{
-		quitmsg = "Switching servers...";
+		quitmsg = TEXT_SWITCHSERVER;
 		to_user(from,FMT_PLAIN,quitmsg);
 		goto do_server_jump;
 	}
@@ -1615,7 +1617,7 @@ void do_nick(COMMAND_ARGS)
 		return;
 	}
 	guid = a2i(nick);
-	backup = current;	
+	backup = current;
 	if (!errno)
 	{
 		nick = chop(&rest);
