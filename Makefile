@@ -1,6 +1,6 @@
 #
 #   EnergyMech, IRC Bot software
-#   Copyright (c) 1997-2009 proton
+#   Copyright (c) 1997-2018 proton
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -23,8 +23,8 @@ MISCFILES =	COPYING CREDITS README README.TCL TODO VERSIONS VERSIONS-1 Makefile 
 HELPFILES =	help/8BALL help/ACCESS help/ALIAS help/AWAY help/BAN help/BANLIST help/BYE \
 		help/CCHAN help/CHACCESS help/CHANBAN help/CHANNELS help/CHAT help/CLEARSHIT \
 		help/CMD help/CORE help/CSERV help/CTCP help/CYCLE help/DEOP help/DIE \
-		help/DNS help/DNSSERVER help/DO help/DOWN help/ECHO help/ESAY help/FORGET \
-		help/GREET help/HELP help/IDLE help/INSULT help/INVITE help/JOIN help/KB \
+		help/DNS help/DNSSERVER help/DO help/DOWN help/ECHO help/ESAY help/FEATURES \
+		help/FORGET help/GREET help/HELP help/IDLE help/INSULT help/INVITE help/JOIN help/KB \
 		help/KICK help/KS help/LAST help/LEVELS help/LINK help/LOAD help/LUSERS help/ME \
 		help/MODE help/MSG help/NAMES help/NEXTSERVER help/NICK help/NOTIFY help/ONTIME \
 		help/OP help/PART help/PASSWD help/PROTECTION help/PYTHON help/PYTHONSCRIPT \
@@ -87,6 +87,11 @@ clean:		FORCE
 install:	FORCE
 		$(MAKE) -C src install
 
+mega:		FORCE
+		$(MAKE) -C src mega
+
+mega-install:	FORCE
+		$(MAKE) -C src mega-install
 #
 # packing things up for distribution
 #

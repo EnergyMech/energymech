@@ -1,0 +1,9 @@
+The Energymech contains a list of which features were included
+when the source was compiled.
+
+You can view this list at the command prompt in your shell with
+./(name of executable) -v
+
+Or, once the bot is started, with the command CORE or ESAY $cap
+
+See also: core, esay

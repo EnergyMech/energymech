@@ -17,6 +17,6 @@ excess flood if not careful.
    (none)     Send output to you (default).
    channel    Send output to the specified channel.
    >file      Send output to file. Lines are appended to the end of the file.
-              If the file does not exist, it is created.
+              This file needs to exist before logging to it.
  
 See also: rspy

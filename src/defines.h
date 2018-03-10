@@ -303,6 +303,7 @@ enum {
 #define BNAUTH_PLAINTEXT	0
 #define BNAUTH_DES		1
 #define BNAUTH_MD5		2
+#define BNAUTH_SHA		3
 
 #endif /* BOTNET */
 

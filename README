@@ -48,15 +48,15 @@ Setup?
 
 Read the  sample.conf  file to  get  an idea of  the  config  file
 commands and then try to make your own.  A basic setup doesnt need
-much  more than  NICK,  ALTNICK,  SET USERFILE,  JOIN  and  SERVER
-entries, the rest is just tweaks of default values.
+much  more than NICK, SET ALTNICK, SET USERFILE,  JOIN and  SERVER
+entries, the rest is mostly just tweaks of default values.
 
 Quick steps:
 
 1) cp sample.conf mech.conf
 
-2) pico mech.conf
--- replace ''pico'' with your favourite text editor,  look through
+2) edit mech.conf
+-- replace ''edit'' with your favourite text editor,  look through
    the file for sections to change,  you will have to remove lines
    in order to get the bot to work. Check the file completely!
 
@@ -72,7 +72,7 @@ Quick steps:
 
    then 'run'  this file with  './energymech -f trick.conf'.  this
    will create a userfile  with the name  you chose ('mech.passwd'
-   is a good descriptive name which I usually use myself).
+   is a good descriptive name which I often use myself).
 
    re-use the filename  you selected in your  proper configuration
    file. and remember to 'rm -f mech.session' if you compiled your
@@ -94,6 +94,10 @@ support when running ./configure from the compiling section above.
 Updated Files?
 ~~~~~~~~~~~~~~
 The main distro-site for the EnergyMech is:
+
+   https://github.com/MadCamel/energymech
+
+Files, documentation and tips can be found at:
 
    http://www.energymech.net
 
@@ -131,5 +135,4 @@ IT COMES TO CONFIGURING AND USING IT.
 
 ---*---
 
-proton, July 24th, 2009.
-<mailto:proton@energymech.net>
+joonicks, March 10th, 2018.
