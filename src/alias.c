@@ -1,7 +1,7 @@
 /*
 
     EnergyMech, IRC bot software
-    Copyright (c) 1997-2004 proton
+    Copyright (c) 1997-2018 proton
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,104 +20,197 @@
 */
 #define ALIAS_C
 #include "config.h"
-
 #ifdef ALIAS
 #include "defines.h"
 #include "structs.h"
+#ifdef ALIASTEST
+#define MAIN_C
+#endif
 #include "global.h"
+
+#ifndef ALIASTEST
 #include "h.h"
 #include "text.h"
 #include "mcmd.h"
+#else /* ALIASTEST */
 
+void afmt(char *, const char *, const char *);
+
+void debug(char *format, ...)
+{
+        va_list msg;
+
+        va_start(msg,format);
+        vsprintf(debugbuf,format,msg);
+        va_end(msg);
+
+        write(1,debugbuf,strlen(debugbuf));
+}
+
+char result[MSGLEN];
+char *input = "alias one two three four five   six seven eight nine ten";
+
+void testcase(const char *test, const char *expect)
+{
+	afmt(result,test,input);
+	if (strcmp(result,expect) == 0) debug("testcase SUCCESS: test \"%s\" -> got \"%s\"\n",test,expect);
+	else debug("testcase FAIL: test \"%s\", expected \"%s\", got \"%s\"\n",test,expect,result);
+}
+
+int main(int argc, char **argv)
+{
+	char *format = argv[1];
+	strcpy(CurrentNick,"noob");
+	if (format == NULL)
+	{
+		// testcases
+		testcase("cmd","cmd");
+		testcase("cmd cmd","cmd cmd");
+		testcase("cmd $$","cmd $");
+		testcase("cmd $$0","cmd $0");
+		testcase("cmd $$$0","cmd $alias");
+		testcase("cmd $$$0$$","cmd $alias$");
+		testcase("cmd $1","cmd one");
+		testcase("cmd $0","cmd alias");
+		testcase("cmd $1-2","cmd one two");
+		testcase("cmd $1 $2","cmd one two");
+		testcase("cmd $2 $1","cmd two one");
+		testcase("cmd $8-","cmd eight nine ten");
+		testcase("cmd $4-5","cmd four five");
+		testcase("cmd $5-6","cmd five   six");
+		testcase("cmd $~","cmd noob");
+		testcase("cmd $one $two","cmd $one $two");
+		exit(0);
+	}
+	debug("input = %s\n",input);
+	debug("format = %s\n",format);
+	afmt(result,format,input);
+	debug("result = %s\n",result);
+	exit(0);
+}
+
+#endif /* ALIASTEST */
+
+/*
+ *   copy_to = buffer to put resulting new command into
+ *   src = Alias format string
+ *   input = input from user
+ */
 void afmt(char *copy_to, const char *src, const char *input)
 {
-#define BUFTAIL	(tmp+MSGLEN-1)		/* avoid buffer overflows */
-	char	tmp[MSGLEN];
-	const char *np;
+#define BUFTAIL	(copy_to+MSGLEN-1)		/* avoid buffer overflows */
+	const char *argstart,*argend;
 	char	*dest;
-	int	n,t,tu,spc;
+	int	startnum,endnum,spc;
 
-	dest = tmp;
+	dest = copy_to;
 	while(*src)
 	{
-check_fmt:
-		if (*src == '$')
+		if (src[0] == '$' && src[1] == '$')
+			src++;
+		else
+		if (*src == '$' && src[1] == '~')
+		{
+			src += 2;
+			argstart = CurrentNick;
+			while(*argstart && dest <= BUFTAIL)
+				*(dest++) = *(argstart++);
+		}
+		else
+		if (*src == '$' && (attrtab[(uchar)src[1]] & NUM) == NUM)
 		{
 			src++;
-			if (*src == '$')
-				goto copychar;
-			tu = t = n = 0;
+			startnum = endnum = 0;
 			while(attrtab[(uchar)*src] & NUM)
+				startnum = (startnum * 10) + (*(src++) - '0');
+			if (*src == ' ' || *src == 0)
+				endnum = startnum;
+			else
+			if (*src == '-')
 			{
-				n = (n * 10) + (*(src++) - '0');
+				src++;
+				if ((attrtab[(uchar)*src] & NUM) != NUM)
+					endnum = 9999;
+				else
+				while(attrtab[(uchar)*src] & NUM)
+					endnum = (endnum * 10) + (*src++ - '0');
 			}
-			if (n)
+
+			argstart = input;
+			if (startnum)
+			for(spc=0;*argstart;argstart++)
 			{
-				if (*src == '-')
+				if (*argstart == ' ')
 				{
-					tu = n;
-					src++;
-					while(attrtab[(uchar)*src] & NUM)
-					{
-						t = (t * 10) + (*(src++) - '0');
-					}
-				}
-				n--;
-				spc = 0;
-				for(np=input;*np;)
-				{
-					if (*np == ' ')
-					{
-						if (!spc)
-							n--;
-						spc = 1;
-					}
-					else
-					{
-						spc = 0;
-						if (!n)
-							break;
-					}
-					np++;
-				}
-				spc = 0;
-				while(*np)
-				{
-					if (*np == ' ')
-					{
-						if (!tu || (t && tu >= t))
-							goto check_fmt;
-						if (!spc)
-							tu++;
-						spc = 1;
-					}
-					else
-					{
-						spc = 0;
-					}
-					if (dest == BUFTAIL)
-						goto afmt_escape;
-					*(dest++) = *(np++);
+					while(*argstart == ' ') // skip multiple spaces
+						argstart++;
+					if (++spc >= startnum)
+						break;
 				}
 			}
-			goto check_fmt;
+
+			for(argend=argstart,spc=startnum;*argend;argend++)
+			{
+				if (*argend == ' ')
+				{
+					if (++spc > endnum)
+						break;
+					while(*argend == ' ') // skip multiple spaces
+						argend++;
+				}
+			}
+//			debug("args #%i-#%i, characters %i-%i\n",startnum,endnum,argstart-input,argend-input);
+			while(*argstart && argstart < argend && dest <= BUFTAIL)
+				*(dest++) = *(argstart++);
+			continue;
 		}
-copychar:
-		if (dest == BUFTAIL)
-			goto afmt_escape;
+		if (dest >= BUFTAIL)
+			break;
 		*(dest++) = *(src++);
 	}
-afmt_escape:
 	*dest = 0;
-	Strcpy(copy_to,tmp);
+//	debug("start %i end %i spc %i\n",startnum,endnum,spc);
 }
+
+#ifndef ALIASTEST
 
 /*
  *
  *  associated commands
  *
  */
+/*---Help:ALIAS
 
+Create a command alias. Arguments in the form $#, $#- and $#-# will
+be replaced with the corresponding argument from input.
+
+$0     The zeroeth argument (the aliased command).
+$1     The first argument.
+$1-    All arguments starting with the first.
+$3-    All arguments starting with the third.
+$1-2   The first and second argument.
+$3-5   The third, fourth and fifth argument.
+$$     A literal $ character.
+$~     Nickname of the user doing the command.
+
+Example:
+ALIAS MEEP SAY $2 $1 $3-
+
+Doing ``MEEP one two three four''
+Would become ``SAY two one three four''
+
+Example 2:
+ALIAS MEEP SAY #home $~ did $0
+
+Doing ``MEEP one two three four''
+Would become ``SAY #home nickname did MEEP''
+
+Aliases may call other aliases and aliases can be used
+to replace built in commands. Aliases can recurse a
+maximum of 20 times (to prevent infinite loops).
+
+See also: unalias
+---Helpend---*/
 void do_alias(COMMAND_ARGS)
 {
 	/*
@@ -193,4 +286,6 @@ void do_unalias(COMMAND_ARGS)
 	to_user(from,"Couldnt find matching alias");
 }
 
+#endif /* not ALIASTEST */
 #endif /* ALIAS */
+
