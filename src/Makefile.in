@@ -72,7 +72,7 @@ install:	$(INSTALLNAME)
 		$(MV) $(INSTALLNAME) $(INSTALLDIR)
 
 clean:		FORCE
-		$(RM) $(INSTALLNAME) gencmd mcmd.h core $(OFILES)
+		$(RM) $(INSTALLNAME) gencmd mcmd.h core aliastest $(OFILES)
 
 $(INSTALLNAME):	$(OFILES)
 		$(CROSS_COMPILE)$(CC) $(LFLAGS) -o $(INSTALLNAME) $(OFILES) $(LPROF) $(LIBS) $(LDSCRIPT)
@@ -104,6 +104,13 @@ mega-static:	$(SRCFILES) $(INCS) usage.h
 		$(CROSS_COMPILE)$(CC) $(CFLAGS) -o $(INSTALLNAME) mega.c $(LPROF) $(LIBS) $(LDSCRIPT) $(PYINCLUDE) $(TCLINCLUDE) -static
 @oc@		$(CROSS_COMPILE)objcopy -R .note -R .comment $(INSTALLNAME)
 @sz@		size $(INSTALLNAME)
+
+#
+#  testing stuff
+#
+
+aliastest:	alias.c
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -o aliastest $< $(LPROF) $(LIBS) $(LDSCRIPT) -DALIASTEST
 
 #
 #

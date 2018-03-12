@@ -395,7 +395,7 @@ LS const uchar attrtab[256] =
 /*
  *  user struct for the core client
  */
-LS const Strp CMA = 
+LS const Strp CMA =
 {
 	NULL,
 	"*"
