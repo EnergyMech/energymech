@@ -977,6 +977,10 @@ int main(int argc, char **argv, char **envp)
 	LocalBot.x.x.aop = 1;
 	LocalBot.chan = CoreUser.chan = (Strp*)&CMA;
 
+#ifdef UPTIME
+	init_uptime();
+#endif /* UPTIME */
+
 	readcfgfile();
 
 #ifndef I_HAVE_A_LEGITIMATE_NEED_FOR_MORE_THAN_4_BOTS
@@ -1035,10 +1039,6 @@ int main(int argc, char **argv, char **envp)
 #ifdef CTCP
 	memset(&ctcp_slot,0,sizeof(ctcp_slot));
 #endif /* CTCP */
-
-#ifdef UPTIME
-	init_uptime();
-#endif /* UPTIME */
 
 #ifdef BOTNET
 	last_autolink = now + 30 + (rand() >> 27);	/* + 0-31 seconds */
