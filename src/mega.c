@@ -24,6 +24,7 @@
 #include "function.c"
 #include "greet.c"
 #include "help.c"
+#include "hostinfo.c"
 #include "irc.c"
 #include "kicksay.c"
 #include "main.c"

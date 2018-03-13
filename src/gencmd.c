@@ -1,7 +1,7 @@
 /*
 
     EnergyMech, IRC bot software
-    Copyright (c) 1997-2009 proton
+    Copyright (c) 1997-2018 proton
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -223,6 +223,11 @@ struct
 	/*
 	 *  Level 100
 	 */
+#ifdef HOSTINFO
+	{ 0, "HOSTINFO",	"do_hostinfo",		100	| CCPW	| GAXS				},
+	{ 0, "MEMINFO",		"do_meminfo",		100	| CCPW	| GAXS				},
+	{ 0, "CPUINFO",		"do_cpuinfo",		100	| CCPW	| GAXS				},
+#endif /* HOSTINFO */
 #ifdef RAWDNS
 	{ 0, "DNSSERVER",	"do_dnsserver",		100	| CCPW  | GAXS				},
 	{ 0, "DNSROOT",		"do_dnsroot",		100	| CCPW	| GAXS | CARGS			},

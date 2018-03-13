@@ -9,13 +9,22 @@
 
 #define	S(x)	x,sizeof(x)
 
-__page(".text.e")
+#if 0
+    *(.text.e)  /* RARE */
+    *(.text.d)  /* INIT */ main
+    *(.text.b)  /* CFG1 */ func2
+    *(.text.c)  /* CMD1 */ func1
+    *(.text.a)  /* CORE */
+    *(.text.f)  /* DBUG */
+#endif
+
+__page(".text.c")
 int function1(int a)
 {
 	return a + 1;
 }
 
-__page(".text.c")
+__page(".text.b")
 int function2(int a)
 {
 	return a + 2;
@@ -24,7 +33,7 @@ int function2(int a)
 __page(".text.d")
 int main(int argc, char **argv)
 {
-	if (((void*)main < (void*)function1) && ((void*)function1 < (void*)function2))
+	if (((void*)main < (void*)function2) && ((void*)function2 < (void*)function1))
 		write(1,S("yes\n"));
 	else
 		write(1,S("no\n"));

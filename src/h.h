@@ -581,6 +581,13 @@ LS void check_dynamode(Chan *)					__page(CORE_SEG);
 
 #endif /* DYNAMODE */
 
+#ifdef HOSTINFO
+
+LS void do_hostinfo(COMMAND_ARGS)				__page(CMD1_SEG);
+LS void do_meminfo(COMMAND_ARGS)				__page(CMD1_SEG);
+LS void do_cpuinfo(COMMAND_ARGS)				__page(CMD1_SEG);
+
+#endif /* HOSTINFO */
 /*
  *
  */

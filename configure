@@ -59,6 +59,7 @@ do
           dynamode ) ft_dynamode=$yesno ;;
           dyncmd )   ft_dyncmd=$yesno ;;
           greet )    ft_greet=$yesno ;;
+          hostinfo ) ft_hostinfo=$yesno ;;
           idwrap )   ft_idwrap=$yesno ;;
           ircd_ext ) ft_ircd_ext=$yesno ;;
           md5 )      ft_md5=$yesno ;;
@@ -107,7 +108,7 @@ do
 
   case "$feature" in
     debug | botnet | telnet | alias | seen | session | dyncmd | newbie | wingate | md5 | sha \
-    | ctcp | dccfile | uptime | redirect | greet | perl | profiling | tcl | dynamode | web \
+    | ctcp | dccfile | uptime | redirect | greet | perl | profiling | tcl | dynamode | web | hostinfo \
     | note | notify | trivia | toybox | bounce | stats | rawdns | ircd_ext | idwrap | chanban | python )
       case _"$optarg"_ in
         _yes_ | _no_ | __ )
@@ -152,6 +153,8 @@ do
         dyncmd_no ) ft_dyncmd=no ;;
         greet_yes | greet_ ) ft_greet=yes ;;
         greet_no ) ft_greet=no ;;
+        hostinfo_yes | hostinfo_ ) ft_hostinfo=yes ;;
+        hostinfo_no ) ft_hostinfo=no ;;
         idwrap_yes | idwrap_ ) ft_idwrap=yes ;;
         idwrap_no ) ft_idwrap=no ;;
         ircd_ext_yes | ircd_ext_ ) ft_ircd_ext=yes ;;
@@ -210,6 +213,7 @@ do
         dynamode )     ft_dynamode=no ;;
         dyncmd )       ft_dyncmd=no ;;
         greet )        ft_greet=no ;;
+        hostinfo )     ft_hostinfo=no ;;
         idwrap )       ft_idwrap=no ;;
         ircd_ext )     ft_ircd_ext=no ;;
         md5 )          ft_md5=no ;;
@@ -258,6 +262,7 @@ do
 		     ft_dynamode=yes
                      ft_dyncmd=yes
 		     ft_greet=yes
+		     ft_hostinfo=yes
 		     ft_ircd_ext=yes
 		     ft_md5=yes
                      ft_newbie=yes
@@ -296,6 +301,8 @@ Features and packages:
   --with-botnet            Botnet support
   --with-debug             Debug support
   --with-dyncmd            Dynamic command levels support
+  --with-hostinfo	   Support for code that reveals/displays/shares information about the host
+			   that the bot is running on.
   --with-newbie            Newbie support
   --with-profiling         Profiling (gcc+gprof)
   --with-seen              SEEN support
@@ -876,10 +883,10 @@ TESTC=config/ldtest.c
 
 echo $ac_n "checking for friendly ld ... "$ac_c
 
-$CC -o $TESTP $TESTC -Wl,-T,src/ld/mech.ldscript 1> /dev/null 2> /dev/null
+$CC -o $TESTP $TESTC -Wl,-T,src/ld/elf64-x86-64 1> /dev/null 2> /dev/null
 if [ -x $TESTP ]; then
   if [ `$TESTP` = "yes" ]; then
-    ldscript='-Wl,-T,ld/mech.ldscript'
+    ldscript='-Wl,-T,ld/elf64-x86-64'
     has_ldscript=yes
   fi
 fi
@@ -1058,6 +1065,13 @@ else
   test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes -o "$ans" = internal && def_sha='#define SHACRYPT'
 fi
 
+def_hostinfo='#undef HOSTINFO'
+unset ans
+echo $ac_n "Host info support? ......................... [Y/n] "$ac_c
+test "$ft_hostinfo" && echo "$ft_hostinfo" && ans=$ft_hostinfo
+test -z "$ft_hostinfo" && read ans
+test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_hostinfo='#define HOSTINFO'
+
 def_newbie='#undef NEWBIE'
 unset ans
 echo $ac_n "Newbie support? ............................ [Y/n] "$ac_c
@@ -1231,6 +1245,7 @@ sed "
   s|@DEF_DYNCMD@|$def_dyncmd|;
 s|@DEF_DYNAMODE@|$def_dynamode|;
    s|@DEF_GREET@|$def_greet|;
+s|@DEF_HOSTINFO@|$def_hostinfo|;
   s|@DEF_IDWRAP@|$def_idwrap|;
 s|@DEF_IRCD_EXT@|$def_ircd_ext|;
      s|@DEF_MD5@|$def_md5|;
