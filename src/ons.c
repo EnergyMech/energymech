@@ -449,9 +449,10 @@ recheck_alias:
 	{
 		if (!Strcasecmp(alias->alias,command))
 		{
-			afmt(amem,alias->format,msg);
+			unchop(command,msg);
+			afmt(amem,alias->format,command);
 #ifdef DEBUG
-			debug("(on_msg) [ALIAS] %s %s --> %s\n",command,msg,amem);
+			debug("(on_msg) [ALIAS] %s --> %s\n",command,amem);
 #endif /* DEBUG */
 			msg = amem;
 			pt = chop(&msg);

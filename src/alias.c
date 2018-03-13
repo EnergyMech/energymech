@@ -159,7 +159,9 @@ void afmt(char *copy_to, const char *src, const char *input)
 						argend++;
 				}
 			}
-//			debug("args #%i-#%i, characters %i-%i\n",startnum,endnum,argstart-input,argend-input);
+#ifdef DEBUG
+			debug("(afmt) args #%i-#%i, characters %i-%i\n",startnum,endnum,argstart-input,argend-input);
+#endif /* DEBUG */
 			while(*argstart && argstart < argend && dest <= BUFTAIL)
 				*(dest++) = *(argstart++);
 			continue;
@@ -169,7 +171,9 @@ void afmt(char *copy_to, const char *src, const char *input)
 		*(dest++) = *(src++);
 	}
 	*dest = 0;
-//	debug("start %i end %i spc %i\n",startnum,endnum,spc);
+#ifdef DEBUG
+	debug("(afmt) start %i end %i spc %i\n",startnum,endnum,spc);
+#endif /* DEBUG */
 }
 
 #ifndef ALIASTEST

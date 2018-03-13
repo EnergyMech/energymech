@@ -43,14 +43,14 @@ CHMOD =		chmod
 INCS =		config.h mcmd.h defines.h global.h h.h structs.h text.h
 
 OFILES =	alias.o auth.o bounce.o chanban.o channel.o core.o \
-		ctcp.o debug.o dns.o dynamode.o function.o greet.o help.o irc.o \
+		ctcp.o debug.o dns.o dynamode.o function.o greet.o help.o hostinfo.o irc.o \
 		kicksay.o main.o net.o net_chan.o note.o notify.o ons.o parse.o \
 		perl.o prot.o python.o redirect.o reset.o seen.o shit.o socket.o \
 		spy.o stats.o tcl.o telnet.o toybox.o trivia.o uptime.o \
 		user.o vars.o web.o @MD5_O@ @SHA_O@
 
 SRCFILES =	alias.c auth.c bounce.c chanban.c channel.c core.c \
-		ctcp.c debug.c dns.c dynamode.c function.c greet.c help.c irc.c \
+		ctcp.c debug.c dns.c dynamode.c function.c greet.c help.c hostinfo.c irc.c \
 		kicksay.c main.c net.c net_chan.c note.c notify.c ons.c parse.c \
 		perl.c prot.c python.c redirect.c reset.c seen.c shit.c socket.c \
 		spy.c stats.c tcl.c telnet.c toybox.c trivia.c uptime.c \
@@ -153,6 +153,9 @@ greet.o:	greet.c $(INCS)
 		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
 help.o:		help.c $(INCS) usage.h
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
+
+hostinfo.o:	hostinfo.c $(INCS)
 		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
 irc.o:		irc.c $(INCS)
