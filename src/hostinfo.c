@@ -72,7 +72,9 @@ int parse_proc_status(char *line)
 	int	i;
 
 	key = chop(&line);
+#ifdef DEBUG
 	debug("pps key = %s (%s)\n",key,line);
+#endif
 	if (key == NULL)
 		return(FALSE);
 	for(i=0;sv[i].key;i++)
