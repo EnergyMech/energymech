@@ -1,0 +1,5 @@
+get the default script with:
+
+gcc -o energymech mega.c -lcrypt -Wl,-verbose > default
+
+edit out non-script output and modify with the custom .text.[abcde] entries
