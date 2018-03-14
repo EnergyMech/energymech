@@ -469,7 +469,7 @@ typedef struct Spy
 	Client		*dcc;
 	int		destbot;
 
-	char		*src;
+	const char	*src;
 	char		*dest;
 	char		p[2];
 

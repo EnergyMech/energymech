@@ -193,6 +193,11 @@
 @DEF_HOSTINFO@
 
 /*
+ *  URLCAPTURE: capture url's mentioned
+ */
+@DEF_URLCAPTURE@
+
+/*
  *  FASTNICK: faster nick regain if the nick is seen when released
  *  Enables code that is potentially dangerous if an attacker aquires
  *  the nick that the bot wants

@@ -1,7 +1,7 @@
 /*
 
     EnergyMech, IRC bot software
-    Copyright (c) 1997-2004 proton
+    Copyright (c) 1997-2018 proton
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -101,7 +101,7 @@ void send_uptime(int type)
 	const char *server,*nick;
 	int	sz;
 
-	if (uptimeport == 0)
+	if (uptimehost == NULL || uptimeport == 0)
 		return;
 
 #ifdef RAWDNS

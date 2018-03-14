@@ -49,6 +49,7 @@
 #include "toybox.c"
 #include "trivia.c"
 #include "uptime.c"
+#include "urlcap.c"
 #include "user.c"
 #include "vars.c"
 #include "web.c"

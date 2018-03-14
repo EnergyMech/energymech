@@ -1,7 +1,7 @@
 /*
 
     EnergyMech, IRC bot software
-    Copyright (c) 2001-2009 proton
+    Copyright (c) 2001-2018 proton
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -76,73 +76,76 @@ LS const Setting VarName[SIZE_VARS] =
 /*
  *  all global variables
  */
-/* TYPE		UACCES	MIN	DEFAULT		NAME		MAX		*/
-{ INT_GLOBAL,	40,	0,	ZERO,		"AAWAY",	1440		},	/* set auto-away after ___ minutes */
-{ STR_GLOBAL,	90,	0,	VNULL,		"ALTNICK"			},	/* alternative nick */
+/* TYPE		UACCES	MIN	DEFAULT			NAME		MAX	*/
+{ INT_GLOBAL,	40,	0,	ZERO,			"AAWAY",	1440	},	/* set auto-away after ___ minutes */
+{ STR_GLOBAL,	90,	0,	VNULL,			"ALTNICK"		},	/* alternative nick */
 #ifdef BOTNET
-{ TOG_PROC,	90,	0,	TOGPROC(autolink),	"AUTOLINK",	1		},	/* establish links automagically */
+{ TOG_PROC,	90,	0,	TOGPROC(autolink),	"AUTOLINK",	1	},	/* establish links automagically */
 #endif /* BOTNET */
 #ifdef BOUNCE
-{ INT_PROC,	100,	0,	INTPROC(bounce_port),	"BNCPORT",	65535,		(&new_port_bounce)	},	/* irc proxy port to listen on */
+{ INT_PROC,	100,	0,	INTPROC(bounce_port),	"BNCPORT",	65535,	(&new_port_bounce) },	/* irc proxy port to listen on */
 #endif /* BOUNCE */
-{ TOG_GLOBAL,	90,	0,	INTCAST(1),	"CC",		1		},	/* require command char */
-{ CHR_GLOBAL,	90,	1,	CMDCHAR,	"CMDCHAR",	255		},	/* command char */
+{ TOG_GLOBAL,	90,	0,	INTCAST(1),		"CC",		1	},	/* require command char */
+{ CHR_GLOBAL,	90,	1,	CMDCHAR,		"CMDCHAR",	255	},	/* command char */
 #ifdef CTCP
-{ TOG_GLOBAL,	90,	0,	INTCAST(1),	"CTCP",		1		},	/* ctcp replies enable */
+{ TOG_GLOBAL,	90,	0,	INTCAST(1),		"CTCP",		1	},	/* ctcp replies enable */
 #endif /* CTCP */
-{ INT_PROC,	100,	10,	INTPROC(ctimeout),	"CTIMEOUT",	3600		},	/* how long to wait between connect attempts */
+{ INT_PROC,	100,	10,	INTPROC(ctimeout),	"CTIMEOUT",	3600	},	/* how long to wait between connect attempts */
 #ifdef DCC_FILE
-{ INT_GLOBAL,	80,	0,	ZERO,		"DCCANON",	100		},	/* anonymous (non user) DCC slots */
-{ STR_GLOBAL,	80,	0,	VNULL,		"DCCFILES"			},	/* string with space separated masks for auto-accepted filenames */
-{ INT_GLOBAL,	80,	0,	INTCAST(4),	"DCCUSER",	100		},	/* user DCC slots */
+{ INT_GLOBAL,	80,	0,	ZERO,			"DCCANON",	100	},	/* anonymous (non user) DCC slots */
+{ STR_GLOBAL,	80,	0,	VNULL,			"DCCFILES"		},	/* string with space separated masks for auto-accepted filenames */
+{ INT_GLOBAL,	80,	0,	INTCAST(4),		"DCCUSER",	100	},	/* user DCC slots */
 #endif /* DCC_FILE */
-{ TOG_GLOBAL,	80,	0,	ZERO,		"ENFPASS",	1		},	/* disallow users with no passwords */
-{ STR_GLOBAL,	90,	0,	VNULL,		"IDENT"				},	/* register with this in the `user' field */
-{ STR_GLOBAL,	90,	0,	VNULL,		"IRCNAME"			},	/* register with this in the `real name' field */
+{ TOG_GLOBAL,	80,	0,	ZERO,			"ENFPASS",	1	},	/* disallow users with no passwords */
+{ STR_GLOBAL,	90,	0,	VNULL,			"IDENT"			},	/* register with this in the `user' field */
+{ STR_GLOBAL,	90,	0,	VNULL,			"IRCNAME"		},	/* register with this in the `real name' field */
 #ifdef NOTIFY
-{ INT_GLOBAL,	80,	10,	INTCAST(30),	"ISONDELAY",	600		},	/* seconds between each ISON */
+{ INT_GLOBAL,	80,	10,	INTCAST(30),		"ISONDELAY",	600	},	/* seconds between each ISON */
 #endif /* NOTIFY */
 #ifdef BOTNET
-{ STR_PROC,	90,	0,	STRPROC(linkpass),	"LINKPASS"			},	/* local process linkpass */
-{ INT_PROC,	100,	0,	INTPROC(linkport),	"LINKPORT",	65535		},	/* listen on <linkport> for botnet connections */
+{ STR_PROC,	90,	0,	STRPROC(linkpass),	"LINKPASS"		},	/* local process linkpass */
+{ INT_PROC,	100,	0,	INTPROC(linkport),	"LINKPORT",	65535	},	/* listen on <linkport> for botnet connections */
 #endif /* BOTNET */
-{ INT_GLOBAL,	80,	1,	INTCAST(3),	"MODES",	20		},	/* max number of channel modes to send */
+{ INT_GLOBAL,	80,	1,	INTCAST(3),		"MODES",	20	},	/* max number of channel modes to send */
 #ifdef BOTNET
-{ TOG_GLOBAL,	90,	0,	INTCAST(1),	"NETUSERS",	1		},	/* this bot accepts shared users (on by default) */
+{ TOG_GLOBAL,	90,	0,	INTCAST(1),		"NETUSERS",	1	},	/* this bot accepts shared users (on by default) */
 #endif /* BOTNET */
-{ TOG_GLOBAL,	80,	0,	ZERO,		"NOIDLE",	1		},	/* dont idle */
+{ TOG_GLOBAL,	80,	0,	ZERO,			"NOIDLE",	1	},	/* dont idle */
 #ifdef NOTIFY
-{ STR_GLOBAL,	80,	0,	VNULL,		"NOTIFYFILE"			},	/* read notify settings from <notifyfile> */
+{ STR_GLOBAL,	80,	0,	VNULL,			"NOTIFYFILE"		},	/* read notify settings from <notifyfile> */
 #endif /* NOTIFY */
-{ TOG_GLOBAL,	90,	0,	ZERO,		"ONOTICE",	1		},	/* ircd has /notice @#channel */
+{ TOG_GLOBAL,	90,	0,	ZERO,			"ONOTICE",	1	},	/* ircd has /notice @#channel */
 #ifdef TRIVIA
-{ CHR_PROC,	80,	0,	CHRPROC(triv_qchar),	"QCHAR"				},	/* use <qchar> as mask char when displaying answer */
-{ INT_PROC,	80,	1,	INTPROC(triv_qdelay),	"QDELAY",	3600		},	/* seconds between each question */
-{ STR_PROC,	80,	0,	STRPROC(triv_qfile),	"QFILE"				},	/* load questions from <qfile> */
+{ CHR_PROC,	80,	0,	CHRPROC(triv_qchar),	"QCHAR"			},	/* use <qchar> as mask char when displaying answer */
+{ INT_PROC,	80,	1,	INTPROC(triv_qdelay),	"QDELAY",	3600	},	/* seconds between each question */
+{ STR_PROC,	80,	0,	STRPROC(triv_qfile),	"QFILE"			},	/* load questions from <qfile> */
 #endif /* TRIVIA */
 #ifdef CTCP
-{ TOG_GLOBAL,	80,	0,	ZERO,		"RF",		1		},	/* random ctcp finger reply */
-{ TOG_GLOBAL,	80,	0,	ZERO,		"RV",		1		},	/* random ctcp version reply */
+{ TOG_GLOBAL,	80,	0,	ZERO,			"RF",		1	},	/* random ctcp finger reply */
+{ TOG_GLOBAL,	80,	0,	ZERO,			"RV",		1	},	/* random ctcp version reply */
 #endif /* CTCP */
 #ifdef SEEN
-{ STR_PROC,	90,	0,	STRPROC(seenfile),	"SEENFILE"			},	/* load/save seen database from <seenfile> */
+{ STR_PROC,	90,	0,	STRPROC(seenfile),	"SEENFILE"		},	/* load/save seen database from <seenfile> */
 #endif /* SEEN */
-{ STR_GLOBAL,	80,	0,	VNULL,		"SERVERGROUP"			},	/* connect bot to a certain group of servers */
-{ TOG_GLOBAL,	90,	0,	ZERO,		"SPY",		1		},	/* send info about executed commands to status channel */
-{ STR_GLOBAL,	90,	0,	VNULL,		"UMODES"			},	/* send these modes on connect */
+{ STR_GLOBAL,	80,	0,	VNULL,			"SERVERGROUP"		},	/* connect bot to a certain group of servers */
+{ TOG_GLOBAL,	90,	0,	ZERO,			"SPY",		1	},	/* send info about executed commands to status channel */
+{ STR_GLOBAL,	90,	0,	VNULL,			"UMODES"		},	/* send these modes on connect */
 #ifdef UPTIME
-{ STR_PROC,	100,	0,	STRPROC(uptimehost),	"UPHOST"			},	/* send uptime packets to <uphost> */
-{ STR_PROC,	100,	0,	STRPROC(uptimenick),	"UPNICK"			},	/* send <upnick> as identifier instead of bots nick */
-{ INT_PROC,	100,	0,	INTPROC(uptimeport),	"UPPORT",	65535		},	/* send packets to port <upport> */
+{ STR_PROC,	100,	0,	STRPROC(uptimehost),	"UPHOST"		},	/* send uptime packets to <uphost> */
+{ STR_PROC,	100,	0,	STRPROC(uptimenick),	"UPNICK"		},	/* send <upnick> as identifier instead of bots nick */
+{ INT_PROC,	100,	0,	INTPROC(uptimeport),	"UPPORT",	65535	},	/* send packets to port <upport> */
+#ifdef URLCAPTURE
+{ INT_PROC,	100,	0,	INTPROC(urlhistmax),	"URLHIST",	100	},	/* max # of url's to keep in history */
+#endif /* URLCAPTURE */
 #endif /* UPTIME */
-{ STR_GLOBAL,	90,	0,	VNULL,		"USERFILE"			},	/* what file to load/save userlist from/to */
-{ STR_GLOBAL,	90,	0,	VNULL,		"VIRTUAL", 	0,		(&var_resolve_host)	},	/* visual host */
+{ STR_GLOBAL,	90,	0,	VNULL,			"USERFILE"		},	/* what file to load/save userlist from/to */
+{ STR_GLOBAL,	90,	0,	VNULL,			"VIRTUAL", 	0,	(&var_resolve_host) },	/* visual host */
 #ifdef WEB
-{ INT_PROC,	100,	0,	INTPROC(webport),	"WEBPORT",	65535		},	/* httpd should listen on... */
+{ INT_PROC,	100,	0,	INTPROC(webport),	"WEBPORT",	65535	},	/* httpd should listen on... */
 #endif /* WEB */
 #ifdef WINGATE
-{ STR_GLOBAL,	90,	0,	VNULL,		"WINGATE",	0,		(&var_resolve_host)	},	/* wingate hostname */
-{ INT_GLOBAL,	90,	0,	ZERO,		"WINGPORT",	65535		},	/* wingate port */
+{ STR_GLOBAL,	90,	0,	VNULL,			"WINGATE",	0,	(&var_resolve_host) },	/* wingate hostname */
+{ INT_GLOBAL,	90,	0,	ZERO,			"WINGPORT",	65535	},	/* wingate port */
 #endif /* WINGATE */
 { 0, }};
 

@@ -551,7 +551,7 @@ void ctcp_dcc(char *from, char *to, char *rest)
 		debug("(ctcp_dcc) rest: `%s'\n",nullstr(rest));
 #endif /* DEBUG */
 		filename = chop(&rest);
-		if (!is_safepath(filename))
+		if (is_safepath(filename,FILE_MUST_EXIST) != FILE_IS_SAFE)
 		{
 #ifdef DEBUG
 			debug("(ctcp_dcc) filename `%s' is not safe\n",filename);
