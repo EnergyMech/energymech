@@ -41,7 +41,7 @@
 #define MECHUSERLOGIN			"v3.energymech.net"
 
 BEG const char VERSION[]		MDEF("3.0.99p4");
-BEG const char SRCDATE[]		MDEF("March 9th, 2018");
+BEG const char SRCDATE[]		MDEF("March 13th, 2018");
 #ifdef __CYGWIN__
 BEG const char BOTCLASS[]		MDEF("WinMech");
 #else /* ! CYGWIN */
@@ -63,10 +63,15 @@ BEG const char __SPYSTR_RAWIRC[]	MDEF("rawirc");
 BEG const char __SPYSTR_MESSAGE[]	MDEF("message");
 BEG const char __SPYSTR_STATUS[]	MDEF("status");
 BEG const char __SPYSTR_BOTNET[]	MDEF("botnet");
-#define SPYSTR_RAWIRC			(char*)__SPYSTR_RAWIRC
-#define SPYSTR_MESSAGE			(char*)__SPYSTR_MESSAGE
-#define SPYSTR_STATUS			(char*)__SPYSTR_STATUS
-#define SPYSTR_BOTNET			(char*)__SPYSTR_BOTNET
+#define SPYSTR_RAWIRC			__SPYSTR_RAWIRC
+#define SPYSTR_MESSAGE			__SPYSTR_MESSAGE
+#define SPYSTR_STATUS			__SPYSTR_STATUS
+#define SPYSTR_BOTNET			__SPYSTR_BOTNET
+
+#ifdef URLCAPTURE
+BEG const char __SPYSTR_URL[]		MDEF("url");
+#define SPYSTR_URL			__SPYSTR_URL
+#endif /* URLCAPTURE */
 
 BEG const char STR_MECHRESET[]		MDEF("MECHRESET=");
 
@@ -110,7 +115,6 @@ BEG User	__internal_users[2];
  *  (functions that do not call any other non-trivial functions)
  */
 BEG char	gsockdata[MAXLEN];
-
 BEG char	nick_buf[MAXHOSTLEN];
 BEG char	nuh_buf[NUHLEN];
 
@@ -138,10 +142,6 @@ BEG time_t	now;
 BEG Alias	*aliaslist		MDEF(NULL);
 
 #endif /* ALIAS */
-
-#ifdef UPTIME
-BEG char	*defaultuptimehost	MDEF("uptime.energymech.net");
-#endif /* UPTIME */
 
 #ifdef BOTNET
 
@@ -191,11 +191,17 @@ BEG Note	*notelist		MDEF(NULL);
 
 #endif /* NOTE */
 
-#ifdef SCRIPTING
+#ifdef RAWDNS
 
-BEG Hook	*hooklist		MDEF(NULL);
+BEG dnsList	*dnslist		MDEF(NULL);
+BEG dnsAuthority *dnsroot		MDEF(NULL);
+BEG struct in_addr ia_ns[MAX_NAMESERVERS];
+BEG struct in_addr ia_default;
 
-#endif /* SCRIPTING */
+#ifdef SESSION
+BEG Strp	*dnsrootfiles		MDEF(NULL);
+#endif /* SESSION */
+#endif /* RAWDNS */
 
 #ifdef REDIRECT
 
@@ -210,6 +216,12 @@ LS struct
 } redirect;
 
 #endif /* REDIRECT */
+
+#ifdef SCRIPTING
+
+BEG Hook	*hooklist		MDEF(NULL);
+
+#endif /* SCRIPTING */
 
 #ifdef SEEN
 
@@ -237,8 +249,16 @@ BEG ulong	uptimeip		MDEF((ulong)-1);
 BEG ulong	uptimecookie;
 BEG ulong	uptimeregnr		MDEF(0);
 BEG time_t	uptimelast		MDEF(0);
+BEG const char	*defaultuptimehost	MDEF("uptime.energymech.net");
 
 #endif /* UPTIME */
+
+#ifdef URLCAPTURE
+
+BEG int		urlhistmax		MDEF(20);	/* proc var */
+BEG Strp	*urlhistory		MDEF(NULL);
+
+#endif /* URLCAPTURE */
 
 #ifdef WEB
 
@@ -247,17 +267,6 @@ BEG int		webport			MDEF(0);
 
 #endif /* WEB */
 
-#ifdef RAWDNS
-
-BEG dnsList	*dnslist		MDEF(NULL);
-BEG dnsAuthority *dnsroot		MDEF(NULL);
-BEG struct in_addr ia_ns[MAX_NAMESERVERS];
-BEG struct in_addr ia_default;
-
-#ifdef SESSION
-BEG Strp	*dnsrootfiles		MDEF(NULL);
-#endif /* SESSION */
-#endif /* RAWDNS */
 
 #ifndef I_HAVE_A_LEGITIMATE_NEED_FOR_MORE_THAN_4_BOTS
 

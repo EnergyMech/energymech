@@ -1,7 +1,7 @@
 /*
 
     EnergyMech, IRC bot software
-    Parts Copyright (c) 1997-2009 proton
+    Parts Copyright (c) 1997-2018 proton
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -59,7 +59,7 @@ void check_idlekick(void)
 }
 
 __attr (CORE_SEG, regparm(2))
-Chan *find_channel(char *name, int anychannel)
+Chan *find_channel(const char *name, int anychannel)
 {
 	Chan	*chan;
 	uchar	ni;
@@ -79,13 +79,13 @@ Chan *find_channel(char *name, int anychannel)
 }
 
 __attr(CORE_SEG, __regparm (1))
-Chan *find_channel_ac(char *name)
+Chan *find_channel_ac(const char *name)
 {
 	return(find_channel(name,CHAN_ACTIVE));
 }
 
 __attr(CORE_SEG, __regparm (1))
-Chan *find_channel_ny(char *name)
+Chan *find_channel_ny(const char *name)
 {
 	return(find_channel(name,CHAN_ANY));
 }

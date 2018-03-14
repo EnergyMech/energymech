@@ -9,6 +9,8 @@ src/energymech
 src/gencmd
 src/mcmd.h
 src/usercombo.h
+src/aliastest
+src/safepathtest
 
 *~
 *.bak

@@ -29,6 +29,8 @@
 #include "h.h"
 #include "settings.h"
 
+#ifndef TEST
+
 #define boolstr(x)	(x) ? "TRUE" : "FALSE"
 
 LS const char tabs[20] = "\t\t\t\t\t\t\t\t\t\t";
@@ -184,6 +186,9 @@ LS struct
 {	init_uptime,			"init_uptime"			},
 {	send_uptime,			"send_uptime"			},
 #endif /* UPTIME */
+#ifdef URLCAPTURE
+{	urlcapture,			"urlcapture"			},
+#endif /* URLCAPTURE */
 {	0,				"(unknown)"			},
 { NULL, }};
 
@@ -1300,7 +1305,7 @@ int wrap_debug(void)
 
 	close(fd);
 	debug_fd = backup_fd;
-	dodebug = backup_dodebug; 
+	dodebug = backup_dodebug;
 
 	debug("(wrap_debug) all done.\n");
 	return(1);
@@ -1313,6 +1318,8 @@ void do_debug(COMMAND_ARGS)
 	else
 		to_user(from,"Unable to write debug information to file");
 }
+
+#endif /* ifndef TEST */
 
 void debug(char *format, ...)
 {
@@ -1339,7 +1346,7 @@ void debug(char *format, ...)
 	}
 
 	va_start(msg,format);
-	vsprintf(debugbuf,format,msg);
+	vsnprintf(debugbuf,sizeof(debugbuf),format,msg);
 	va_end(msg);
 
 	if ((write(debug_fd,debugbuf,strlen(debugbuf))) < 0)

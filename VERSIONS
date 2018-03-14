@@ -1,5 +1,10 @@
 3.0.99p4 -- WORK IN PROGRESS (~March, 2018)
 
+ * Added: URL capturing with command to display recent URLs seen
+          by the bot. Also spy source "URL" for spy channels.
+ * Fixed: Rewrite of is_safepath() to conform with standard C
+ * Fixed: Potential crash bug in send_uptime()
+ * Fixed: Potential crash bug in debug()
  * Added: New host information commands: HOSTINFO, MEMINFO, CPUINFO.
  * Added: New configuration option: hostinfo
  * Fixed: Custom ld script fintuning the core order.

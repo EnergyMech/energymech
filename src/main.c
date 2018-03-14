@@ -1,7 +1,7 @@
 /*
 
     EnergyMech, IRC bot software
-    Parts Copyright (c) 1997-2009 proton
+    Parts Copyright (c) 1997-2018 proton
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -774,6 +774,7 @@ int main(int argc, char **argv, char **envp) __attribute__ ((__sect(INIT_SEG)));
 #endif
 int main(int argc, char **argv, char **envp)
 {
+	struct stat st;
 	char	*opt;
 	int	do_fork = TRUE;
 	int	versiononly = FALSE;
@@ -786,15 +787,14 @@ int main(int argc, char **argv, char **envp)
 		_exit(1);
 	}
 
-	{
-		struct stat st; // allocate temporary
-
-		stat("..",&st);
-		parent_inode = st.st_ino; // used for is_safepath()
-	}
+	stat("..",&st);
+	parent_inode = st.st_ino; // used for is_safepath()
 
 	srand(now+getpid());
 
+	/*
+	 *   Code to detect and recover after a RESET
+	 */
 	while(*envp)
 	{
 		char	*p1;

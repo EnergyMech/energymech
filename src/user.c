@@ -738,7 +738,7 @@ User *add_user(char *handle, char *pass, int axs)
 /*
  *  find the user record for a named handle
  */
-User *find_handle(char *handle)
+User *find_handle(const char *handle)
 {
 	User 	*user;
 
@@ -803,7 +803,7 @@ User *get_user(const char *userhost, const char *channel)
 /*
  *  highest channel on a given channel
  */
-int get_useraccess(char *userhost, char *channel)
+int get_useraccess(const char *userhost, const char *channel)
 {
 	User	*user;
 

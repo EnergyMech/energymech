@@ -23,29 +23,17 @@
 #ifdef ALIAS
 #include "defines.h"
 #include "structs.h"
-#ifdef ALIASTEST
+#ifdef TEST
 #define MAIN_C
 #endif
 #include "global.h"
-
-#ifndef ALIASTEST
 #include "h.h"
 #include "text.h"
 #include "mcmd.h"
-#else /* ALIASTEST */
 
-void afmt(char *, const char *, const char *);
+#ifdef TEST
 
-void debug(char *format, ...)
-{
-        va_list msg;
-
-        va_start(msg,format);
-        vsprintf(debugbuf,format,msg);
-        va_end(msg);
-
-        write(1,debugbuf,strlen(debugbuf));
-}
+#include "debug.c"
 
 char result[MSGLEN];
 char *input = "alias one two three four five   six seven eight nine ten";
@@ -60,6 +48,8 @@ void testcase(const char *test, const char *expect)
 int main(int argc, char **argv)
 {
 	char *format = argv[1];
+
+	dodebug = 1;
 	strcpy(CurrentNick,"noob");
 	if (format == NULL)
 	{
@@ -89,7 +79,7 @@ int main(int argc, char **argv)
 	exit(0);
 }
 
-#endif /* ALIASTEST */
+#endif /* TEST */
 
 /*
  *   copy_to = buffer to put resulting new command into
@@ -160,7 +150,9 @@ void afmt(char *copy_to, const char *src, const char *input)
 				}
 			}
 #ifdef DEBUG
+#ifndef TEST
 			debug("(afmt) args #%i-#%i, characters %i-%i\n",startnum,endnum,argstart-input,argend-input);
+#endif /* ifndef TEST */
 #endif /* DEBUG */
 			while(*argstart && argstart < argend && dest <= BUFTAIL)
 				*(dest++) = *(argstart++);
@@ -172,11 +164,13 @@ void afmt(char *copy_to, const char *src, const char *input)
 	}
 	*dest = 0;
 #ifdef DEBUG
+#ifndef TEST
 	debug("(afmt) start %i end %i spc %i\n",startnum,endnum,spc);
+#endif /* ifndef TEST */
 #endif /* DEBUG */
 }
 
-#ifndef ALIASTEST
+#ifndef TEST
 
 /*
  *
@@ -290,6 +284,6 @@ void do_unalias(COMMAND_ARGS)
 	to_user(from,"Couldnt find matching alias");
 }
 
-#endif /* not ALIASTEST */
+#endif /* not TEST */
 #endif /* ALIAS */
 

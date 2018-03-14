@@ -182,7 +182,7 @@ help_loop:
 	/*
 	 *  We dont want to show help for "../../../../../../etc/passwd"
 	 */
-	if (!is_safepath(line))
+	if (is_safepath(line,FILE_MUST_EXIST) != FILE_IS_SAFE)
 #ifdef DEBUG
 	{
 		debug("(do_help) unsafe help filename (%s), exiting\n",line);

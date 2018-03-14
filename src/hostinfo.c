@@ -31,6 +31,12 @@
 
 #include <sys/utsname.h>
 
+/*---Help:HOSTINFO:(no arguments)
+
+Equivalent to ``uname -orm''
+
+See also: meminfo, cpuinfo
+*/
 void do_hostinfo(COMMAND_ARGS)
 {
 	struct utsname un;
@@ -96,6 +102,19 @@ int parse_proc_status(char *line)
 	return(FALSE);
 }
 
+/*---Help:MEMINFO:(no arguments)
+
+Will display memory usage of the energymech process.
+
+VM   Virtual size, size if everything was loaded into memory)
+RSS   Resident set size, physical memory actually in use right now.
+  Code    Memory allocated for code
+  Data    Memory allocated for data
+  Libs    Memory used by shared libraries
+  Stack   Memory allocated for stack
+
+See also: hostinfo, cpuinfo
+*/
 void do_meminfo(COMMAND_ARGS)
 {
 	char	fn[64];
@@ -115,6 +134,10 @@ void do_meminfo(COMMAND_ARGS)
 		vmsize,vmpeak,vmrss,vmexe,vmdata,vmlib,vmstk);
 }
 
+/*---Help:CPUINFO:(no arguments)
+
+See also: hostinfo, meminfo
+*/
 void do_cpuinfo(COMMAND_ARGS)
 {
 }

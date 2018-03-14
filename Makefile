@@ -92,6 +92,14 @@ mega:		FORCE
 
 mega-install:	FORCE
 		$(MAKE) -C src mega-install
+
+#
+#  code validation tests
+#
+
+test:		FORCE
+		$(MAKE) -C src test
+
 #
 # packing things up for distribution
 #

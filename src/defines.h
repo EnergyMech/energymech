@@ -1,7 +1,7 @@
 /*
 
     EnergyMech, IRC bot software
-    Parts Copyright (c) 1997-2009 proton
+    Parts Copyright (c) 1997-2018 proton
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -162,6 +162,14 @@
 #define IsProc(x)		(VarName[x].type & PROC_VAR)
 
 /*
+ *  is_safepath
+ */
+#define	FILE_IS_SAFE		1
+#define	FILE_MUST_EXIST		1
+#define FILE_MAY_EXIST		2
+#define FILE_MUST_NOTEXIST	3
+
+/*
  *  see settings.h for the actual setting struct
  */
 enum {
@@ -264,6 +272,9 @@ enum {
 	STR_UPNICK,
 	INT_UPPORT,
 #endif /* UPTIME */
+#ifdef URLCAPTURE
+	INT_URLHISTMAX,
+#endif /* URLCAPTURE */
 	STR_USERFILE,
 	STR_VIRTUAL,
 #ifdef WEB
@@ -381,6 +392,9 @@ enum {
 #define SPY_MESSAGE		5
 #define SPY_RAWIRC		6
 #define SPY_BOTNET		7
+#ifdef URLCAPTURE
+#define SPY_URL			8
+#endif /* URLCAPTURE */
 
 #define SPYF_ANY		1
 #define SPYF_CHANNEL		(1 << SPY_CHANNEL)
@@ -388,6 +402,7 @@ enum {
 #define SPYF_MESSAGE		(1 << SPY_MESSAGE)
 #define SPYF_RAWIRC		(1 << SPY_RAWIRC)
 #define SPYF_BOTNET		(1 << SPY_BOTNET)
+#define SPYF_URL		(1 << SPY_URL)
 
 /*
  *  notify defines

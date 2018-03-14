@@ -79,6 +79,7 @@ do
           toybox )   ft_toybox=$yesno ;;
           trivia )   ft_trivia=$yesno ;;
           uptime )   ft_uptime=$yesno ;;
+          urlcapture ) ft_urlcapture=$yesno ;;
           web )      ft_web=$yesno ;;
           wingate )  ft_wingate=$yesno ;;
         esac
@@ -109,7 +110,7 @@ do
   case "$feature" in
     debug | botnet | telnet | alias | seen | session | dyncmd | newbie | wingate | md5 | sha \
     | ctcp | dccfile | uptime | redirect | greet | perl | profiling | tcl | dynamode | web | hostinfo \
-    | note | notify | trivia | toybox | bounce | stats | rawdns | ircd_ext | idwrap | chanban | python )
+    | note | notify | trivia | toybox | bounce | stats | rawdns | ircd_ext | idwrap | chanban | python | urlcapture )
       case _"$optarg"_ in
         _yes_ | _no_ | __ )
           ;;
@@ -193,6 +194,8 @@ do
         trivia_no ) ft_trivia=no ;;
         uptime_yes | uptime_ ) ft_uptime=yes ;;
         uptime_no ) ft_uptime=no ;;
+        urlcapture_yes | urlcapture_ ) ft_urlcapture=yes ;;
+        urlcapture_no ) ft_urlcapture=no ;;
         web_yes | web_ ) ft_web=yes ;;
         web_no ) ft_web=no ;;
         wingate_yes | wingate_ ) ft_wingate=yes ;;
@@ -234,6 +237,7 @@ do
         toybox )       ft_toybox=no ;;
         trivia )       ft_trivia=no ;;
         uptime )       ft_uptime=no ;;
+        urlcapture )   ft_urlcapture=no ;;
         web )          ft_web=no ;;
         wingate )      ft_wingate=no ;;
       esac
@@ -280,6 +284,7 @@ do
 		     ft_toybox=yes
 		     ft_trivia=yes
 		     ft_uptime=yes
+		     ft_urlcapture=yes
 		     ft_web=yes
                      ft_wingate=yes
                      ;;
@@ -302,13 +307,15 @@ Features and packages:
   --with-debug             Debug support
   --with-dyncmd            Dynamic command levels support
   --with-hostinfo	   Support for code that reveals/displays/shares information about the host
-			   that the bot is running on.
+			   that the bot is running on
   --with-newbie            Newbie support
   --with-profiling         Profiling (gcc+gprof)
   --with-seen              SEEN support
   --with-session           Session support
   --with-tcl               Tcl support
   --with-telnet            Telnet support
+  --with-uptime            Include code that sends uptime reports to the IRC bot uptime contest server
+  --with-urlcapture        URL capture support
   --with-wingate           Wingate support
 __EOT__
       exit 0
@@ -1186,6 +1193,13 @@ test "$ft_uptime" && echo "$ft_uptime" && ans=$ft_uptime
 test -z "$ft_uptime" && read ans
 test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_uptime='#define UPTIME'
 
+def_urlcapture='#undef URLCAPTURE'
+unset ans
+echo $ac_n "URL capture support? ....................... [Y/n] "$ac_c
+test "$ft_urlcapture" && echo "$ft_urlcapture" && ans=$ft_urlcapture
+test -z "$ft_urlcapture" && read ans
+test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_urlcapture='#define URLCAPTURE'
+
 def_wingate='#undef WINGATE'
 unset ans
 echo $ac_n "WinGate support? ........................... [Y/n] "$ac_c
@@ -1265,6 +1279,7 @@ s|@DEF_REDIRECT@|$def_redirect|;
   s|@DEF_TOYBOX@|$def_toybox|;
   s|@DEF_TRIVIA@|$def_trivia|;
   s|@DEF_UPTIME@|$def_uptime|;
+s|@DEF_URLCAPTURE@|$def_urlcapture|;
      s|@DEF_WEB@|$def_web|;
  s|@DEF_WINGATE@|$def_wingate|;
 

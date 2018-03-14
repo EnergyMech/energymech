@@ -1,7 +1,7 @@
 /*
 
     EnergyMech, IRC bot software
-    Parts Copyright (c) 1997-2009 proton
+    Parts Copyright (c) 1997-2018 proton
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -354,6 +354,9 @@ void parse_privmsg(char *from, char *rest)
 {
 	ChanUser *cu;
 	char	*to,*channel;
+#ifdef URLCAPTURE
+	const char *src;
+#endif /* URLCAPTURE */
 
 	to = chop(&rest);
 	if (*rest == ':')
@@ -404,6 +407,24 @@ void parse_privmsg(char *from, char *rest)
 	if (CurrentChan && CurrentChan->stats)
 		CurrentChan->stats->privmsg++;
 #endif /* STATS */
+#ifdef URLCAPTURE
+	src = rest;
+	while(*src)
+	{
+		if (tolowertab[*src] == 'h')
+		{
+			if (tolowertab[src[1]] == 't' && tolowertab[src[2]] == 't' && tolowertab[src[3]] == 'p')
+			{
+				if ((src[4] == ':') || // "http:"
+				    (tolowertab[src[4]] == 's' && src[5] == ':')) // "https:"
+				{
+					urlcapture(src);
+				}
+			}
+		}
+		src++;
+	}
+#endif /* URLCAPTURE */
 	on_msg(from,to,rest);
 }
 
