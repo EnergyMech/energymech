@@ -1,7 +1,7 @@
 /*
 
     EnergyMech, IRC bot software
-    Copyright (c) 1997-2009 proton
+    Copyright (c) 1997-2018 proton
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -78,6 +78,7 @@ LS const LinkCmd basicProto[] =
 { 'B', 'L', basicLink		},
 { 'B', 'Q', basicQuit		},
 { 'C', 'O', netchanNeedop	},
+{ 'C', 'S', netchanSupress	}, // experimental command supression
 { 'P', 'A', partyAuth		},
 #ifdef REDIRECT
 { 'P', 'C', partyCommand	},
@@ -97,7 +98,7 @@ LS int deadlinks = FALSE;
  *
  */
 
-Mech *get_netbot(void)
+Mech *get_netbot(void) //get local bot with the lowes guid to act as local master
 {
 	Mech	*netbot,*bot;
 	int	uid;

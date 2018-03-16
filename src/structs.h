@@ -1,7 +1,7 @@
 /*
 
     EnergyMech, IRC bot software
-    Parts Copyright (c) 1997-2009 proton
+    Parts Copyright (c) 1997-2018 proton
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -320,20 +320,8 @@ typedef struct ChanUser
 
 	int		flags;
 
-	/* distance between &_num -> &_time is used in check_mass */
-	int		floodnum;
-	time_t		floodtime;
-	int		bannum;
-	time_t		bantime;
-	int		deopnum;
-	time_t		deoptime;
-	int		kicknum;
-	time_t		kicktime;
-	int		nicknum;
-	time_t		nicktime;
-	int		capsnum;
-	time_t		capstime;
-
+	uint8_t		action_num[INDEX_MAX];
+	time_t		action_time[INDEX_MAX];
 	time_t		idletime;
 
 #ifdef CHANBAN
@@ -514,6 +502,11 @@ typedef struct Mech
 	int		server;			/* ident of my current server	*/
 	int		nextserver;
 
+#ifdef BOTNET
+	const char	*supres_cmd;
+	int		supres_crc;
+#endif
+
 	/*
 	 *  Line buffer for non-essential stuff
 	 */
@@ -549,7 +542,6 @@ typedef struct Mech
 #endif /* NOTIFY */
 
 	Spy		*spylist;
-
 	int		spy;
 
 #ifdef NOTIFY
@@ -659,7 +651,7 @@ typedef struct BotNet
 
 	/*
 	 *  do not touch the above vars!
-	 *  they are copied partially in net.c
+	 *  they are copied partially in that order in net.c
 	 */
 
 	int		guid;		/* remote bot guid	*/
@@ -793,7 +785,7 @@ typedef struct OnMsg
 			redir:1,
 			lbuf:1,
 			cbang:1,
-			acchan:1;
+			acchan:1; // -- 20 bits
 	char		*cmdarg;
 
 } OnMsg;
@@ -810,7 +802,7 @@ typedef struct dnsAuthority
 } dnsAuthority;
 
 typedef struct dnsList
-{ 
+{
 	struct		dnsList *next;
 	time_t		when;
 	struct in_addr	ip;

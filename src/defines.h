@@ -367,6 +367,14 @@ enum {
 
 /* check_mass() */
 
+#define INDEX_FLOOD		0
+#define INDEX_BAN		1
+#define INDEX_DEOP		2
+#define INDEX_KICK		3
+#define INDEX_NICK		4
+#define INDEX_CAPS		5
+#define INDEX_MAX		6
+
 #define CHK_CAPS		0
 #define CHK_PUB			1
 #define CHK_PUBLIC		CHK_PUB

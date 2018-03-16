@@ -1,7 +1,7 @@
 /*
 
     EnergyMech, IRC bot software
-    Parts Copyright (c) 1997-2009 proton
+    Parts Copyright (c) 1997-2018 proton
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -294,9 +294,24 @@ int read_userlist(char *filename)
 	User	*olduserlist;
 	User	*newuserlist;
 	int	in;
+#ifdef DEBUG
+	int	r;
+#endif
 
 	if (!filename)
 		return(FALSE);
+	if (*filename == '<') // read only userfile
+		filename++;
+#ifdef DEBUG
+	if ((r = is_safepath(filename,FILE_MUST_EXIST)) != FILE_IS_SAFE)
+	{
+		debug("(write_userlist) %s: unsafe filename (%i)...\n",filename,r);
+		return(FALSE);
+	}
+#else
+	if (is_safepath(filename,FILE_MUST_EXIST) != FILE_IS_SAFE)
+		return(FALSE);
+#endif
 	if ((in = open(filename,O_RDONLY)) < 0)
 		return(FALSE);
 
@@ -345,7 +360,7 @@ int write_userlist(char *filename)
 	char	*p,flags[7];
 	int	i,f;
 #ifdef DEBUG
-	int	dodeb;
+	int	dodeb,r;
 #endif /* DEBUG */
 
 	if (!filename)
@@ -353,6 +368,27 @@ int write_userlist(char *filename)
 
 	if (!current->ul_save)
 		return(TRUE);
+
+	if (*filename == '<') // we dont write to read only userfiles
+#ifdef DEBUG
+	{
+		debug("(write_userlist) %s: writing to read only userfile is prohibited...\n",filename);
+		return(FALSE);
+	}
+#else
+		return(FALSE);
+#endif
+
+#ifdef DEBUG
+	if ((r = is_safepath(filename,FILE_MAY_EXIST)) != FILE_IS_SAFE)
+	{
+		debug("(write_userlist) %s: unsafe filename (%i)...\n",filename,r);
+		return(FALSE);
+	}
+#else
+	if (is_safepath(filename,FILE_MAY_EXIST) != FILE_IS_SAFE)
+		return(FALSE);
+#endif
 
 	if ((f = open(filename,O_WRONLY|O_CREAT|O_TRUNC,NEWFILEMODE)) < 0)
 		return(FALSE);

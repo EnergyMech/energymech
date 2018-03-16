@@ -42,7 +42,7 @@ void do_hostinfo(COMMAND_ARGS)
 	struct utsname un;
 
 	if (uname(&un) == 0)
-		to_user(from,"%s %s %s",un.sysname,un.release,un.machine);
+		to_user_q(from,"%s %s %s",un.sysname,un.release,un.machine);
 }
 
 char	vmpeak[32];
@@ -130,7 +130,7 @@ void do_meminfo(COMMAND_ARGS)
 		return;
 	readline(fd,&parse_proc_status);	// readline closes fd
 
-	to_user(from,"VM %s (Max %s), RSS %s [ Code %s, Data %s, Libs %s, Stack %s ]",
+	to_user_q(from,"VM %s (Max %s), RSS %s [ Code %s, Data %s, Libs %s, Stack %s ]",
 		vmsize,vmpeak,vmrss,vmexe,vmdata,vmlib,vmstk);
 }
 

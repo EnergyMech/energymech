@@ -795,6 +795,10 @@ int main(int argc, char **argv, char **envp)
 	/*
 	 *   Code to detect and recover after a RESET
 	 */
+/*
+execve( ./energymech, argv = { ./energymech <NULL> <NULL> <NULL> <NULL> }, envp = { MECHRESET=d3 f1881:2:X12 } )
+(recover_debug) debug fd recovered
+*/
 	while(*envp)
 	{
 		char	*p1;
@@ -812,6 +816,9 @@ int main(int argc, char **argv, char **envp)
 		if (*p2 == 0)
 		{
 			mechresetenv = p1;
+			do_fork = FALSE;
+			if (*p1 == 'd')
+				mechresetenv = recover_debug(p1+1);
 			break;
 		}
 		envp++;
@@ -1007,7 +1014,7 @@ int main(int argc, char **argv, char **envp)
 	if (!mechresetenv)
 		to_file(1,INFO_RUNNING);
 
-	if (!mechresetenv && do_fork)
+	if (do_fork)
 	{
 		close(0);
 		close(1);

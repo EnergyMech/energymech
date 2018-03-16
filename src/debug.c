@@ -1,7 +1,7 @@
 /*
 
     EnergyMech, IRC bot software
-    Copyright (c) 1997-2009 proton
+    Copyright (c) 1997-2018 proton
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -42,19 +42,49 @@ LS const struct
 
 } StructList[] =
 {
+{ "aME\t",		sizeof(aME)		}, // for memory allocation debugging
+{ "aMEA",		sizeof(aMEA)		},
+#ifdef ALIAS
+{ "Alias",		sizeof(Alias)		},
+#endif /* ALIAS */
 { "Auth",		sizeof(Auth)		},
 { "Ban\t",		sizeof(Ban)		},
+#ifdef BOTNET
+{ "BotInfo",		sizeof(BotInfo)		},
+{ "BotNet",		sizeof(BotNet)		},
+#endif
 { "Chan",		sizeof(Chan)		},
 { "ChanStats",		sizeof(ChanStats)	},
 { "ChanUser",		sizeof(ChanUser)	},
 { "Client",		sizeof(Client)		},
+{ "ShortClient",	sizeof(ShortClient)	},
+#ifdef RAWDNS
+{ "dnsAuthority",	sizeof(dnsAuthority)	},
+{ "dnsList",		sizeof(dnsList)		},
+{ "dnsQuery",		sizeof(dnsQuery)	},
+#endif
+#ifdef SCRIPTING
+{ "Hook",		sizeof(Hook)		},
+{ "HookTimer",		sizeof(HookTimer)	},
+#endif
 { "ircLink",		sizeof(ircLink)		},
 { "IReq",		sizeof(IReq)		},
+{ "KickSay",		sizeof(KickSay)		},
 { "KillSock",		sizeof(KillSock)	},
 { "Mech",		sizeof(Mech)		},
+#ifdef BOTNET
+{ "NetCfg",		sizeof(NetCfg)		},
+#endif
+#ifdef NOTE
+{ "Note",		sizeof(Note)		},
+#endif /* NOTE */
 #ifdef NOTIFY
+{ "nfLog",		sizeof(nfLog)		},
 { "Notify",		sizeof(Notify)		},
 #endif /* NOTIFY */
+{ "OnMsg",		sizeof(OnMsg)		},
+{ "qKick",		sizeof(qKick)		},
+{ "qMode",		sizeof(qMode)		},
 #ifdef SEEN
 { "Seen",		sizeof(Seen)		},
 #endif /* SEEN */
@@ -62,14 +92,19 @@ LS const struct
 { "ServerGroup",	sizeof(ServerGroup)	},
 { "Setting",		sizeof(Setting)		},
 { "Shit",		sizeof(Shit)		},
+{ "Spy\t",		sizeof(Spy)		},
 { "Strp",		sizeof(Strp)		},
 #ifdef TRIVIA
 { "TrivScore",		sizeof(TrivScore)	},
 #endif /* TRIVIA */
+{ "UniVar",		sizeof(UniVar)		},
 { "User",		sizeof(User)		},
-{ "OnMsg",		sizeof(OnMsg)		},
-{ "Spy\t",		sizeof(Spy)		},
+#ifdef WEB
+{ "WebDoc",		sizeof(WebDoc)		},
+{ "WebSock",		sizeof(WebSock)		},
+#endif
 { NULL, }};
+
 
 LS struct
 {

@@ -17,8 +17,8 @@
 #   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-MISCFILES =	COPYING CREDITS README README.TCL TODO VERSIONS VERSIONS-1 Makefile configure \
-		checkmech sample.conf sample.py sample.tcl sample.userfile default.bigchars
+MISCFILES =	CREDITS LICENSE README README.TCL TODO VERSIONS VERSIONS-1 Makefile configure \
+		checkmech sample.conf sample.py sample.tcl sample.userfile default.bigchars public/README
 
 HELPFILES =	help/8BALL help/ACCESS help/ALIAS help/AWAY help/BAN help/BANLIST help/BYE \
 		help/CCHAN help/CHACCESS help/CHANBAN help/CHANNELS help/CHAT help/CLEARSHIT \
@@ -45,23 +45,24 @@ RANDFILES =	messages/8ball.txt messages/away.txt messages/insult.txt \
 		messages/kick.txt messages/nick.txt messages/pickup.txt \
 		messages/say.txt messages/signoff.txt messages/version.txt
 
-STUBFILES =	src/Makefile.in src/config.h.in src/ld/mech.ldscript
+STUBFILES =	src/Makefile.in src/config.h.in src/ld/README src/ld/elf32-i386 src/ld/elf64-x86-64
 
-TESTFILES =	config/cc.c config/inet_addr.c config/ldtest.c \
+TESTFILES =	config/cc.c config/endian.c config/inet_addr.c config/ldtest.c \
 		config/ptr_size.c config/socket.c config/tcl.c config/which \
 		config/md5.h config/md5_internal.c config/pw.c \
+		config/sha_internal.c config/sha1.h \
 		config/inet_aton.c config/unaligned.c config/python.c
 
 TRIVFILES =	trivia/mkindex.c
 
 SRCFILES =	src/alias.c src/auth.c src/bounce.c src/chanban.c src/channel.c \
 		src/core.c src/ctcp.c src/debug.c src/dns.c src/dynamode.c \
-		src/function.c src/gencmd.c src/greet.c src/help.c src/irc.c \
+		src/function.c src/gencmd.c src/greet.c src/help.c src/hostinfo.c src/irc.c \
 		src/kicksay.c src/main.c src/mega.c src/net.c src/net_chan.c \
 		src/note.c src/notify.c src/ons.c src/parse.c src/perl.c \
 		src/prot.c src/python.c src/redirect.c src/reset.c src/seen.c \
 		src/shit.c src/socket.c src/spy.c src/stats.c src/tcl.c \
-		src/telnet.c src/toybox.c src/trivia.c src/uptime.c src/user.c \
+		src/telnet.c src/toybox.c src/trivia.c src/uptime.c src/urlcap.c src/user.c \
 		src/vars.c src/web.c src/md5/md5.c src/md5/md5.h
 
 HDRFILES =	src/defines.h src/global.h src/h.h src/settings.h src/structs.h src/text.h src/usage.h
@@ -110,7 +111,7 @@ dist:		FORCE
 dist2:		FORCE
 		rm -rf /tmp/$(DISTDIR)
 		mkdir /tmp/$(DISTDIR)
-		tar cf - $(DISTFILES) | ( cd /tmp/$(DISTDIR) ; tar --preserve -xf - )
+		tar cf - $(DISTFILES) | ( cd /tmp/$(DISTDIR) ; tar --preserve-permissions -xf - )
 		cd /tmp ; tar cf - $(DISTDIR) | gzip -9 > $(DISTDIR).tar.gz
 		rm -rf /tmp/$(DISTDIR)
 		chmod 644 /tmp/$(DISTDIR).tar.gz

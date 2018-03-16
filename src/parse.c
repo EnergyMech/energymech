@@ -350,6 +350,28 @@ void parse_ping(char *from, char *rest)
 	to_server("PONG :%s\n",rest);
 }
 
+void parse_pong(char *from, char *rest)
+{
+	time_t	ot;
+	char	*src;
+
+#ifdef DEBUG
+	debug("(parse_pong) rest == %s\n",rest);
+#endif
+
+	if (rest[0] == ':' && rest[1] == 'O' && rest[2] == 'T')
+	{
+		ot = 0;
+		src = &rest[3];
+		while(attrtab[(uchar)*src] & NUM)
+			ot = (ot * 10) + (*src++ - '0');
+		current->ontime = ot;
+#ifdef DEBUG
+		debug("(parse_pong) recovering ontime = %lu (%s)\n",ot,idle2str(now - ot,TRUE));
+#endif
+	}
+}
+
 void parse_privmsg(char *from, char *rest)
 {
 	ChanUser *cu;
@@ -1366,6 +1388,7 @@ LS const struct
 	{ 0x4E49434B,	NEEDFROM,		on_nick		},	/* NICK */
 	{ 0x4B49434B,	NEEDFROM,		on_kick		},	/* KICK */
 	{ 0x50494E47,	0,			parse_ping	},	/* PING */
+	{ 0x504F4E47,	DROPONE,		parse_pong	},	/* PONG */
 	{ 0x544F5049,	NEEDFROM,		parse_topic	},	/* TOPIC */
 	{ 0x4E4F5449,	NEEDFROM,		parse_notice	},	/* NOTICE */
 	{ 0x51554954,	NEEDFROM,		parse_quit	},	/* QUIT */
@@ -1497,12 +1520,13 @@ void parseline(char *rest)
 				cmdhash = 0;
 		}
 	}
-	if (!cmdhash)
+	if (cmdhash == 0)
 		return;
 #endif /* SCRIPTING */
 
 	cmdhash = stringhash(command);
 
+	//debug("cmdhash = %08X\n",cmdhash);
 	for(i=0;pFuncs[i].hash;i++)
 	{
 		if (cmdhash == pFuncs[i].hash)
@@ -1510,9 +1534,26 @@ void parseline(char *rest)
 			if ((pFuncs[i].flags & NEEDFROM) && !from)
 				return;
 			if (pFuncs[i].flags & DROPONE)
-				chop(&rest);	/* discard bot nick */
+				chop(&rest);	/* discard one argument (usually bot nick) */
 			pFuncs[i].func(from,rest);
 			return;
 		}
 	}
+	//debug("unmatched cmdhash %08X\n",cmdhash);
 }
+
+/*
+
+(in)  {2} :weber.freenode.net PONG weber.freenode.net :OT1521044136
+cmdhash = 504F4E47
+unmatched cmdhash 504F4E47
+
+(in)  {2} :weber.freenode.net 347 jooboy #amdx :End of Channel Invite List
+cmdhash = 00333437
+unmatched cmdhash 00333437
+
+(in)  {2} :weber.freenode.net 349 jooboy #amdx :End of Channel Exception List
+cmdhash = 00333439
+unmatched cmdhash 00333439
+
+*/

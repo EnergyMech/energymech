@@ -864,7 +864,44 @@ typedef struct
 
 } HookTimer;
 
+	//using that struct, calculate when the next time will be
+	//start by determining what the time is now
+
+	thistime = now;
+
+	//which second is it
+	thissecond = thistime % 60;
+
+	if (ht->second1 == 0x3FFFFFFF && ht->second2 == 0x3FFFFFFF)
+	{
+		// dont add waiting period to get to the proper second
+	}
+
+	//which minute is it
+	thistime = (thistime - thissecond) / 60;
+	thisminute = thistime % 60;
+	if (ht->minute1 == 0x3FFFFFFF && ht->minute2 == 0x3FFFFFFF)
+	{
+		// dont add waiting period to get to the proper minute
+	}
+
+	//which hour is it
+	thistime = (thistime - thisminute) / 60;
+	thishour = thistime % 24;
+	if (ht->hour == 0xFFFFFF)
+	{
+		// dont add waiting period to get to the proper hour
+	}
+
+	//which weekday is it
+	thistime = (thistime - thishour) / 60;	//thistime is now = day since epoch
+	if (ht->weekday == 0x7F) // every day
+	{
+		// dont add waiting period to get to the correct day
+	}
+
 #endif /* 0 */
+
 /*
  *  return -1 on failure
  */

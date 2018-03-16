@@ -106,6 +106,9 @@
 }
 
 #endif /* DEBUG */
+LS int makecrc(const char *);
+LS void send_supress(const char *, const char *);
+LS void netchanSupress(BotNet *, char *);
 
 LS Chan *find_channel(const char *, int)			__attr(CORE_SEG, __regparm (2) );
 LS Chan *find_channel_ac(const char *)				__attr(CORE_SEG, __regparm (1) );
