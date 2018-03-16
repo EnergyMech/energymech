@@ -58,7 +58,7 @@ void check_idlekick(void)
 	}
 }
 
-__attr (CORE_SEG, regparm(2))
+__attr(CORE_SEG, __regparm(2))
 Chan *find_channel(const char *name, int anychannel)
 {
 	Chan	*chan;
@@ -625,7 +625,7 @@ void remove_chanuser(Chan *chan, char *nick)
 /*
  *  Requires CurrentChan to be set properly
  */
-__attr(CORE_SEG, __regparm (2) )
+__attr(CORE_SEG, __regparm(2))
 void make_chanuser(char *nick, char *userhost)
 {
 	ChanUser *new;

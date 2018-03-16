@@ -1,7 +1,7 @@
 /*
 
     EnergyMech, IRC bot software
-    Copyright (c) 1997-2004 proton
+    Copyright (c) 1997-2018 proton
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -29,6 +29,36 @@
 #include "h.h"
 #include "text.h"
 #include "mcmd.h"
+
+int makecrc(const char *args)
+{
+	int	crc = 0;
+
+	while(*args)
+	{
+		crc += ((12345 * *args) % 321) + 4567;
+		args++;
+	}
+
+	return(crc);
+}
+
+void send_supress(const char *command, const char *args)
+{
+	Mech	*backup;
+	int	crc;
+
+	crc = makecrc(args);
+	for(backup=botlist;backup;backup=backup->next)
+	{
+		if (backup != current)
+		{
+			backup->supres_cmd = command;
+			backup->supres_crc = crc;
+		}
+	}
+	botnet_relay(NULL,"CS%s %i\n",command,crc);
+}
 
 ChanUser *find_chanbot(Chan *chan, char *nick)
 {
@@ -139,6 +169,41 @@ void netchanNeedop(BotNet *source, char *rest)
 				check_botinfo(binfo,channel);
 		}
         }
+}
+
+void netchanSupress(BotNet *source, char *rest)
+{
+	Mech	*backup;
+	const char *cmd;
+	int	crc,i,j;
+
+	botnet_relay(source,"CS%s\n",rest);
+
+	cmd = chop(&rest);
+
+	// convert command to const command
+	for(i=0;mcmd[i].name;i++)
+	{
+		j = Strcasecmp(mcmd[i].name,cmd);
+		if (j < 0)
+			continue;
+		if (j > 0)
+			return;
+		cmd = mcmd[i].name;
+		break;
+	}
+
+	if (mcmd[i].name == NULL)
+		return;
+
+	crc = a2i(rest);
+
+	// to all local bots
+	for(backup=botlist;backup;backup=backup->next)
+	{
+		backup->supres_cmd = cmd;
+		backup->supres_crc = crc;
+	}
 }
 
 #endif /* BOTNET */

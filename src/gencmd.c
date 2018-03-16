@@ -58,7 +58,8 @@ struct
 	/*
 	 *  public access commands
 	 */
-	{ 0, "VERIFY",		"do_auth",		 0		| NOPUB				},
+	{ 0, "AUTH",		"do_auth",		 0		| NOPUB	| CBANG			}, // double up on AUTH/VERIFY to better
+	{ 0, "VERIFY",		"do_auth",		 0		| NOPUB	| CBANG			}, // catch login attempts
 #ifdef TOYBOX
 	{ 0, "8BALL",		"do_8ball",		 0		| CBANG				},
 #endif /* TOYBOX */

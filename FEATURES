@@ -1,0 +1,67 @@
+--- Alias support
+
+  Command substitution
+
+--- Async DNS support
+
+  Normally energymech uses blocking calls to lookup hostnames.
+On bad networks this could cause problems because the whole mech
+process will lock up until it gets its answer from the domain name
+server. Async DNS support, or RawDNS for short, uses low level code
+to do hostname lookups asynchronously.
+
+--- Botnet support
+
+  Standard botnet functionality. Connect to other bots and share userlists
+and other informaton. Partyline extends over the whole botnet.
+
+--- Channel ban support
+
+  Sometimes ypu want to keep people from certain other channels out of your
+own channel. With channel ban enabled, the bot will periodically do WHOIS on
+users in your channel and if they are in your rivals channel as well, they can
+be kicked or banned, etc.
+
+--- Command output redirect
+
+  Certain commands like HELP normally require you to DCC chat or telnet to the
+bot in order to execute. With command output redirect enabled, you can run
+commands and force the output to be sent to a different target, like a nick,
+channel or even file.
+
+--- CTCP
+
+  Standard CTCP replies, VERSION, PING and FINGER. CTCP is not necessary for
+DCC chat and DCC file support to operate.
+
+--- DCC file support
+
+--- Debug support
+
+  If you have a problem running a mech, debug output could explain whats going on.
+Very necessary to include if you are a developer...
+
+--- Dynamic channel limit (+l)
+--- Dynamic command levels support
+--- Greet support
+--- HTTP server support
+--- Host info support
+--- IRC proxy support
+--- IRCD extensions support
+--- Newbie support
+--- Note support
+--- Notify support
+--- Password hashing with MD5
+--- Password hashing with SHA
+--- Scripting with Python
+--- Scripting with Tcl
+--- Seen support
+--- Session support
+--- Statistics support
+--- Telnet support
+--- Trivia support
+--- Toybox fun and games
+--- Uptime support
+--- URL capture support
+--- WinGate support
+

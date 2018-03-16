@@ -277,11 +277,11 @@ void update_modes(Chan *chan)
  */
 int check_mass(Chan *chan, ChanUser *doer, int type)
 {
-	time_t	*when;
-	int	*num,limit;
+	time_t	when;
+	int	num,limit;
 
 	/*
-	 *  must handle servers ...
+	 *  must handle servers ... (netsplits, chanserv, nickserv, ...)
 	 */
 	if (!doer)
 		return(FALSE);
@@ -300,38 +300,37 @@ int check_mass(Chan *chan, ChanUser *doer, int type)
 	 */
 	//case CHK_CAPS:
 	case INT_CKL:
-		num = &doer->capsnum;
+		num = INDEX_CAPS;
 		break;
 	//case CHK_PUB:
 	case INT_FL:
-		num = &doer->floodnum;
+		num = INDEX_FLOOD;
 		break;
 	/*
 	 *  three things we dont want channel ops to do
 	 */
 	//case CHK_DEOP:
 	case INT_MDL:
-		num = &doer->deopnum;
+		num = INDEX_DEOP;
 		break;
 	//case CHK_BAN:
 	case INT_MBL:
-		num = &doer->bannum;
+		num = INDEX_BAN;
 		break;
 	default:
 /*	case CHK_KICK: */
 /*	case INT_MKL: */
-		num = &doer->kicknum;
+		num = INDEX_KICK;
 		break;
 	}
 
-	when = (time_t*)&num[1];
-	if ((now - *when) > 10)
+	if ((now - doer->action_time[num]) > 10)
 	{
-		*when = now;
-		*num = 0;
+		doer->action_time[num] = now;
+		doer->action_num[num] = 0;
 	}
-	++(*num);
-	if (*num >= limit && limit)
+	++(doer->action_num[num]);
+	if (doer->action_num[num] >= limit && limit)
 		return(TRUE);
 	return(FALSE);
 }

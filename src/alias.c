@@ -249,6 +249,9 @@ void do_alias(COMMAND_ARGS)
 			set_mallocdoer(do_alias);
 			alias->format = Strdup(rest);
 			to_user(from,"Replaced alias: %s --> %s",cmd,rest);
+#ifdef DEBUG
+			debug("(do_alias) Replaced alias: %s --> %s\n",cmd,rest);
+#endif
 			return;
 		}
 	}
@@ -260,6 +263,9 @@ void do_alias(COMMAND_ARGS)
 	alias->next = aliaslist;
 	aliaslist = alias;
 	to_user(from,"Added alias: %s --> %s",cmd,rest);
+#ifdef DEBUG
+	debug("(do_alias) Added alias: %s --> %s\n",cmd,rest);
+#endif
 }
 
 void do_unalias(COMMAND_ARGS)

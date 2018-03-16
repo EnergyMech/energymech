@@ -417,8 +417,9 @@ int make_auth(const char *userhost, const User *user)
  *
  */
 
-/*
- *  Usage: VERIFY <password>
+/*---Help:AUTH:<password>
+ */
+/*---Help:VERIFY:<password>
  */
 void do_auth(COMMAND_ARGS)
 {

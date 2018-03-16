@@ -121,6 +121,9 @@ aliastest:	alias.c
 safepathtest:	function.c
 		$(CROSS_COMPILE)$(CC) $(CFLAGS) -o safepathtest $< $(LPROF) $(LIBS) $(LDSCRIPT) -DTEST
 
+commands:
+		grep -E '(void do_.*\(COMMAND_ARGS\)|/*---Help:)' *c
+
 #
 #
 #
