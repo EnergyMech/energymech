@@ -1,5 +1,6 @@
 3.0.99p4 -- WORK IN PROGRESS (~March, 2018)
 
+ * Added: STABLE/BETA/ALPHA status to individual features in configure.
  * Fixed: If bot guid is changed or deleted in the config, and the bot
           is reset, the connection associated with the removed guid
           will be cleaned up and closed instead of lingering.
