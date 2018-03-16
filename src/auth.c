@@ -1,7 +1,7 @@
 /*
 
     EnergyMech, IRC bot software
-    Copyright (c) 2001-2004 proton
+    Copyright (c) 2001-2018 proton
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@
 #include "mcmd.h"
 
 #ifndef MD5CRYPT
+#ifndef SHACRYPT
 
 /*
  *  simple password encryption
@@ -68,7 +69,7 @@ char *cipher(char *arg)
 
 	if (!arg || !*arg)
 		return(NULL);
-	
+
 	B1a = B2a = B3a = B4a = 0;
 	B1b = B2b = B3b = B4b = 0;
 	ptr = arg;
@@ -114,7 +115,39 @@ int passmatch(char *plain, char *encoded)
 	return(!Strcmp(cipher(plain),encoded));
 }
 
-#else /* MD5CRYPT */
+#endif /* not SHACRYPT */
+#endif /* not MD5CRYPT */
+
+#ifdef SHACRYPT
+
+/*
+ *  use SHA512 to hash passwords
+ */
+
+char *CRYPT_FUNC(const char *, const char *);
+
+char *makepass(char *plain)
+{
+	char	salt[8];
+
+	sprintf(salt,"$6$%04x",(rand() >> 16));
+	return(CRYPT_FUNC(plain,salt));
+}
+
+int passmatch(char *plain, char *encoded)
+{
+	char	*enc;
+
+	if (matches("$6$????$*",encoded))
+		return(FALSE);
+	enc = CRYPT_FUNC(plain,encoded);
+	return(!Strcmp(enc,encoded));
+}
+
+#endif /* SHACRYPT */
+
+#ifndef SHACRYPT
+#ifdef MD5CRYPT
 
 /*
  *  use MD5 to hash passwords
@@ -141,7 +174,7 @@ int passmatch(char *plain, char *encoded)
 }
 
 #endif /* MD5CRYPT */
-
+#endif /* not SHACRYPT */
 /*
  *
  */
@@ -384,8 +417,9 @@ int make_auth(const char *userhost, const User *user)
  *
  */
 
-/*
- *  Usage: VERIFY <password>
+/*---Help:AUTH:<password>
+ */
+/*---Help:VERIFY:<password>
  */
 void do_auth(COMMAND_ARGS)
 {

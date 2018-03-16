@@ -1,7 +1,7 @@
 /*
 
     EnergyMech, IRC bot software
-    Parts Copyright (c) 1997-2009 proton
+    Parts Copyright (c) 1997-2018 proton
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -69,12 +69,12 @@ void cfg_pass(char *rest)
 
 void cfg_mask(char *rest)
 {
-	addtouser(&cfgUser->mask,rest);
+	addtouser(&cfgUser->mask,rest,TRUE);
 }
 
 void cfg_chan(char *rest)
 {
-	addtouser(&cfgUser->chan,rest);
+	addtouser(&cfgUser->chan,rest,TRUE);
 }
 
 LS struct
@@ -294,9 +294,24 @@ int read_userlist(char *filename)
 	User	*olduserlist;
 	User	*newuserlist;
 	int	in;
+#ifdef DEBUG
+	int	r;
+#endif
 
 	if (!filename)
 		return(FALSE);
+	if (*filename == '<') // read only userfile
+		filename++;
+#ifdef DEBUG
+	if ((r = is_safepath(filename,FILE_MUST_EXIST)) != FILE_IS_SAFE)
+	{
+		debug("(write_userlist) %s: unsafe filename (%i)...\n",filename,r);
+		return(FALSE);
+	}
+#else
+	if (is_safepath(filename,FILE_MUST_EXIST) != FILE_IS_SAFE)
+		return(FALSE);
+#endif
 	if ((in = open(filename,O_RDONLY)) < 0)
 		return(FALSE);
 
@@ -345,7 +360,7 @@ int write_userlist(char *filename)
 	char	*p,flags[7];
 	int	i,f;
 #ifdef DEBUG
-	int	dodeb;
+	int	dodeb,r;
 #endif /* DEBUG */
 
 	if (!filename)
@@ -353,6 +368,27 @@ int write_userlist(char *filename)
 
 	if (!current->ul_save)
 		return(TRUE);
+
+	if (*filename == '<') // we dont write to read only userfiles
+#ifdef DEBUG
+	{
+		debug("(write_userlist) %s: writing to read only userfile is prohibited...\n",filename);
+		return(FALSE);
+	}
+#else
+		return(FALSE);
+#endif
+
+#ifdef DEBUG
+	if ((r = is_safepath(filename,FILE_MAY_EXIST)) != FILE_IS_SAFE)
+	{
+		debug("(write_userlist) %s: unsafe filename (%i)...\n",filename,r);
+		return(FALSE);
+	}
+#else
+	if (is_safepath(filename,FILE_MAY_EXIST) != FILE_IS_SAFE)
+		return(FALSE);
+#endif
 
 	if ((f = open(filename,O_WRONLY|O_CREAT|O_TRUNC,NEWFILEMODE)) < 0)
 		return(FALSE);
@@ -447,8 +483,8 @@ void rehash_chanusers(void)
 	}
 }
 
-__attr(CORE_SEG, __regparm (2))
-void addtouser(Strp **pp, const char *string)
+__attr(CORE_SEG, __regparm (3))
+void addtouser(Strp **pp, const char *string, int rehash)
 {
 	Strp	*um;
 
@@ -463,7 +499,8 @@ void addtouser(Strp **pp, const char *string)
 	set_mallocdoer(addtouser);
 	*pp = um = (Strp*)Calloc(sizeof(Strp) + strlen(string));
 	Strcpy(um->p,string);
-	rehash_chanusers();
+	if (rehash)
+		rehash_chanusers();
 }
 
 __attr(CORE_SEG, __regparm (2))
@@ -716,7 +753,7 @@ User *add_user(char *handle, char *pass, int axs)
 #endif /* DEBUG */
 
 	set_mallocdoer(add_user);
-	user = (User*)Calloc(sizeof(User) + Strlen2(handle,pass));
+	user = (User*)Calloc(sizeof(User) + Strlen(handle,pass,NULL)); // Strlen() tolerates pass being NULL, Strlen2() does not.
 	user->x.x.access = axs;
 	user->next = current->userlist;
 	current->userlist = user;
@@ -737,7 +774,7 @@ User *add_user(char *handle, char *pass, int axs)
 /*
  *  find the user record for a named handle
  */
-User *find_handle(char *handle)
+User *find_handle(const char *handle)
 {
 	User 	*user;
 
@@ -802,7 +839,7 @@ User *get_user(const char *userhost, const char *channel)
 /*
  *  highest channel on a given channel
  */
-int get_useraccess(char *userhost, char *channel)
+int get_useraccess(const char *userhost, const char *channel)
 {
 	User	*user;
 
@@ -1133,6 +1170,7 @@ void do_user(COMMAND_ARGS)
 	Strp	*ump;
 	char	*handle,*pt,*mask,*nick,*chan,*anum,*pass,*encpass;
 	char	mode;
+	char	tmpmask[NUHLEN];
 	int	change;
 	int	newaccess,uaccess;
 	union	usercombo combo;
@@ -1209,27 +1247,31 @@ void do_user(COMMAND_ARGS)
 		/*
 		 *  convert and check nick/mask
 		 */
-		if ((mask = nick2uh(from,nick)) == NULL)
+		if ((mask = nick2uh(from,nick)) == NULL) // nick2uh uses nuh_buf
 			return;
+		Strcpy(tmpmask,mask);
+#ifdef DEBUG
+		debug("(do_user) nick2uh(from \"%s\", nick \"%s\") = mask \"%s\"\n",from,nick,tmpmask);
+#endif /* DEBUG */
 #ifdef NEWBIE
-		if (!matches(mask,"!@"))
+		if (!matches(tmpmask,"!@"))
 		{
-			to_user(from,"Problem adding %s (global mask)",mask);
+			to_user(from,"Problem adding %s (global mask)",tmpmask);
 			return;
 		}
-		if (matches("*@?*.?*",mask))
+		if (matches("*@?*.?*",tmpmask))
 		{
-			to_user(from,"Problem adding %s (invalid mask)",mask);
+			to_user(from,"Problem adding %s (invalid mask)",tmpmask);
 			return;
 		}
 #endif /* NEWBIE */
-		format_uh(mask,FUH_USERHOST);
+		format_uh(tmpmask,FUH_USERHOST); // format_uh uses local temporary buffer but copies result back into tmpmask
 		/*
 		 *  dont duplicate users
 		 */
-		if (get_useraccess(mask,chan))
+		if (get_useraccess(tmpmask,chan))
 		{
-			to_user(from,"%s (%s) on %s is already a user",nick,mask,chan);
+			to_user(from,"%s (%s) on %s is already a user",nick,tmpmask,chan);
 			return;
 		}
 		/*
@@ -1246,9 +1288,12 @@ void do_user(COMMAND_ARGS)
 		 *  add_user() touches current->ul_save for us
 		 */
 		user = add_user(handle,encpass,newaccess);
-		addtouser(&user->mask,mask);
-		addtouser(&user->chan,chan);
-		to_user(from,"%s has been added as %s on %s",handle,mask,chan);
+		addtouser(&user->mask,tmpmask,FALSE);	// does not run rehash_chanusers(), does not clobber nuh_buf
+		addtouser(&user->chan,chan,TRUE);	// clobbers nuh_buf
+#ifdef DEBUG
+		debug("(do_user) from %s, handle %s,\n\tmask %s, chan %s\n",from,handle,tmpmask,chan);
+#endif /* DEBUG */
+		to_user(from,"%s has been added as %s on %s",handle,tmpmask,chan);
 		to_user(from,"Access level: %i%s%s",newaccess,(pass) ? "  Password: " : "",(pass) ? pass : "");
 #ifdef NEWUSER_SPAM
 		if ((newaccess != BOTLEVEL) && find_nuh(nick))
@@ -1418,7 +1463,7 @@ usage:
 			return;
 		}
 #endif /* NEWBIE */
-		addtouser(&user->chan,mask);
+		addtouser(&user->chan,mask,TRUE);
 		change++;
 	}
 	else
@@ -1452,7 +1497,7 @@ usage:
 			return;
 		}
 #endif /* NEWBIE */
-		addtouser(&user->mask,mask);
+		addtouser(&user->mask,mask,TRUE);
 		change++;
 	}
 
@@ -1516,7 +1561,14 @@ void do_echo(COMMAND_ARGS)
 void change_pass(User *user, char *pass)
 {
 	User	*new,**uptr;
+	char	*enc;
 
+	enc = makepass(pass);
+	if (strlen(user->pass) <= strlen(enc))
+	{
+		Strcpy(user->pass,enc);
+		user->modcount++;
+	}
 	/*
 	 *  password is stuck in a solid malloc in a linked list
 	 *  add_user() touches current->ul_save for us

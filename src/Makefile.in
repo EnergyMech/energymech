@@ -1,6 +1,6 @@
 #
 #   EnergyMech, IRC bot software
-#   Copyright (c) 1997-2009 proton
+#   Copyright (c) 1997-2018 proton
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -42,23 +42,30 @@ CHMOD =		chmod
 
 INCS =		config.h mcmd.h defines.h global.h h.h structs.h text.h
 
+TESTFILES =	aliastest safepathtest
+
 OFILES =	alias.o auth.o bounce.o chanban.o channel.o core.o \
-		ctcp.o debug.o dns.o dynamode.o function.o greet.o help.o irc.o \
+		ctcp.o debug.o dns.o dynamode.o function.o greet.o help.o hostinfo.o irc.o \
 		kicksay.o main.o net.o net_chan.o note.o notify.o ons.o parse.o \
 		perl.o prot.o python.o redirect.o reset.o seen.o shit.o socket.o \
-		spy.o stats.o tcl.o telnet.o toybox.o trivia.o uptime.o \
-		user.o vars.o web.o @MD5_O@
+		spy.o stats.o tcl.o telnet.o toybox.o trivia.o uptime.o urlcap.o \
+		user.o vars.o web.o @MD5_O@ @SHA_O@
 
 SRCFILES =	alias.c auth.c bounce.c chanban.c channel.c core.c \
-		ctcp.c debug.c dns.c dynamode.c function.c greet.c help.c irc.c \
+		ctcp.c debug.c dns.c dynamode.c function.c greet.c help.c hostinfo.c irc.c \
 		kicksay.c main.c net.c net_chan.c note.c notify.c ons.c parse.c \
 		perl.c prot.c python.c redirect.c reset.c seen.c shit.c socket.c \
-		spy.c stats.c tcl.c telnet.c toybox.c trivia.c uptime.c \
+		spy.c stats.c tcl.c telnet.c toybox.c trivia.c uptime.c urlcap.c \
 		user.c vars.c web.c
 
 all:		$(INSTALLNAME)
 
-mcmd.h:		gencmd.c config.h structs.h ;
+#
+#   mcmd.h is generated at compile time to wrap up all command attributes more efficiently,
+#   instead of doing extra parsing and handling while the bot is running.
+#
+
+mcmd.h:		gencmd.c config.h structs.h
 		$(CC) $(LFLAGS) -o gencmd gencmd.c
 		./gencmd > mcmd.h
 
@@ -67,24 +74,31 @@ install:	$(INSTALLNAME)
 		$(MV) $(INSTALLNAME) $(INSTALLDIR)
 
 clean:		FORCE
-		$(RM) $(INSTALLNAME) gencmd mcmd.h core $(OFILES)
+		$(RM) $(INSTALLNAME) gencmd mcmd.h core $(TESTFILES) $(OFILES)
 
 $(INSTALLNAME):	$(OFILES)
 		$(CROSS_COMPILE)$(CC) $(LFLAGS) -o $(INSTALLNAME) $(OFILES) $(LPROF) $(LIBS) $(LDSCRIPT)
 @oc@		$(CROSS_COMPILE)objcopy -R .note -R .comment $(INSTALLNAME)
 @sz@		size $(INSTALLNAME)
 
-mega:		$(SRCFILES) $(INCS) usage.h
-		$(CROSS_COMPILE)$(CC) $(CFLAGS) -o $(INSTALLNAME) mega.c $(LPROF) $(LIBS) $(LDSCRIPT) $(PYINCLUDE) $(TCLINCLUDE)
+$(INSTALLNAME)-static:	$(OFILES)
+		$(CROSS_COMPILE)$(CC) $(LFLAGS) -o $(INSTALLNAME) $(OFILES) $(LPROF) $(LIBS) $(LDSCRIPT) -static
 @oc@		$(CROSS_COMPILE)objcopy -R .note -R .comment $(INSTALLNAME)
 @sz@		size $(INSTALLNAME)
 
+
 #
-# static targets
+#  'mega' versions
+#  compiling the C files all at once (having all the code "visible" during the whole process) enables GCC to make more optimizations,
+#  resulting in a smaller, more efficient, binary. this process uses lots more memory at compile time.
 #
 
-$(INSTALLNAME)-static:	$(OFILES)
-		$(CROSS_COMPILE)$(CC) $(LFLAGS) -o $(INSTALLNAME) $(OFILES) $(LPROF) $(LIBS) $(LDSCRIPT) -static
+mega-install:	mega $(SRCFILES) $(INCS) usage.h
+		$(CHMOD) $(INSTALLMODE) $(INSTALLNAME)
+		$(MV) $(INSTALLNAME) $(INSTALLDIR)
+
+mega:		$(SRCFILES) $(INCS) usage.h
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -o $(INSTALLNAME) mega.c $(LPROF) $(LIBS) $(LDSCRIPT) $(PYINCLUDE) $(TCLINCLUDE)
 @oc@		$(CROSS_COMPILE)objcopy -R .note -R .comment $(INSTALLNAME)
 @sz@		size $(INSTALLNAME)
 
@@ -92,6 +106,23 @@ mega-static:	$(SRCFILES) $(INCS) usage.h
 		$(CROSS_COMPILE)$(CC) $(CFLAGS) -o $(INSTALLNAME) mega.c $(LPROF) $(LIBS) $(LDSCRIPT) $(PYINCLUDE) $(TCLINCLUDE) -static
 @oc@		$(CROSS_COMPILE)objcopy -R .note -R .comment $(INSTALLNAME)
 @sz@		size $(INSTALLNAME)
+
+#
+#  testing stuff
+#
+
+test:		$(TESTFILES)
+		./aliastest
+		./safepathtest
+
+aliastest:	alias.c
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -o aliastest $< $(LPROF) $(LIBS) $(LDSCRIPT) -DTEST
+
+safepathtest:	function.c
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -o safepathtest $< $(LPROF) $(LIBS) $(LDSCRIPT) -DTEST
+
+commands:
+		grep -E '(void do_.*\(COMMAND_ARGS\)|/*---Help:)' *c
 
 #
 #
@@ -134,6 +165,9 @@ greet.o:	greet.c $(INCS)
 		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
 help.o:		help.c $(INCS) usage.h
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
+
+hostinfo.o:	hostinfo.c $(INCS)
 		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
 irc.o:		irc.c $(INCS)
@@ -208,6 +242,9 @@ trivia.o:	trivia.c $(INCS)
 uptime.o:	uptime.c $(INCS)
 		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
+urlcap.o:	urlcap.c $(INCS)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
+
 user.o:		user.c $(INCS)
 		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
@@ -219,5 +256,8 @@ web.o:		web.c $(INCS)
 
 md5/md5.o:	md5/md5.c $(INCS)
 		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< -o $@ -Imd5 $(CPROF)
+
+sha/sha1.o:	sha/sha1.c $(INCS)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< -o $@ -Isha1 $(CPROF)
 
 FORCE:

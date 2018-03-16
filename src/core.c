@@ -138,7 +138,11 @@ int write_session(void)
 #ifdef RAWDNS
 	Strp	*p;
 #endif /* RAWDNS */
+#ifdef ALIAS
+	Alias	*alias;
+#endif /* ALIAS */
 	Server	*sp;
+	Spy	*spy;
 	Chan	*chan;
 	Mech	*bot;
 	UniVar	*varval;
@@ -155,94 +159,12 @@ int write_session(void)
 			to_file(sf,"dnsserver %s\n",inet_ntoa(ia_ns[j]));
 #endif /* RAWDNS */
 
-	for(bot=botlist;bot;bot=bot->next)
-	{
-		to_file(sf,"nick %i %s\n",bot->guid,bot->wantnick);
-		/*
-		 *  current->setting contains channel defaults and global vars
-		 */
-		for(j=0;VarName[j].name;j++)
-		{
-			varval = &bot->setting[j];
-			if (IsProc(j))
-				varval = varval->proc_var;
-			if (IsChar(j))
-			{
-				if ((int)VarName[j].setto != varval->char_var)
-					to_file(sf,"set %s %c\n",VarName[j].name,varval->char_var);
-			}
-			else
-			if (IsNum(j))
-			{
-				if ((int)VarName[j].setto != varval->int_var)
-					to_file(sf,"set %s %i\n",VarName[j].name,varval->int_var);
-			}
-			else
-			if (IsStr(j))
-			{
-				/*
-				 *  There are no default string settings
-				 */
-				if (varval->str_var)
-					to_file(sf,"set %s %s\n",VarName[j].name,varval->str_var);
-			}
-		}
-		for(chan=bot->chanlist;chan;chan=chan->next)
-		{
-			if (!chan->active && !chan->rejoin)
-				continue;
-			to_file(sf,"join %s %s\n",chan->name,(chan->key) ? chan->key : "");
-			/*
-			 *  using CHANSET_SIZE: only the first settings contain stuff
-			 */
-			for(j=0;j<CHANSET_SIZE;j++)
-			{
-				varval = &chan->setting[j];
-				if (IsNum(j))
-				{
-					if ((int)VarName[j].setto != varval->int_var)
-						to_file(sf,"set %s %i\n",VarName[j].name,varval->int_var);
-				}
-				else
-				if (IsStr(j))
-				{
-					/*
-					 *  There are no default string settings
-					 */
-					if (varval->str_var)
-						to_file(sf,"set %s %s\n",VarName[j].name,varval->str_var);
-				}
-			}
-		}
-	}
-
 	to_file(sf,"set ctimeout %i\n",ctimeout);
 	for(sp=serverlist;sp;sp=sp->next)
 	{
 		to_file(sf,"server %s %i %s\n",sp->name,(sp->port) ? sp->port : 6667,
 			(sp->pass[0]) ? sp->pass : "");
 	}
-
-#ifdef TRIVIA
-	if (triv_qfile)
-		to_file(sf,"set qfile %s\n",triv_qfile);
-	to_file(sf,"set qdelay %i\n",triv_qdelay);
-	to_file(sf,"set qchar %c\n",triv_qchar);
-#endif /* TRIVIA */
-
-#ifdef UPTIME
-	if (uptimehost && Strcasecmp(uptimehost,defaultuptimehost))
-		to_file(sf,"set uphost %s\n",uptimehost);
-	if (uptimeport)
-		to_file(sf,"set upport %i\n",uptimeport);
-	if (uptimenick)
-		to_file(sf,"set upnick %s\n",uptimenick);
-#endif /* UPTIME */
-
-#ifdef SEEN
-	if (seenfile)
-		to_file(sf,"set seenfile %s\n",seenfile);
-#endif /* SEEN */
 
 #ifdef BOTNET
 	if (linkpass)
@@ -270,6 +192,27 @@ int write_session(void)
 		to_file(sf,"set webport %i\n",webport);
 #endif /* WEB */
 
+#ifdef UPTIME
+	if (uptimehost && Strcasecmp(uptimehost,defaultuptimehost))
+		to_file(sf,"set uphost %s\n",uptimehost);
+	if (uptimeport)
+		to_file(sf,"set upport %i\n",uptimeport);
+	if (uptimenick)
+		to_file(sf,"set upnick %s\n",uptimenick);
+#endif /* UPTIME */
+
+#ifdef TRIVIA
+	if (triv_qfile)
+		to_file(sf,"set qfile %s\n",triv_qfile);
+	to_file(sf,"set qdelay %i\n",triv_qdelay);
+	to_file(sf,"set qchar %c\n",triv_qchar);
+#endif /* TRIVIA */
+
+#ifdef SEEN
+	if (seenfile)
+		to_file(sf,"set seenfile %s\n",seenfile);
+#endif /* SEEN */
+
 #ifdef DYNCMD
 	/*
 	 *  because of "chaccess XXX disable" its best to save chaccess last
@@ -285,6 +228,87 @@ int write_session(void)
 		}
 	}
 #endif /* DYNCMD */
+
+#ifdef ALIAS
+	for(alias=aliaslist;alias;alias=alias->next)
+	{
+		to_file(sf,"alias %s %s\n",alias->alias,alias->format);
+	}
+#endif /* ALIAS */
+
+	for(bot=botlist;bot;bot=bot->next)
+	{
+		to_file(sf,"nick %i %s\n",bot->guid,bot->wantnick);
+		/*
+		 *  current->setting contains channel defaults and global vars
+		 */
+		for(j=0;VarName[j].name;j++)
+		{
+			if (IsProc(j))
+				continue;
+			varval = &bot->setting[j];
+			if (IsChar(j))
+			{
+				if (VarName[j].v.num != varval->char_var)
+					to_file(sf,"set %s %c\n",VarName[j].name,varval->char_var);
+			}
+			else
+			if (IsNum(j))
+			{
+				if (VarName[j].v.num != varval->int_var)
+					to_file(sf,"set %s %i\n",VarName[j].name,varval->int_var);
+			}
+			else
+			if (IsStr(j))
+			{
+				/*
+				 *  There are no default string settings
+				 */
+				if (varval->str_var)
+					to_file(sf,"set %s %s\n",VarName[j].name,varval->str_var);
+			}
+		}
+		for(chan=bot->chanlist;chan;chan=chan->next)
+		{
+			if (!chan->active && !chan->rejoin)
+				continue;
+			to_file(sf,"join %s %s\n",chan->name,(chan->key) ? chan->key : "");
+			/*
+			 *  using CHANSET_SIZE: only the first settings contain stuff
+			 */
+			for(j=0;j<CHANSET_SIZE;j++)
+			{
+				varval = &chan->setting[j];
+				if (IsNum(j))
+				{
+					if (VarName[j].v.num != varval->int_var)
+						to_file(sf,"set %s %i\n",VarName[j].name,varval->int_var);
+				}
+				else
+				if (IsStr(j))
+				{
+					/*
+					 *  There are no default string settings
+					 */
+					if (varval->str_var)
+						to_file(sf,"set %s %s\n",VarName[j].name,varval->str_var);
+				}
+			}
+		}
+		// SPY files
+		for(spy=bot->spylist;spy;spy=spy->next)
+		{
+			if (spy->t_dest == SPY_FILE)
+			{
+				if (spy->src && spy->dest)
+					to_file(sf,"spy %s > %s\n",spy->src,spy->dest);
+#ifdef DEBUG
+				else
+					debug("spy to session fail\n");
+#endif /* DEBUG */
+			}
+		}
+	}
 
 	close(sf);
 	return(TRUE);
@@ -840,7 +864,44 @@ typedef struct
 
 } HookTimer;
 
+	//using that struct, calculate when the next time will be
+	//start by determining what the time is now
+
+	thistime = now;
+
+	//which second is it
+	thissecond = thistime % 60;
+
+	if (ht->second1 == 0x3FFFFFFF && ht->second2 == 0x3FFFFFFF)
+	{
+		// dont add waiting period to get to the proper second
+	}
+
+	//which minute is it
+	thistime = (thistime - thissecond) / 60;
+	thisminute = thistime % 60;
+	if (ht->minute1 == 0x3FFFFFFF && ht->minute2 == 0x3FFFFFFF)
+	{
+		// dont add waiting period to get to the proper minute
+	}
+
+	//which hour is it
+	thistime = (thistime - thisminute) / 60;
+	thishour = thistime % 24;
+	if (ht->hour == 0xFFFFFF)
+	{
+		// dont add waiting period to get to the proper hour
+	}
+
+	//which weekday is it
+	thistime = (thistime - thishour) / 60;	//thistime is now = day since epoch
+	if (ht->weekday == 0x7F) // every day
+	{
+		// dont add waiting period to get to the correct day
+	}
+
 #endif /* 0 */
+
 /*
  *  return -1 on failure
  */
@@ -1184,8 +1245,10 @@ void do_core(COMMAND_ARGS)
 	}
 
 	i = Strcmp(current->nick,current->wantnick);
-	table_buffer((i) ? TEXT_CURRNICKWANT : TEXT_CURRNICKHAS,current->nick,current->wantnick);
-	table_buffer(TEXT_CURRGUID,current->guid);
+	if (i)
+		table_buffer(TEXT_CURRNICKWANT,current->nick,current->wantnick,current->guid);
+	else
+		table_buffer(TEXT_CURRNICKHAS,current->nick,current->guid);
 	table_buffer(TEXT_USERLISTSTATS,u,su,EXTRA_CHAR(su),bu,EXTRA_CHAR(bu));
 
 	pt = tmp;
@@ -1358,12 +1421,12 @@ void do_server(COMMAND_ARGS)
 	ServerGroup *sg;
 	Server	*sp,*dp,**spp;
 	char	*server,*aport,*pass;
-	char	addc,*last,*quitmsg = "Trying new server, brb...";
+	char	addc,*last,*quitmsg = TEXT_TRYNEWSERVER;
 	int	n,iport,sgi;
 
 	if (CurrentCmd->name == C_NEXTSERVER)
 	{
-		quitmsg = "Switching servers...";
+		quitmsg = TEXT_SWITCHSERVER;
 		to_user(from,FMT_PLAIN,quitmsg);
 		goto do_server_jump;
 	}
@@ -1591,7 +1654,7 @@ void do_nick(COMMAND_ARGS)
 		return;
 	}
 	guid = a2i(nick);
-	backup = current;	
+	backup = current;
 	if (!errno)
 	{
 		nick = chop(&rest);

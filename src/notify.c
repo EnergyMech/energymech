@@ -244,7 +244,7 @@ void catch_whois(char *nick, char *userhost, char *realname)
 			 *  put in a new log entry
 			 */
 			set_mallocdoer(catch_whois);
-			nlog = (nfLog*)Calloc(sizeof(nfLog) + Strlen2(userhost,realname));
+			nlog = (nfLog*)Calloc(sizeof(nfLog) + Strlen2(userhost,realname)); // realname is never NULL
 			nlog->signon = now;
 			nlog->next = nf->log;
 			nf->log = nlog;
@@ -306,7 +306,7 @@ int notifylog_callback(char *rest)
 				pp = &(*pp)->next;
 			}
 			set_mallocdoer(notifylog_callback);
-			nlog = (nfLog*)Calloc(sizeof(nfLog) + Strlen2(userhost,rest));
+			nlog = (nfLog*)Calloc(sizeof(nfLog) + Strlen2(userhost,rest)); // rest is never NULL
 			nlog->signon = on;
 			nlog->signoff = off;
 			nlog->next = *pp;

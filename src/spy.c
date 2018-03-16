@@ -1,7 +1,7 @@
 /*
 
     EnergyMech, IRC bot software
-    Parts Copyright (c) 1997-2004 proton
+    Parts Copyright (c) 1997-2018 proton
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@
 
 #ifdef DEBUG
 
-LS const char SPY_DEFS[7][12] =
+LS const char SPY_DEFS[][12] =
 {
 	"SPY_FILE",
 	"SPY_CHANNEL",
@@ -38,7 +38,10 @@ LS const char SPY_DEFS[7][12] =
 	"SPY_STATUS",
 	"SPY_MESSAGE",
 	"SPY_RAWIRC",
-	"SPY_BOTNET"
+	"SPY_BOTNET",
+#ifdef URLCAPTURE
+	"SPY_URL",
+#endif /* URLCAPTURE */
 };
 
 #endif /* DEBUG */
@@ -161,21 +164,28 @@ void spy_typecount(Mech *bot)
 
 struct
 {
-	char	*idstring;
+	const char *idstring;
 	int	typenum;
-	
-} spy_source_list[] = 
+
+} spy_source_list[] =
 {
 { SPYSTR_STATUS,	SPY_STATUS	},
 { SPYSTR_MESSAGE,	SPY_MESSAGE	},
 { SPYSTR_RAWIRC,	SPY_RAWIRC	},
 { SPYSTR_BOTNET,	SPY_BOTNET	},
+#ifdef URLCAPTURE
+{ SPYSTR_URL,		SPY_URL		},
+#endif /* URLCAPTURE */
 { NULL, 0 },
 };
 
-int spy_source(char *from, int *t_src, char **src)
+int spy_source(char *from, int *t_src, const char **src)
 {
 	int	i;
+
+#ifdef DEBUG
+	debug("(spy_source) t_src %i, src %s\n",*t_src,*src);
+#endif /* ifdef DEBUG */
 
 	for(i=0;spy_source_list[i].idstring;i++)
 	{
@@ -198,6 +208,31 @@ int spy_source(char *from, int *t_src, char **src)
  *
  */
 
+/*---Help:SPY:[STATUS|MESSAGE|RAWIRC|URL|[guid:|botnick:] [channel|> filename]
+
+Spy on a certain source of messages. When you join DCC chat,
+the STATUS source is added by default as a spy source for you.
+If no arguments are given, the current list of active spy
+channels is shown. Output is not line buffered and can cause
+excess flood if not careful.
+
+  (sources)
+   STATUS     Status messages.
+   MESSAGE    Pivate messages that the bot receives.
+   RAWIRC     Lines received from irc server before processing.
+   URL        URLs seen by the bot.
+   guid:      Messages from a bot specified by guid.
+   botnick:   Messages from a bot specified by nick.
+   channel    Activities on the specified channel.
+
+  (destinations)
+   (none)     Send output to you (default).
+   channel    Send output to the specified channel.
+   >file      Send output to file. Lines are appended to the end of the file.
+              This file needs to exist before logging to it.
+
+See also: rspy
+*/
 void do_spy(COMMAND_ARGS)
 {
 	/*
@@ -205,10 +240,10 @@ void do_spy(COMMAND_ARGS)
 	 */
 	Spy	*spy;
 	Mech	*backup,*destbot;
-	char	*src,*dest;
+	const char *src;
+	char	*dest;
 	int	t_src,t_dest;
-	int	sz;
-	int	guid;
+	int	sz,r,guid;
 
 	if (!*rest)
 	{
@@ -291,9 +326,9 @@ guid_ok:
 	else
 	{
 		sz = spy_source(from,&t_src,&src);
-		if (sz < 0)
+		if (sz < 0) // user has insufficient access to source
 			goto spy_usage;
-		if (sz < cmdaccess)
+		if (sz < cmdaccess) // user has less access relative to source than the command level of SPY
 			return;
 	}
 
@@ -304,6 +339,7 @@ guid_ok:
 		 */
 		if (*dest == '>')
 		{
+			// accept both ">file" and "> file"
 			dest++;
 			if (!*dest)
 			{
@@ -314,8 +350,16 @@ guid_ok:
 			/*
 			 *  Dont just open anything.
 			 */
-			if (!is_safepath(dest))
+			r = is_safepath(dest,FILE_MAY_EXIST);
+			if (r != FILE_IS_SAFE)
+#ifdef DEBUG
+			{
+				debug("(do_spy) Filename \"%s\" was deemed unsafe (%i)\n",dest,r);
 				goto spy_usage;
+			}
+#else
+				goto spy_usage;
+#endif /* DEBUG */
 			t_dest = SPY_FILE;
 			goto spy_dest_ok;
 		}
@@ -384,7 +428,7 @@ spy_dest_ok:
 
 	if (t_src == SPY_CHANNEL)
 	{
-		Strcpy(spy->src,src);
+		Strcpy((char*)spy->src,src);
 	}
 	else
 	{
@@ -434,7 +478,8 @@ void do_rspy(COMMAND_ARGS)
 	 *  on_msg checks: CARGS
 	 */
 	Spy	*spy,**pspy;
-	char	*src,*dest,*tmp;
+	const char *src;
+	char	*dest,*tmp;
 	int	t_src,t_dest;
 	int	n;
 
@@ -468,10 +513,11 @@ rspy_usage:
 					goto rspy_usage;
 			}
 			/*
-			 *  Dont just open anything.
+			 *   this is about removing an existing spy channel
+			 *   filename does not need to be checked because
+			 *   - if its a bogus filename, it wont match any open spy channels
+			 *   - if its a matching filename, its going to be removed right now
 			 */
-			if (!is_safepath(dest))
-				goto rspy_usage;
 			t_dest = SPY_FILE;
 			goto rspy_dest_ok;
 		}

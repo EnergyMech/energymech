@@ -79,7 +79,7 @@ void copy_vars(UniVar *dst, UniVar *src)
 		{
 			dst[i].int_var = src[i].int_var;
 		}
-	}	
+	}
 }
 
 void set_binarydefault(UniVar *dst)
@@ -87,7 +87,7 @@ void set_binarydefault(UniVar *dst)
 	int	i;
 
 	for(i=0;VarName[i].name;i++)
-		dst[i].str_var = VarName[i].setto;
+		dst[i].str_var = VarName[i].v.str;
 }
 
 void delete_vars(UniVar *vars, int which)
@@ -131,6 +131,11 @@ void ec_access(char *from, char *to)
 
 	sprintf(num,"%i",get_useraccess(from,to));
 	nobo_strcpy(num);
+}
+
+void ec_capabilities(char *from, char *to)
+{
+	nobo_strcpy(__mx_opts);
 }
 
 void ec_cc(char *from, char *to)
@@ -272,16 +277,17 @@ LS const struct
 
 } ecmd[] =
 {
-	{ ec_access,	"$access",	7	},
-	{ ec_cc,	"$cc",		3	},
-	{ ec_channels,	"$channels",	9	},
-	{ ec_time,	"$time",	5	},
-	{ ec_set,	"$var(",	5	},
-	{ ec_on,	"$on",		3	},
-	{ ec_server,	"$server",	7	},
-	{ ec_up,	"$up",		3	},
-	{ ec_ver,	"$ver",		4	},
-	{ NULL,		"",		0	},
+	{ ec_access,		"$access",	7	},
+	{ ec_capabilities,	"$cap",		4	},
+	{ ec_cc,		"$cc",		3	},
+	{ ec_channels,		"$channels",	9	},
+	{ ec_time,		"$time",	5	},
+	{ ec_set,		"$var(",	5	},
+	{ ec_on,		"$on",		3	},
+	{ ec_server,		"$server",	7	},
+	{ ec_up,		"$up",		3	},
+	{ ec_ver,		"$ver",		4	},
+	{ NULL,			"",		0	},
 };
 
 /*
@@ -388,7 +394,7 @@ second_pass:
 
 			varval = (IsProc(i)) ? current->setting[i].proc_var : &univar[i];
 
-			sz = Strlen2(tmp,VarName[i].name);
+			sz = Strlen2(tmp,VarName[i].name); // VarName[i].name is never NULL
 
 			if (IsStr(i))
 			{

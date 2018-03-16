@@ -1,7 +1,7 @@
 /*
 
     EnergyMech, IRC bot software
-    Parts Copyright (c) 1997-2009 proton
+    Parts Copyright (c) 1997-2018 proton
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -82,7 +82,12 @@ typedef struct
 
 typedef struct DEFstruct
 {
-	int		id;
+	union
+	{
+		int	id;
+		void	*func;
+
+	} v;
 	char		*idstr;
 
 } DEFstruct;
@@ -168,7 +173,16 @@ typedef struct Setting
 	uchar		type;
 	uchar		uaccess;		/* user access to touch/view this setting */
 	short		min;
-	void		*setto;			/* type-casted to whatever */
+	union
+	{
+			int	num;
+			int	*numptr;
+			char	chr;
+			char	*str;
+			char	**strptr;
+
+	} v;
+	//void		*setto;			/* type-casted to whatever */
 	char		*name;
 	int		max;
 	void		(*func)(const struct Setting *);
@@ -306,20 +320,8 @@ typedef struct ChanUser
 
 	int		flags;
 
-	/* distance between &_num -> &_time is used in check_mass */
-	int		floodnum;
-	time_t		floodtime;
-	int		bannum;
-	time_t		bantime;
-	int		deopnum;
-	time_t		deoptime;
-	int		kicknum;
-	time_t		kicktime;
-	int		nicknum;
-	time_t		nicktime;
-	int		capsnum;
-	time_t		capstime;
-
+	uint8_t		action_num[INDEX_MAX];
+	time_t		action_time[INDEX_MAX];
 	time_t		idletime;
 
 #ifdef CHANBAN
@@ -455,7 +457,7 @@ typedef struct Spy
 	Client		*dcc;
 	int		destbot;
 
-	char		*src;
+	const char	*src;
 	char		*dest;
 	char		p[2];
 
@@ -500,6 +502,11 @@ typedef struct Mech
 	int		server;			/* ident of my current server	*/
 	int		nextserver;
 
+#ifdef BOTNET
+	const char	*supres_cmd;
+	int		supres_crc;
+#endif
+
 	/*
 	 *  Line buffer for non-essential stuff
 	 */
@@ -535,7 +542,6 @@ typedef struct Mech
 #endif /* NOTIFY */
 
 	Spy		*spylist;
-
 	int		spy;
 
 #ifdef NOTIFY
@@ -565,7 +571,7 @@ typedef struct Mech
 
 #ifdef IDWRAP
 	char		*identfile;
-#endif /* IDWRAP */		
+#endif /* IDWRAP */
 
 	/* big buffers at the end */
 	UniVar		setting[SIZE_VARS];	/* global vars + channel defaults */
@@ -645,7 +651,7 @@ typedef struct BotNet
 
 	/*
 	 *  do not touch the above vars!
-	 *  they are copied partially in net.c
+	 *  they are copied partially in that order in net.c
 	 */
 
 	int		guid;		/* remote bot guid	*/
@@ -654,8 +660,9 @@ typedef struct BotNet
 
 	struct
 	{
-	ulong		pta:1;		/* plain text auth	*/
-	ulong		md5:1;		/* md5 */
+	ulong		pta:1,		/* plain text auth	*/
+			sha:1,		/* SHA */
+			md5:1;		/* MD5 */
 
 	} opt;
 
@@ -778,7 +785,7 @@ typedef struct OnMsg
 			redir:1,
 			lbuf:1,
 			cbang:1,
-			acchan:1;
+			acchan:1; // -- 20 bits
 	char		*cmdarg;
 
 } OnMsg;
@@ -795,7 +802,7 @@ typedef struct dnsAuthority
 } dnsAuthority;
 
 typedef struct dnsList
-{ 
+{
 	struct		dnsList *next;
 	time_t		when;
 	struct in_addr	ip;

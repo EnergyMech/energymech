@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 #   EnergyMech, IRC Bot software
-#   Copyright (c) 1997-2009 proton
+#   Copyright (c) 1997-2018 proton
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -22,6 +22,9 @@ umask 077
 
 # perl still unsupported
 has_perl=no
+compile=no
+install=no
+silentopt=no
 
 for opt
 do
@@ -59,6 +62,7 @@ do
           dynamode ) ft_dynamode=$yesno ;;
           dyncmd )   ft_dyncmd=$yesno ;;
           greet )    ft_greet=$yesno ;;
+          hostinfo ) ft_hostinfo=$yesno ;;
           idwrap )   ft_idwrap=$yesno ;;
           ircd_ext ) ft_ircd_ext=$yesno ;;
           md5 )      ft_md5=$yesno ;;
@@ -71,12 +75,14 @@ do
           redirect ) ft_redirect=$yesno ;;
           seen )     ft_seen=$yesno ;;
           session )  ft_session=$yesno ;;
+          sha )      ft_sha=$yesno ;;
           stats )    ft_stats=$yesno ;;
           tcl )      ft_tcl=$yesno ;;
           telnet )   ft_telnet=$yesno ;;
           toybox )   ft_toybox=$yesno ;;
           trivia )   ft_trivia=$yesno ;;
           uptime )   ft_uptime=$yesno ;;
+          urlcapture ) ft_urlcapture=$yesno ;;
           web )      ft_web=$yesno ;;
           wingate )  ft_wingate=$yesno ;;
         esac
@@ -105,9 +111,9 @@ do
   esac
 
   case "$feature" in
-    debug | botnet | telnet | alias | seen | session | dyncmd | newbie | wingate | md5 \
-    | ctcp | dccfile | uptime | redirect | greet | perl | profiling | tcl | dynamode | web \
-    | note | notify | trivia | toybox | bounce | stats | rawdns | ircd_ext | idwrap | chanban | python )
+    debug | botnet | telnet | alias | seen | session | dyncmd | newbie | wingate | md5 | sha \
+    | ctcp | dccfile | uptime | redirect | greet | perl | profiling | tcl | dynamode | web | hostinfo \
+    | note | notify | trivia | toybox | bounce | stats | rawdns | ircd_ext | idwrap | chanban | python | urlcapture )
       case _"$optarg"_ in
         _yes_ | _no_ | __ )
           ;;
@@ -151,6 +157,8 @@ do
         dyncmd_no ) ft_dyncmd=no ;;
         greet_yes | greet_ ) ft_greet=yes ;;
         greet_no ) ft_greet=no ;;
+        hostinfo_yes | hostinfo_ ) ft_hostinfo=yes ;;
+        hostinfo_no ) ft_hostinfo=no ;;
         idwrap_yes | idwrap_ ) ft_idwrap=yes ;;
         idwrap_no ) ft_idwrap=no ;;
         ircd_ext_yes | ircd_ext_ ) ft_ircd_ext=yes ;;
@@ -175,6 +183,8 @@ do
         seen_no ) ft_seen=no ;;
         session_yes | session_ ) ft_session=yes ;;
         session_no ) ft_session=no ;;
+        sha_yes | sha_ ) ft_seen=yes ;;
+        sha_no ) ft_sha=no ;;
         stats_yes | stats_ ) ft_stats=yes ;;
         stats_no ) ft_stats=no ;;
         tcl_yes | tcl_ ) ft_tcl=yes ;;
@@ -187,6 +197,8 @@ do
         trivia_no ) ft_trivia=no ;;
         uptime_yes | uptime_ ) ft_uptime=yes ;;
         uptime_no ) ft_uptime=no ;;
+        urlcapture_yes | urlcapture_ ) ft_urlcapture=yes ;;
+        urlcapture_no ) ft_urlcapture=no ;;
         web_yes | web_ ) ft_web=yes ;;
         web_no ) ft_web=no ;;
         wingate_yes | wingate_ ) ft_wingate=yes ;;
@@ -207,6 +219,7 @@ do
         dynamode )     ft_dynamode=no ;;
         dyncmd )       ft_dyncmd=no ;;
         greet )        ft_greet=no ;;
+        hostinfo )     ft_hostinfo=no ;;
         idwrap )       ft_idwrap=no ;;
         ircd_ext )     ft_ircd_ext=no ;;
         md5 )          ft_md5=no ;;
@@ -220,17 +233,23 @@ do
         redirect )     ft_redirect=no ;;
         seen )         ft_seen=no ;;
         session )      ft_session=no ;;
+        sha )          ft_sha=yes ;;
         stats )        ft_stats=no ;;
         tcl )          ft_tcl=no ;;
         telnet )       ft_telnet=no ;;
         toybox )       ft_toybox=no ;;
         trivia )       ft_trivia=no ;;
         uptime )       ft_uptime=no ;;
+        urlcapture )   ft_urlcapture=no ;;
         web )          ft_web=no ;;
         wingate )      ft_wingate=no ;;
       esac
     ;;
+    --compile)   compile=yes ;;
+    --install)   install=yes ;;
+    --silence=options) silentopt=yes ;;
     --md5=internal)  ft_md5=internal ;;
+    --sha=internal)  ft_sha=internal ;;
     --use-cpuflags)  cc_arch_opt=yes ;;
     --no-cpuflags)   cc_arch_opt=no ;;
     --use-optimize)  cc_optimize_opt=yes ;;
@@ -253,6 +272,7 @@ do
 		     ft_dynamode=yes
                      ft_dyncmd=yes
 		     ft_greet=yes
+		     ft_hostinfo=yes
 		     ft_ircd_ext=yes
 		     ft_md5=yes
                      ft_newbie=yes
@@ -263,12 +283,14 @@ do
 		     ft_redirect=yes
                      ft_seen=yes
                      ft_session=yes
+                     ft_sha=yes
 		     ft_stats=yes
                      ft_tcl=yes
                      ft_telnet=yes
 		     ft_toybox=yes
 		     ft_trivia=yes
 		     ft_uptime=yes
+		     ft_urlcapture=yes
 		     ft_web=yes
                      ft_wingate=yes
                      ;;
@@ -283,18 +305,25 @@ Features and packages:
   --with-FEATURE[=ARG]     use FEATURE [ARG=yes]
   --without-FEATURE        do not use FEATURE (same as --with-FEATURE=no)
   --md5=internal           Use internal routines for MD5 password hashes instead of system libraries
+  --sha=internal           Use internal routines for SHA password hashes instead of system libraries
+  --use-ofp                Try to use compiler flag -fomit-frame-pointer
+  --no-ofp                 Do not use compiler flag -fomit-frame-pointer
 #md5 | ctcp | dccfile | uptime | redirect | greet | perl | dynamode | web \
 #note | notify | trivia | toybox | bounce | stats | rawdns | ircd_ext | idwrap | chanban | python )
   --with-alias             ALIAS support
   --with-botnet            Botnet support
   --with-debug             Debug support
   --with-dyncmd            Dynamic command levels support
+  --with-hostinfo	   Support for code that reveals/displays/shares information about the host
+			   that the bot is running on
   --with-newbie            Newbie support
   --with-profiling         Profiling (gcc+gprof)
   --with-seen              SEEN support
   --with-session           Session support
   --with-tcl               Tcl support
   --with-telnet            Telnet support
+  --with-uptime            Include code that sends uptime reports to the IRC bot uptime contest server
+  --with-urlcapture        URL capture support
   --with-wingate           Wingate support
 __EOT__
       exit 0
@@ -330,7 +359,7 @@ fi
 echo $ac_n "checking system type ... "$ac_c
 
 cf_ERR=yes
-UNAME=`config/which uname`     
+UNAME=`config/which uname`
 test -x $UNAME && cf_ERR=
 
 if test -z "$cf_ERR" && cf_ERR=yes && $UNAME -s 1> /dev/null 2> /dev/null; then
@@ -359,7 +388,7 @@ if [ "$cf_SYS" = AIX ]; then
 else
   cf_SYSMACH="$cf_SYS"'-'"$cf_MACH"
 fi
-  
+
 echo $ac_t "$cf_SYSMACH"
 
 #
@@ -578,7 +607,41 @@ esac
 rm -f $TESTP
 
 #
+#  big/little endian
 #
+
+TESTC=config/endian.c
+
+if [ -z "$endian" ]; then
+  endian=unknown
+  echo $ac_n "checking endianness ... "$ac_c
+  $CC -o $TESTP $TESTC 1> /dev/null 2> /dev/null
+  if [ -x $TESTP ]; then
+    endian=`$TESTP`
+    if [ "$endian" == "1" ]; then
+      endian="little"
+    else
+      endian="big"
+    fi
+  fi
+  echo $ac_t "$endian endian"
+fi
+
+case "$endian" in
+  little )
+    LIT_END="#define LITTLE_ENDIAN"
+    BIG_END="#undef BIG_ENDIAN"
+    ;;
+  * )
+    LIT_END="#undef LITTLE_ENDIAN"
+    BIG_END="#define BIG_ENDIAN"
+    ;;
+esac
+
+rm -f $TESTP
+
+#
+#  Some processors like Sparc, will cause a bus error (SIGBUS) if you try to access unaligned memory
 #
 
 has_unaligned=no
@@ -619,7 +682,7 @@ echo $ac_t "$has_inet_addr"
 rm -f $TESTP
 
 #
-#  where is inet_addr() ?
+#  where is inet_aton() ?
 #
 
 has_inet_aton=no
@@ -663,13 +726,59 @@ echo $ac_t "$has_socket"
 rm -f $TESTP
 
 #
-#  check for MD5 capabilities
+#  check for SHA capabilities in libc/glibc/libcrypt
 #
+has_sha=no
 has_md5=no
-has_des=no
-if [ ! "$ft_md5" = no ]; then
+if [ ! "$ft_sha" = no ]; then
   TESTC=config/pw.c
-  echo $ac_n "checking for crypt() ... "$ac_c
+  echo $ac_n "checking for SHA in crypt() ... "$ac_c
+  sha_internal=
+  crypt_func='-DCRYPT_FUNC=crypt'
+  CRYPT_FUNCTION='#define CRYPT_FUNC crypt'
+  if [ "$ft_sha" = internal ]; then
+    sha_internal=config/sha_internal.c
+    crypt_func='-DCRYPT_FUNC=sha_crypt'
+    CRYPT_FUNCTION='#define CRYPT_FUNC sha_crypt'
+  fi
+  $CC -o $TESTP $TESTC $sha_internal $crypt_func 1> /dev/null 2> /dev/null
+  if [ ! -x $TESTP ]; then
+    libcrypt=-lcrypt
+    has_sha=yes
+    $CC -o $TESTP $TESTC $crypt_func $libcrypt 1> /dev/null 2> /dev/null
+  fi
+  if [ ! -x $TESTP ]; then
+    libcrypt=/usr/lib/libcrypt.so
+    has_sha=yes
+    $CC -o $TESTP $TESTC $crypt_func $libcrypt 1> /dev/null 2> /dev/null
+  fi
+  if [ ! -x $TESTP ]; then
+    has_sha=no
+    libcrypt=
+  fi
+  if [ -x $TESTP ]; then
+    pwhash=`$TESTP`
+    case "$pwhash" in
+      MD5 ) has_md5=yes ;;
+      SHAMD5 )
+        has_md5=yes
+        has_sha=yes
+      ;;
+    esac
+  fi
+  echo $ac_t "$has_sha"
+  [ "$has_sha" = yes -a "$sha_internal" ] && has_sha=internal
+  rm -f $TESTP
+fi
+
+#
+#  check for MD5 capabilities in libc/glibc/libcrypt
+#
+if [ "$has_md5" = yes ]; then
+  echo "checking for MD5 in crypt() ... (cached) yes"
+elif [ ! "$ft_md5" = no ]; then
+  TESTC=config/pw.c
+  echo $ac_n "checking for MD5 in crypt() ... "$ac_c
   md5_internal=
   crypt_func='-DCRYPT_FUNC=crypt'
   CRYPT_FUNCTION='#define CRYPT_FUNC crypt'
@@ -697,11 +806,6 @@ if [ ! "$ft_md5" = no ]; then
     pwhash=`$TESTP`
     case "$pwhash" in
       MD5 ) has_md5=yes ;;
-      DES ) has_des=yes ;;
-      DESaMD5 )
-        has_md5=yes
-        has_des=yes
-      ;;
     esac
   fi
   echo $ac_t "$has_md5"
@@ -794,10 +898,10 @@ TESTC=config/ldtest.c
 
 echo $ac_n "checking for friendly ld ... "$ac_c
 
-$CC -o $TESTP $TESTC -Wl,-T,src/ld/mech.ldscript 1> /dev/null 2> /dev/null
+$CC -o $TESTP $TESTC -Wl,-T,src/ld/elf64-x86-64 1> /dev/null 2> /dev/null
 if [ -x $TESTP ]; then
   if [ `$TESTP` = "yes" ]; then
-    ldscript='-Wl,-T,ld/mech.ldscript'
+    ldscript='-Wl,-T,ld/elf64-x86-64'
     has_ldscript=yes
   fi
 fi
@@ -847,139 +951,167 @@ if [ "$ft_md5" = internal ]; then
   MD5_O=md5/md5.o
 fi
 
+SHA_O=
+if [ "$ft_sha" = internal ]; then
+  SHA_O=sha/sha.o
+fi
+
+out=echo
+if [ "$silentopt" == yes ]; then
+  out=/bin/true
+fi
+
 echo
-echo "Do you want ..."
-echo
+$out "Do you want ..."
+$out
 
 def_alias='#undef ALIAS'
 unset ans
-echo $ac_n "Alias support? ............................. [Y/n] "$ac_c
-test "$ft_alias" && echo "$ft_alias" && ans=$ft_alias
+$out $ac_n "[STABLE] Alias support? ............................. [Y/n] "$ac_c
+test "$ft_alias" && $out "$ft_alias" && ans=$ft_alias
 test -z "$ft_alias" && read ans
 test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_alias='#define ALIAS'
 
-def_toybox='#undef TOYBOX'
-unset ans
-echo $ac_n "Amusing misc commands (toybox)? ............ [Y/n] "$ac_c
-test "$ft_toybox" && echo "$ft_toybox" && ans=$ft_toybox
-test -z "$ft_toybox" && read ans
-test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_toybox='#define TOYBOX'
-
 def_rawdns='#undef RAWDNS'
 unset ans
-echo $ac_n "Async DNS support? ......................... [y/N] "$ac_c
-test "$ft_rawdns" && echo "$ft_rawdns" && ans=$ft_rawdns
+$out $ac_n "[ BETA ] Async DNS support? ......................... [y/N] "$ac_c
+test "$ft_rawdns" && $out "$ft_rawdns" && ans=$ft_rawdns
 test -z "$ft_rawdns" && read ans
 test "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_rawdns='#define RAWDNS'
 
 def_botnet='#undef BOTNET'
 unset ans
-echo $ac_n "Botnet support? ............................ [Y/n] "$ac_c
-test "$ft_botnet" && echo "$ft_botnet" && ans=$ft_botnet
+$out $ac_n "[STABLE] Botnet support? ............................ [Y/n] "$ac_c
+test "$ft_botnet" && $out "$ft_botnet" && ans=$ft_botnet
 test -z "$ft_botnet" && read ans
 test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_botnet='#define BOTNET'
 
 def_chanban='#undef CHANBAN'
 unset ans
-echo $ac_n "Channel ban support? ....................... [Y/n] "$ac_c
-test "$ft_chanban" && echo "$ft_chanban" && ans=$ft_chanban
+$out $ac_n "[STABLE] Channel ban support? ....................... [Y/n] "$ac_c
+test "$ft_chanban" && $out "$ft_chanban" && ans=$ft_chanban
 test -z "$ft_chanban" && read ans
 test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_chanban='#define CHANBAN'
 
+def_redirect='#undef REDIRECT'
+unset ans
+$out $ac_n "[STABLE] Command output redirect? ................... [Y/n] "$ac_c
+test "$ft_redirect" && $out "$ft_redirect" && ans=$ft_redirect
+test -z "$ft_redirect" && read ans
+test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_redirect='#define REDIRECT'
+
 def_ctcp='#undef CTCP'
 unset ans
-echo $ac_n "CTCP? ...................................... [Y/n] "$ac_c
-test "$ft_ctcp" && echo "$ft_ctcp" && ans=$ft_ctcp
+$out $ac_n "[STABLE] CTCP? ...................................... [Y/n] "$ac_c
+test "$ft_ctcp" && $out "$ft_ctcp" && ans=$ft_ctcp
 test -z "$ft_ctcp" && read ans
 test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_ctcp='#define CTCP'
 
 def_dccfile='#undef DCC_FILE'
 unset ans
-echo $ac_n "DCC file support? .......................... [Y/n] "$ac_c
-test "$ft_dccfile" && echo "$ft_dccfile" && ans=$ft_dccfile
+$out $ac_n "[STABLE] DCC file support? .......................... [Y/n] "$ac_c
+test "$ft_dccfile" && $out "$ft_dccfile" && ans=$ft_dccfile
 test -z "$ft_dccfile" && read ans
 test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_dccfile='#define DCC_FILE'
 
 def_debug='#undef DEBUG'
 unset ans
-echo $ac_n "Debug support? ............................. [y/N] "$ac_c
-test "$ft_debug" && echo "$ft_debug" && ans=$ft_debug
+$out $ac_n "[STABLE] Debug support? ............................. [y/N] "$ac_c
+test "$ft_debug" && $out "$ft_debug" && ans=$ft_debug
 test -z "$ft_debug" && read ans
 test "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_debug='#define DEBUG'
 
 def_dynamode='#undef DYNAMODE'
 unset ans
-echo $ac_n "Dynamic channel limit (+l)? ................ [Y/n] "$ac_c
-test "$ft_dynamode" && echo "$ft_dynamode" && ans=$ft_dynamode
+$out $ac_n "[STABLE] Dynamic channel limit (+l)? ................ [Y/n] "$ac_c
+test "$ft_dynamode" && $out "$ft_dynamode" && ans=$ft_dynamode
 test -z "$ft_dynamode" && read ans
 test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_dynamode='#define DYNAMODE'
 
 def_dyncmd='#undef DYNCMD'
 unset ans
-echo $ac_n "Dynamic command levels support? ............ [Y/n] "$ac_c
-test "$ft_dyncmd" && echo "$ft_dyncmd" && ans=$ft_dyncmd
+$out $ac_n "[STABLE] Dynamic command levels support? ............ [Y/n] "$ac_c
+test "$ft_dyncmd" && $out "$ft_dyncmd" && ans=$ft_dyncmd
 test -z "$ft_dyncmd" && read ans
 test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_dyncmd='#define DYNCMD'
 
-def_bounce='#undef BOUNCE'
-unset ans
-echo $ac_n "IRC proxy support? ......................... [Y/n] "$ac_c
-test "$ft_bounce" && echo "$ft_bounce" && ans=$ft_bounce
-test -z "$ft_bounce" && read ans
-test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_bounce='#define BOUNCE'
-
-def_ircd_ext='#undef IRCD_EXTENSIONS'
-unset ans
-echo $ac_n "IRCD extensions support? ................... [Y/n] "$ac_c
-test "$ft_ircd_ext" && echo "$ft_ircd_ext" && ans=$ft_ircd_ext
-test -z "$ft_ircd_ext" && read ans
-test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_ircd_ext='#define IRCD_EXTENSIONS'
-
 def_greet='#undef GREET'
 unset ans
-echo $ac_n "Greet support? ............................. [Y/n] "$ac_c
-test "$ft_greet" && echo "$ft_greet" && ans=$ft_greet
+$out $ac_n "[STABLE] Greet support? ............................. [Y/n] "$ac_c
+test "$ft_greet" && $out "$ft_greet" && ans=$ft_greet
 test -z "$ft_greet" && read ans
 test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_greet='#define GREET'
 
 def_web='#undef WEB'
 unset ans
-echo $ac_n "HTTP server support? ....................... [y/N] "$ac_c
-test "$ft_web" && echo "$ft_web" && ans=$ft_web
+$out $ac_n "[ ALPHA] HTTP server support? ....................... [y/N] "$ac_c
+test "$ft_web" && $out "$ft_web" && ans=$ft_web
 test -z "$ft_web" && read ans
 test "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_web='#define WEB'
 
-def_md5='#undef MD5CRYPT'
+def_hostinfo='#undef HOSTINFO'
 unset ans
-echo $ac_n "MD5 password support? ...................... [Y/n] "$ac_c
-if [ "$has_md5" = no ]; then
-  echo 'no (unsupported)'
-else
-  test "$ft_md5" && echo "$ft_md5" && ans=$ft_md5
-  test -z "$ft_md5" && read ans
-  test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes -o "$ans" = internal && def_md5='#define MD5CRYPT'
-fi
+$out $ac_n "[ BETA ] Host info support? ......................... [Y/n] "$ac_c
+test "$ft_hostinfo" && $out "$ft_hostinfo" && ans=$ft_hostinfo
+test -z "$ft_hostinfo" && read ans
+test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_hostinfo='#define HOSTINFO'
+
+def_bounce='#undef BOUNCE'
+unset ans
+$out $ac_n "[STABLE] IRC proxy support? ......................... [Y/n] "$ac_c
+test "$ft_bounce" && $out "$ft_bounce" && ans=$ft_bounce
+test -z "$ft_bounce" && read ans
+test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_bounce='#define BOUNCE'
+
+def_ircd_ext='#undef IRCD_EXTENSIONS'
+unset ans
+$out $ac_n "[ BETA ] IRCD extensions support? ................... [Y/n] "$ac_c
+test "$ft_ircd_ext" && $out "$ft_ircd_ext" && ans=$ft_ircd_ext
+test -z "$ft_ircd_ext" && read ans
+test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_ircd_ext='#define IRCD_EXTENSIONS'
 
 def_newbie='#undef NEWBIE'
 unset ans
-echo $ac_n "Newbie support? ............................ [Y/n] "$ac_c
-test "$ft_newbie" && echo "$ft_newbie" && ans=$ft_newbie
+$out $ac_n "[STABLE] Newbie support? ............................ [Y/n] "$ac_c
+test "$ft_newbie" && $out "$ft_newbie" && ans=$ft_newbie
 test -z "$ft_newbie" && read ans
 test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_newbie='#define NEWBIE'
 
 def_note='#undef NOTE'
 unset ans
-echo $ac_n "Note support? .............................. [Y/n] "$ac_c
-test "$ft_note" && echo "$ft_note" && ans=$ft_note
+$out $ac_n "[STABLE] Note support? .............................. [Y/n] "$ac_c
+test "$ft_note" && $out "$ft_note" && ans=$ft_note
 test -z "$ft_note" && read ans
 test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_note='#define NOTE'
 
 def_notify='#undef NOTIFY'
 unset ans
-echo $ac_n "Notify support? ............................ [Y/n] "$ac_c
-test "$ft_notify" && echo "$ft_notify" && ans=$ft_notify
+$out $ac_n "[STABLE] Notify support? ............................ [Y/n] "$ac_c
+test "$ft_notify" && $out "$ft_notify" && ans=$ft_notify
 test -z "$ft_notify" && read ans
 test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_notify='#define NOTIFY'
+
+def_md5='#undef MD5CRYPT'
+unset ans
+$out $ac_n "[STABLE] Password hashing with MD5? (less secure) ... [Y/n] "$ac_c
+if [ "$has_md5" = no ]; then
+  $out 'no (unsupported)'
+else
+  test "$ft_md5" && $out "$ft_md5" && ans=$ft_md5
+  test -z "$ft_md5" && read ans
+  test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes -o "$ans" = internal && def_md5='#define MD5CRYPT'
+fi
+
+def_sha='#undef SHACRYPT'
+unset ans
+$out $ac_n "[ BETA ] Password hashing with SHA? (best) .......... [Y/n] "$ac_c
+if [ "$has_sha" = no ]; then
+  $out 'no (unsupported)'
+else
+  test "$ft_sha" && $out "$ft_sha" && ans=$ft_sha
+  test -z "$ft_sha" && read ans
+  test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes -o "$ans" = internal && def_sha='#define SHACRYPT'
+fi
 
 #
 #  perl support not yet functional (2009-05-11)
@@ -997,11 +1129,11 @@ def_perl='#undef PERL'
 
 def_python='#undef PYTHON'
 unset ans
-echo $ac_n "Python scripting support? .................. [y/N] "$ac_c
+$out $ac_n "[ BETA ] Scripting with Python? ..................... [y/N] "$ac_c
 if [ "$has_python" = no ]; then
-  echo 'no (unsupported)'
+  $out 'no (unsupported)'
 else
-  test "$ft_python" && echo "$ft_python" && ans=$ft_python
+  test "$ft_python" && $out "$ft_python" && ans=$ft_python
   test -z "$ft_python" && read ans
   test "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_python='#define PYTHON'
 fi
@@ -1010,41 +1142,13 @@ if [ "$def_python" = '#undef PYTHON' ]; then
   incpython=
 fi
 
-def_redirect='#undef REDIRECT'
-unset ans
-echo $ac_n "Command output redirect? ................... [Y/n] "$ac_c
-test "$ft_redirect" && echo "$ft_redirect" && ans=$ft_redirect
-test -z "$ft_redirect" && read ans
-test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_redirect='#define REDIRECT'
-
-def_seen='#undef SEEN'
-unset ans
-echo $ac_n "Seen support? .............................. [y/N] "$ac_c
-test "$ft_seen" && echo "$ft_seen" && ans=$ft_seen
-test -z "$ft_seen" && read ans
-test "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_seen='#define SEEN'
-
-def_session='#undef SESSION'
-unset ans
-echo $ac_n "Session support? ........................... [Y/n] "$ac_c
-test "$ft_session" && echo "$ft_session" && ans=$ft_session
-test -z "$ft_session" && read ans
-test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_session='#define SESSION'
-
-def_stats='#undef STATS'
-unset ans
-echo $ac_n "Statistics support? ........................ [Y/n] "$ac_c
-test "$ft_stats" && echo "$ft_stats" && ans=$ft_stats
-test -z "$ft_stats" && read ans
-test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_stats='#define STATS'
-
 def_tcl='#undef TCL'
 unset ans
-echo $ac_n "Tcl scripting support? ..................... [y/N] "$ac_c
+$out $ac_n "[ BETA ] Scripting with Tcl? ........................ [y/N] "$ac_c
 if [ "$has_tcl" = no ]; then
-  echo 'no (unsupported)'
+  $out 'no (unsupported)'
 else
-  test "$ft_tcl" && echo "$ft_tcl" && ans=$ft_tcl
+  test "$ft_tcl" && $out "$ft_tcl" && ans=$ft_tcl
   test -z "$ft_tcl" && read ans
   test "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_tcl='#define TCL'
 fi
@@ -1053,35 +1157,70 @@ if [ "$def_tcl" = '#undef TCL' ]; then
   inctcl=
 fi
 
+def_seen='#undef SEEN'
+unset ans
+$out $ac_n "[STABLE] Seen support? .............................. [y/N] "$ac_c
+test "$ft_seen" && $out "$ft_seen" && ans=$ft_seen
+test -z "$ft_seen" && read ans
+test "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_seen='#define SEEN'
+
+def_session='#undef SESSION'
+unset ans
+$out $ac_n "[STABLE] Session support? ........................... [Y/n] "$ac_c
+test "$ft_session" && $out "$ft_session" && ans=$ft_session
+test -z "$ft_session" && read ans
+test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_session='#define SESSION'
+
+def_stats='#undef STATS'
+unset ans
+$out $ac_n "[STABLE] Statistics support? ........................ [Y/n] "$ac_c
+test "$ft_stats" && $out "$ft_stats" && ans=$ft_stats
+test -z "$ft_stats" && read ans
+test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_stats='#define STATS'
+
 def_telnet='#undef TELNET'
 unset ans
-echo $ac_n "Telnet support? ............................ [Y/n] "$ac_c
-test "$ft_telnet" && echo "$ft_telnet" && ans=$ft_telnet
+$out $ac_n "[STABLE] Telnet support? ............................ [Y/n] "$ac_c
+test "$ft_telnet" && $out "$ft_telnet" && ans=$ft_telnet
 test -z "$ft_telnet" && read ans
 test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_telnet='#define TELNET'
 
 def_trivia='#undef TRIVIA'
 unset ans
-echo $ac_n "Trivia support? ............................ [y/N] "$ac_c
-test "$ft_trivia" && echo "$ft_trivia" && ans=$ft_trivia
+$out $ac_n "[STABLE] Trivia support? ............................ [y/N] "$ac_c
+test "$ft_trivia" && $out "$ft_trivia" && ans=$ft_trivia
 test -z "$ft_trivia" && read ans
 test "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_trivia='#define TRIVIA'
 
+def_toybox='#undef TOYBOX'
+unset ans
+$out $ac_n "[STABLE] Toybox fun and games? ...................... [Y/n] "$ac_c
+test "$ft_toybox" && $out "$ft_toybox" && ans=$ft_toybox
+test -z "$ft_toybox" && read ans
+test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_toybox='#define TOYBOX'
+
 def_uptime='#undef UPTIME'
 unset ans
-echo $ac_n "Uptime support? ............................ [Y/n] "$ac_c
-test "$ft_uptime" && echo "$ft_uptime" && ans=$ft_uptime
+$out $ac_n "[STABLE] Uptime support? ............................ [Y/n] "$ac_c
+test "$ft_uptime" && $out "$ft_uptime" && ans=$ft_uptime
 test -z "$ft_uptime" && read ans
 test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_uptime='#define UPTIME'
 
+def_urlcapture='#undef URLCAPTURE'
+unset ans
+$out $ac_n "[ BETA ] URL capture support? ....................... [Y/n] "$ac_c
+test "$ft_urlcapture" && $out "$ft_urlcapture" && ans=$ft_urlcapture
+test -z "$ft_urlcapture" && read ans
+test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_urlcapture='#define URLCAPTURE'
+
 def_wingate='#undef WINGATE'
 unset ans
-echo $ac_n "WinGate support? ........................... [Y/n] "$ac_c
-test "$ft_wingate" && echo "$ft_wingate" && ans=$ft_wingate
+$out $ac_n "[STABLE] WinGate support? ........................... [Y/n] "$ac_c
+test "$ft_wingate" && $out "$ft_wingate" && ans=$ft_wingate
 test -z "$ft_wingate" && read ans
 test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_wingate='#define WINGATE'
 
-echo ''
+$out ''
 echo "Creating src/Makefile"
 
 O_FLAGS="$cc_optimize_flag $cc_arch_flag $cc_march_flag $cc_ofp_flag"
@@ -1106,6 +1245,7 @@ s%@gdbflag@%$cc_g_flag%;
 /@PYINCLUDE@/ { s,@PYINCLUDE@,$incpython,; };
 /@TCLINCLUDE@/ { s,@TCLINCLUDE@,$inctcl,; };
 s|@MD5_O@|$MD5_O|;
+s|@SHA_O@|$SHA_O|;
 s%@oc@%$objcomment%;
 s%@sz@%$sizecomment%;
 s/[ 	]*\$//g;
@@ -1113,8 +1253,10 @@ s/[ 	]*\$//g;
 
 echo "Creating src/config.h"
 
+CRYPT_HAS_SHA='#undef CRYPT_HAS_SHA'
 CRYPT_HAS_MD5='#undef CRYPT_HAS_MD5'
 CRYPT_HAS_DES='#undef CRYPT_HAS_DES'
+[ "$has_sha" = yes ] && CRYPT_HAS_SHA='#define CRYPT_HAS_SHA'
 [ "$has_md5" = yes ] && CRYPT_HAS_MD5='#define CRYPT_HAS_MD5'
 [ "$has_des" = yes ] && CRYPT_HAS_DES='#define CRYPT_HAS_DES'
 
@@ -1130,9 +1272,11 @@ sed "
   s|@DEF_DYNCMD@|$def_dyncmd|;
 s|@DEF_DYNAMODE@|$def_dynamode|;
    s|@DEF_GREET@|$def_greet|;
+s|@DEF_HOSTINFO@|$def_hostinfo|;
   s|@DEF_IDWRAP@|$def_idwrap|;
 s|@DEF_IRCD_EXT@|$def_ircd_ext|;
      s|@DEF_MD5@|$def_md5|;
+     s|@DEF_SHA@|$def_sha|;
   s|@DEF_NEWBIE@|$def_newbie|;
     s|@DEF_NOTE@|$def_note|;
   s|@DEF_NOTIFY@|$def_notify|;
@@ -1148,10 +1292,14 @@ s|@DEF_REDIRECT@|$def_redirect|;
   s|@DEF_TOYBOX@|$def_toybox|;
   s|@DEF_TRIVIA@|$def_trivia|;
   s|@DEF_UPTIME@|$def_uptime|;
+s|@DEF_URLCAPTURE@|$def_urlcapture|;
      s|@DEF_WEB@|$def_web|;
  s|@DEF_WINGATE@|$def_wingate|;
 
+s|@LIT_END@|$LIT_END|;
+s|@BIG_END@|$BIG_END|;
 s|@DEF_CRYPT_FUNCTION@|$CRYPT_FUNCTION|;
+s|@CRYPT_HAS_SHA@|$CRYPT_HAS_SHA|;
 s|@CRYPT_HAS_MD5@|$CRYPT_HAS_MD5|;
 s|@CRYPT_HAS_DES@|$CRYPT_HAS_DES|;
 s|@IDWRAP_PATH@|$IDWRAP_PATH|;
@@ -1160,10 +1308,20 @@ s|@PTSIZE_DEFINE64@|$PTSIZE_DEFINE64|;
 s|@UNALIGNED_MEM@|$UNALIGNED_MEM|;
 " < src/config.h.in >> src/config.h
 
+if [ "$install" == "yes" ]; then
+  make -C src energymech
+  exit
+fi
+
+if [ "$compile" == "yes" ]; then
+  make -C src energymech
+  exit
+fi
+
 echo ''
 echo 'All done. You can now "make clean install"'
 echo ''
-echo 'Send your bugreports to <proton@energymech.net>'
+echo 'Submit your bugreports at https://github.com/MadCamel/energymech/issues'
 echo ''
 echo 'You have read the README file I hope?'
 echo ''

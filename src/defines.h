@@ -1,7 +1,7 @@
 /*
 
     EnergyMech, IRC bot software
-    Parts Copyright (c) 1997-2009 proton
+    Parts Copyright (c) 1997-2018 proton
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -162,6 +162,14 @@
 #define IsProc(x)		(VarName[x].type & PROC_VAR)
 
 /*
+ *  is_safepath
+ */
+#define	FILE_IS_SAFE		1
+#define	FILE_MUST_EXIST		1
+#define FILE_MAY_EXIST		2
+#define FILE_MUST_NOTEXIST	3
+
+/*
  *  see settings.h for the actual setting struct
  */
 enum {
@@ -264,6 +272,9 @@ enum {
 	STR_UPNICK,
 	INT_UPPORT,
 #endif /* UPTIME */
+#ifdef URLCAPTURE
+	INT_URLHISTMAX,
+#endif /* URLCAPTURE */
 	STR_USERFILE,
 	STR_VIRTUAL,
 #ifdef WEB
@@ -303,6 +314,7 @@ enum {
 #define BNAUTH_PLAINTEXT	0
 #define BNAUTH_DES		1
 #define BNAUTH_MD5		2
+#define BNAUTH_SHA		3
 
 #endif /* BOTNET */
 
@@ -355,6 +367,14 @@ enum {
 
 /* check_mass() */
 
+#define INDEX_FLOOD		0
+#define INDEX_BAN		1
+#define INDEX_DEOP		2
+#define INDEX_KICK		3
+#define INDEX_NICK		4
+#define INDEX_CAPS		5
+#define INDEX_MAX		6
+
 #define CHK_CAPS		0
 #define CHK_PUB			1
 #define CHK_PUBLIC		CHK_PUB
@@ -380,6 +400,9 @@ enum {
 #define SPY_MESSAGE		5
 #define SPY_RAWIRC		6
 #define SPY_BOTNET		7
+#ifdef URLCAPTURE
+#define SPY_URL			8
+#endif /* URLCAPTURE */
 
 #define SPYF_ANY		1
 #define SPYF_CHANNEL		(1 << SPY_CHANNEL)
@@ -387,6 +410,7 @@ enum {
 #define SPYF_MESSAGE		(1 << SPY_MESSAGE)
 #define SPYF_RAWIRC		(1 << SPY_RAWIRC)
 #define SPYF_BOTNET		(1 << SPY_BOTNET)
+#define SPYF_URL		(1 << SPY_URL)
 
 /*
  *  notify defines

@@ -9,12 +9,21 @@ src/energymech
 src/gencmd
 src/mcmd.h
 src/usercombo.h
+src/aliastest
+src/safepathtest
 
 *~
 *.bak
-*.passwd
+mech.passwd
 mech.conf
+mech.users
 mech.pid
+mech.session
 root.zone*
 trick.conf
 
+conf
+debug*
+*.log
+*.stats
+github

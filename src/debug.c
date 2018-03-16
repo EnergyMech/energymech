@@ -1,7 +1,7 @@
 /*
 
     EnergyMech, IRC bot software
-    Copyright (c) 1997-2009 proton
+    Copyright (c) 1997-2018 proton
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -29,6 +29,8 @@
 #include "h.h"
 #include "settings.h"
 
+#ifndef TEST
+
 #define boolstr(x)	(x) ? "TRUE" : "FALSE"
 
 LS const char tabs[20] = "\t\t\t\t\t\t\t\t\t\t";
@@ -40,19 +42,49 @@ LS const struct
 
 } StructList[] =
 {
+{ "aME\t",		sizeof(aME)		}, // for memory allocation debugging
+{ "aMEA",		sizeof(aMEA)		},
+#ifdef ALIAS
+{ "Alias",		sizeof(Alias)		},
+#endif /* ALIAS */
 { "Auth",		sizeof(Auth)		},
 { "Ban\t",		sizeof(Ban)		},
+#ifdef BOTNET
+{ "BotInfo",		sizeof(BotInfo)		},
+{ "BotNet",		sizeof(BotNet)		},
+#endif
 { "Chan",		sizeof(Chan)		},
 { "ChanStats",		sizeof(ChanStats)	},
 { "ChanUser",		sizeof(ChanUser)	},
 { "Client",		sizeof(Client)		},
+{ "ShortClient",	sizeof(ShortClient)	},
+#ifdef RAWDNS
+{ "dnsAuthority",	sizeof(dnsAuthority)	},
+{ "dnsList",		sizeof(dnsList)		},
+{ "dnsQuery",		sizeof(dnsQuery)	},
+#endif
+#ifdef SCRIPTING
+{ "Hook",		sizeof(Hook)		},
+{ "HookTimer",		sizeof(HookTimer)	},
+#endif
 { "ircLink",		sizeof(ircLink)		},
 { "IReq",		sizeof(IReq)		},
+{ "KickSay",		sizeof(KickSay)		},
 { "KillSock",		sizeof(KillSock)	},
 { "Mech",		sizeof(Mech)		},
+#ifdef BOTNET
+{ "NetCfg",		sizeof(NetCfg)		},
+#endif
+#ifdef NOTE
+{ "Note",		sizeof(Note)		},
+#endif /* NOTE */
 #ifdef NOTIFY
+{ "nfLog",		sizeof(nfLog)		},
 { "Notify",		sizeof(Notify)		},
 #endif /* NOTIFY */
+{ "OnMsg",		sizeof(OnMsg)		},
+{ "qKick",		sizeof(qKick)		},
+{ "qMode",		sizeof(qMode)		},
 #ifdef SEEN
 { "Seen",		sizeof(Seen)		},
 #endif /* SEEN */
@@ -60,14 +92,19 @@ LS const struct
 { "ServerGroup",	sizeof(ServerGroup)	},
 { "Setting",		sizeof(Setting)		},
 { "Shit",		sizeof(Shit)		},
+{ "Spy\t",		sizeof(Spy)		},
 { "Strp",		sizeof(Strp)		},
 #ifdef TRIVIA
 { "TrivScore",		sizeof(TrivScore)	},
 #endif /* TRIVIA */
+{ "UniVar",		sizeof(UniVar)		},
 { "User",		sizeof(User)		},
-{ "OnMsg",		sizeof(OnMsg)		},
-{ "Spy\t",		sizeof(Spy)		},
+#ifdef WEB
+{ "WebDoc",		sizeof(WebDoc)		},
+{ "WebSock",		sizeof(WebSock)		},
+#endif
 { NULL, }};
+
 
 LS struct
 {
@@ -154,7 +191,7 @@ LS struct
 #ifdef PYTHON
 {	python_hook,			"python_hook"			},
 {	python_unhook,			"python_unhook"			},
-#endif /* PYTHON */ 
+#endif /* PYTHON */
 #ifdef RAWDNS
 {	rawdns,				"rawdns"			},
 {	parse_query,			"parse_query"			},
@@ -184,6 +221,9 @@ LS struct
 {	init_uptime,			"init_uptime"			},
 {	send_uptime,			"send_uptime"			},
 #endif /* UPTIME */
+#ifdef URLCAPTURE
+{	urlcapture,			"urlcapture"			},
+#endif /* URLCAPTURE */
 {	0,				"(unknown)"			},
 { NULL, }};
 
@@ -196,12 +236,12 @@ LS const DEFstruct SCRIPTdefs[] =
 { HOOK_BOTNET,		"HOOK_BOTNET"		},
 { HOOK_DCC_COMPLETE,	"HOOK_DCC_COMPLETE"	},
 #ifdef TCL
-{ (int)tcl_timer_jump,	"tcl_timer_jump"	},
-{ (int)tcl_parse_jump,	"tcl_parse_jump"	},
+{ .v.func=tcl_timer_jump,	"tcl_timer_jump"	},
+{ .v.func=tcl_parse_jump,	"tcl_parse_jump"	},
 #endif /* TCL */
 #ifdef PYTHON
-{ (int)python_timer_jump, "python_timer_jump"	},
-{ (int)python_parse_jump, "python_parse_jump"	},
+{ .v.func=python_timer_jump, "python_timer_jump"	},
+{ .v.func=python_parse_jump, "python_parse_jump"	},
 #endif /* PYTHON */
 { 0, }};
 #endif /* SCRIPTING */
@@ -301,9 +341,9 @@ void strflags(char *dst, const DEFstruct *flagsstruct, int flags)
 	int	i;
 
 	*dst = 0;
-	for(i=0;(flagsstruct[i].id);i++)
+	for(i=0;(flagsstruct[i].v.id);i++)
 	{
-		if (flagsstruct[i].id & flags)
+		if (flagsstruct[i].v.id & flags)
 		{
 			if (*dst)
 				Strcat(dst,"|");
@@ -318,7 +358,19 @@ const char *strdef(const DEFstruct *dtab, int num)
 
 	for(i=0;(dtab[i].idstr);i++)
 	{
-		if (dtab[i].id == num)
+		if (dtab[i].v.id == num)
+			return(dtab[i].idstr);
+	}
+	return("UNKNOWN");
+}
+
+const char *funcdef(const DEFstruct *dtab, void *func)
+{
+	int	i;
+
+	for(i=0;(dtab[i].idstr);i++)
+	{
+		if (dtab[i].v.func == func)
 			return(dtab[i].idstr);
 	}
 	return("UNKNOWN");
@@ -468,7 +520,7 @@ void debug_settings(UniVar *setting, int type)
 		}
 
 		tpad = STREND(tabs);
-		n = 24 - (Strlen2(pad,VarName[i].name) + 2);
+		n = 24 - (Strlen2(pad,VarName[i].name) + 2); // VarName[i].name is never NULL
 		while(n >= 8)
 		{
 			n = n - 8;
@@ -1161,7 +1213,7 @@ void debug_rawdns(void)
 
 #endif /* RAWDNS */
 
-#if defined(TCL) || defined(PYTHON) 
+#if defined(TCL) || defined(PYTHON)
 
 #if 0
 typedef struct
@@ -1174,7 +1226,7 @@ typedef struct
         ulong           minute2;        //:30;
         ulong           hour;           //:24;
         ulong           weekday;        //:7;
-                        
+
 } HookTimer;
 #endif /* 0 */
 
@@ -1213,7 +1265,7 @@ void debug_scripthook(void)
 	for(h=hooklist;h;h=h->next)
 	{
 		memtouch(h);
-		debug("  ; func\t\t"mx_pfmt" %s\n",(mx_ptr)h->func,strdef(SCRIPTdefs,(int)h->func));
+		debug("  ; func\t\t"mx_pfmt" %s\n",(mx_ptr)h->func,funcdef(SCRIPTdefs,h->func));
 		debug("  ; guid\t\t%i\n",h->guid);
 		debug("  ; flags\t\t%s (%i)\n",strdef(SCRIPTdefs,h->flags),h->flags);
 		if (h->flags == HOOK_TIMER)
@@ -1288,7 +1340,7 @@ int wrap_debug(void)
 
 	close(fd);
 	debug_fd = backup_fd;
-	dodebug = backup_dodebug; 
+	dodebug = backup_dodebug;
 
 	debug("(wrap_debug) all done.\n");
 	return(1);
@@ -1301,6 +1353,8 @@ void do_debug(COMMAND_ARGS)
 	else
 		to_user(from,"Unable to write debug information to file");
 }
+
+#endif /* ifndef TEST */
 
 void debug(char *format, ...)
 {
@@ -1327,7 +1381,7 @@ void debug(char *format, ...)
 	}
 
 	va_start(msg,format);
-	vsprintf(debugbuf,format,msg);
+	vsnprintf(debugbuf,sizeof(debugbuf),format,msg);
 	va_end(msg);
 
 	if ((write(debug_fd,debugbuf,strlen(debugbuf))) < 0)

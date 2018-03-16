@@ -1,7 +1,7 @@
 /*
 
     EnergyMech, IRC bot software
-    Parts Copyright (c) 1997-2009 proton
+    Parts Copyright (c) 1997-2018 proton
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -770,10 +770,11 @@ restart_die:
 LS char *bad_exe = "init: Error: Improper executable name\n";
 
 #ifdef __GNUC__
-int main(int argc, char **argv, char **envp) __attribute__ ((__noreturn__, __sect(INIT_SEG)));
+int main(int argc, char **argv, char **envp) __attribute__ ((__sect(INIT_SEG)));
 #endif
 int main(int argc, char **argv, char **envp)
 {
+	struct stat st;
 	char	*opt;
 	int	do_fork = TRUE;
 	int	versiononly = FALSE;
@@ -786,15 +787,18 @@ int main(int argc, char **argv, char **envp)
 		_exit(1);
 	}
 
-	{
-		struct stat st; // allocate temporary
-
-		stat("..",&st);
-		parent_inode = st.st_ino; // used for is_safepath()
-	}
+	stat("..",&st);
+	parent_inode = st.st_ino; // used for is_safepath()
 
 	srand(now+getpid());
 
+	/*
+	 *   Code to detect and recover after a RESET
+	 */
+/*
+execve( ./energymech, argv = { ./energymech <NULL> <NULL> <NULL> <NULL> }, envp = { MECHRESET=d3 f1881:2:X12 } )
+(recover_debug) debug fd recovered
+*/
 	while(*envp)
 	{
 		char	*p1;
@@ -812,6 +816,9 @@ int main(int argc, char **argv, char **envp)
 		if (*p2 == 0)
 		{
 			mechresetenv = p1;
+			do_fork = FALSE;
+			if (*p1 == 'd')
+				mechresetenv = recover_debug(p1+1);
 			break;
 		}
 		envp++;
@@ -850,16 +857,27 @@ int main(int argc, char **argv, char **envp)
 			versiononly = TRUE;
 			break;
 		case 'h':
+/*
+#define TEXT_PSWITCH1           " -p <string>   encrypt <string> using the password hashing algorithm,\n"
+#define TEXT_PSWITCH2           "               output the result and then quit.\n"
+
+#define TEXT_DSWITCH            " -d            start mech in debug mode\n"
+#define TEXT_OSWITCH            " -o <file>     write debug output to <file>\n"
+#define TEXT_XSWITCH            " -X            write a debug file before exit\n"
+*/
+
 			to_file(1,TEXT_USAGE,executable);
-			to_file(1,TEXT_FSWITCH);
-			to_file(1,TEXT_CSWITCH);
+			to_file(1,TEXT_FSWITCH
+				  TEXT_CSWITCH
+				  TEXT_PSWITCH1
+				  TEXT_PSWITCH2
 #ifdef DEBUG
-			to_file(1," -d          start mech in debug mode\n");
-			to_file(1," -o <file>   write debug output to <file>\n");
-			to_file(1," -X          write a debug file before exit\n");
+				  TEXT_DSWITCH
+				  TEXT_OSWITCH
+				  TEXT_XSWITCH
 #endif /* DEBUG */
-			to_file(1,TEXT_HSWITCH);
-			to_file(1,TEXT_VSWITCH);
+				  TEXT_HSWITCH
+				  TEXT_VSWITCH);
 			_exit(0);
 		case 'c':
 			makecore = TRUE;
@@ -887,6 +905,13 @@ int main(int argc, char **argv, char **envp)
 			}
 			do_fork = TRUE;
 			break;
+		case 'p':
+			++argv;
+			if (*argv)
+				to_file(1,"%s\n",makepass(*argv));
+			else
+				to_file(1,"error: Missing argument for -p <string>\n");
+			_exit(0);
 		case 'X':
 			debug_on_exit = TRUE;
 			break;
@@ -959,6 +984,10 @@ int main(int argc, char **argv, char **envp)
 	LocalBot.x.x.aop = 1;
 	LocalBot.chan = CoreUser.chan = (Strp*)&CMA;
 
+#ifdef UPTIME
+	init_uptime();
+#endif /* UPTIME */
+
 	readcfgfile();
 
 #ifndef I_HAVE_A_LEGITIMATE_NEED_FOR_MORE_THAN_4_BOTS
@@ -985,7 +1014,7 @@ int main(int argc, char **argv, char **envp)
 	if (!mechresetenv)
 		to_file(1,INFO_RUNNING);
 
-	if (!mechresetenv && do_fork)
+	if (do_fork)
 	{
 		close(0);
 		close(1);
@@ -1017,10 +1046,6 @@ int main(int argc, char **argv, char **envp)
 #ifdef CTCP
 	memset(&ctcp_slot,0,sizeof(ctcp_slot));
 #endif /* CTCP */
-
-#ifdef UPTIME
-	init_uptime();
-#endif /* UPTIME */
 
 #ifdef BOTNET
 	last_autolink = now + 30 + (rand() >> 27);	/* + 0-31 seconds */

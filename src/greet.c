@@ -130,7 +130,7 @@ void do_greet(COMMAND_ARGS)
 	{
 		if (isfile)
 		{
-			if (!is_safepath(rest))
+			if (is_safepath(rest,FILE_MUST_EXIST) != FILE_IS_SAFE)
 				goto usage;
 		}
 

@@ -1,7 +1,7 @@
 /*
 
     EnergyMech, IRC bot software
-    Parts Copyright (c) 1997-2009 proton
+    Parts Copyright (c) 1997-2018 proton
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,25 +23,19 @@
 
 #include "defines.h"
 #include "structs.h"
+#ifdef TEST
+#define MAIN_C
+#endif
 #include "global.h"
 #include "h.h"
 #include "text.h"
 
+#ifndef TEST
+
 LS char timebuf[24];		/* max format lentgh == 20+1, round up to nearest longword -> 24 */
 LS char idlestr[36];		/* max format lentgh == 24+1, round up to nearest longword -> 28 */
-
-LS const char monlist[12][4] =
-{
-	"Jan", "Feb", "Mar", "Apr",
-	"May", "Jun", "Jul", "Aug",
-	"Sep", "Oct", "Nov", "Dec"
-};
-
-LS const char daylist[7][4] =
-{
-	"Sun", "Mon", "Tue", "Wed",
-	"Thu", "Fri", "Sat"
-};
+LS const char monlist[12][4] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+LS const char daylist[7][4] = {	"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
 
 /*
  *  memory allocation routines
@@ -176,7 +170,7 @@ void Free(char **mem)
 
 #endif /* DEBUG */
 
-int Strlen(const char *first, ...)
+const int Strlen(const char *first, ...)
 {
 	const char *s,*o;
 	int n;
@@ -200,7 +194,7 @@ int Strlen(const char *first, ...)
 }
 
 __attr(CORE_SEG,__regparm(2))
-int Strlen2(const char *one, const char *two)
+const int Strlen2(const char *one, const char *two)
 {
 	const char *s1,*s2;
 
@@ -493,7 +487,7 @@ char *cluster(char *hostname)
 	}
 	else
 	{
-		/*	
+		/*
 		 *  its not a numeric mask
 		 */
 		p = mask;
@@ -841,7 +835,8 @@ char *Strchr(const char *t, int c)
 	return((*t == ch) ? (char*)t : NULL);
 }
 
-char *Strdup(char *src)
+__attr(CORE_SEG,__regparm(1))
+char *Strdup(const char *src)
 {
 	char	*dest;
 
@@ -1064,6 +1059,8 @@ void table_send(const char *from, const int space)
 	e_table = NULL;
 }
 
+#ifdef OLDCODE
+
 int is_safepath(const char *path)
 {
 	struct stat st;
@@ -1097,3 +1094,125 @@ int is_safepath(const char *path)
 	}
 	return(path_token_check() == 1 ? TRUE : FALSE);
 }
+
+#endif
+
+#endif /* ifndef TEST at the beginning of file */
+
+#define FILE_MUST_EXIST         1
+#define FILE_MAY_EXIST          2
+#define FILE_MUST_NOTEXIST      3
+
+__attr(CORE_SEG,__regparm(2))
+int is_safepath(const char *path, int filemustexist)
+{
+	struct stat st;
+	ino_t	ino;
+	char	tmp[PATH_MAX];
+	const char *src;
+	char	*dst;
+	int	r,mo,dir_r,orr,oerrno;
+
+#ifdef TEST
+	memset(&st,0,sizeof(st));
+#endif
+	if (*(src = path) == '/') // dont allow starting at root, only allow relative paths
+		return(-1);//(FALSE);
+
+	if (strlen(path) >= PATH_MAX)
+		return(-6);
+
+	orr = lstat(path,&st);
+	oerrno = errno;
+
+	if (filemustexist == FILE_MUST_EXIST && orr == -1 && errno == ENOENT)
+		return(-2);
+	if (filemustexist == FILE_MUST_NOTEXIST && orr == 0)
+		return(-3);
+
+	mo = st.st_mode; // save mode for later
+	dir_r = -1;
+
+	for(dst=tmp;*src;)
+	{
+		if (*src == '/')
+		{
+			*dst = 0;
+			if ((dir_r = lstat(tmp,&st)) == -1 && errno == ENOENT)
+				return(-7);
+			if (!(S_ISREG(st.st_mode) || S_ISDIR(st.st_mode))) // disallow all except regular files and directories
+				return(-4);
+			if (st.st_ino == parent_inode) // disallow traversing below bots homedir
+				return(-5);
+		}
+		if (dst == tmp + PATH_MAX-1)
+			return(-6);
+		*dst++ = *src++;
+	}
+	if (filemustexist != FILE_MUST_EXIST && orr == -1 && oerrno == ENOENT)
+		return(TRUE);
+	return (S_ISREG(mo)) ? TRUE : FALSE;
+}
+
+#ifdef TEST
+
+#include "debug.c"
+
+#define P0	"verylongexcessivelengthfilenamegibberish"
+#define P1	P0 "/" P0 "/" P0 "/" P0 "/" P0 "/" P0 "/" P0 "/" P0 "/" P0 "/" P0 "/"
+#define P2	P1 P1 P1 P1 P1 P1 P1 P1 P1 P1 P1 P1 P1 P1 P1 P1 P1 P1 P1 P1 P1 P1 P0
+
+char *tostr[] = { "ZERO", "FILE_MUST_EXIST", "FILE_MAY_EXIST", "FILE_MUST_NOTEXIST" };
+
+void testcase(const char *str, int expected, int filemustexist)
+{
+	int	r;
+
+	r = is_safepath(str,filemustexist);
+	if (r == expected)
+	{
+		debug("testcase SUCCESS: testpath %s %s -> result %i\n",
+			(strlen(str)>50) ? "(very long string)" : str,tostr[filemustexist],r);
+	}
+	else
+	{
+		debug("testcase FAIL: testpath %s(%i) %s -> result %i, expected %i\n",
+			(strlen(str)>50) ? "(very long string)" : str,
+			strlen(str),tostr[filemustexist],r,expected);//(r) ? "TRUE" : "FALSE",(expected) ? "TRUE" : "FALSE");
+	}
+}
+
+int main(int argc, char **argv)
+{
+	struct stat st;
+	int	r;
+
+	dodebug = 1;
+        stat("../..",&st);
+        parent_inode = st.st_ino; // used for is_safepath()
+
+	debug("PATH_MAX = %i\n",PATH_MAX);
+	if (argv[1] == NULL)
+	{
+		testcase("/etc/passwd",-1,FILE_MAY_EXIST);
+		testcase("../../../../../../../../../../../etc/passwd",-5,FILE_MAY_EXIST);
+		testcase("../anyparentfile",1,FILE_MAY_EXIST);
+		testcase("../../anyparentparentfile",-5,FILE_MAY_EXIST);
+		testcase("function.c",TRUE,FILE_MUST_EXIST);
+		testcase("./function.c",TRUE,FILE_MUST_EXIST);
+		testcase("function.c",-3,FILE_MUST_NOTEXIST);
+		testcase("./function.c",-3,FILE_MUST_NOTEXIST);
+		testcase("nosuchfile",1,FILE_MAY_EXIST);
+		testcase("nosuchfile",1,FILE_MUST_NOTEXIST);
+		testcase("./nosuchfile",1,FILE_MUST_NOTEXIST);
+		testcase("../../nosuchfile",-5,FILE_MUST_NOTEXIST);
+		testcase(P2,-6,FILE_MAY_EXIST);
+		exit(0);
+	}
+
+	r = is_safepath(argv[1],FILE_MAY_EXIST);
+	debug("testpath %s -> result %s\n",argv[1],(r) ? "TRUE" : "FALSE");
+}
+
+#endif /* TEST */
+

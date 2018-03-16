@@ -1,7 +1,7 @@
 /*
 
     EnergyMech, IRC bot software
-    Copyright (c) 1997-2008 proton
+    Copyright (c) 1997-2018 proton
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -105,6 +105,7 @@ char *recover_client(char *env)
 		}
 	}
 	close(fd);
+	killsock(fd);
 	return(p);
 
 found_user:
@@ -182,6 +183,8 @@ char *recover_debug(char *env)
 }
 
 #endif /* DEBUG */
+
+//execve( ./energymech, argv = { ./energymech <NULL> <NULL> <NULL> <NULL> }, envp = { MECHRESET=d3 f1881:2:X12 f99:4:X12 } )
 
 char *recover_server(char *env)
 {
@@ -268,8 +271,16 @@ char *recover_server(char *env)
 			debug("(recover_server) {%i} server socket recovered\n",fd);
 #endif /* DEBUG */
 			to_file(fd,"LUSERS\n");
+			fd = -1;
 			break;
 		}
+	}
+	// if we recover a guid:socket without a matching bot in config, it got removed or changed guid
+	// if the guid changed, we cant guess which old<-->new is the matching one so
+	if (fd != -1)
+	{
+		to_file(fd,"QUIT :I'm no longer wanted *cry*\n");
+		killsock(fd);
 	}
 	return(p);
 }
@@ -376,22 +387,24 @@ void do_reset(COMMAND_ARGS)
 	/*
 	 *  Save server connections
 	 */
-	for(backup=botlist;backup;backup=backup->next)
+	backup = current;
+	for(current=botlist;current;current=current->next)
 	{
-		if ((backup->connect == CN_ONLINE) && ((MSGLEN - (p - env)) > 25))
+		if ((current->connect == CN_ONLINE) && ((MSGLEN - (p - env)) > 25))
 		{
-			unset_closeonexec(backup->sock);
+			unset_closeonexec(current->sock);
 			if (n)
 				*(p++) = ' ';
 #ifdef IRCD_EXTENSIONS
-			sprintf(p,"f%i:%i:X%i",backup->guid,backup->sock,backup->ircx_flags);
+			sprintf(p,"f%i:%i:X%i",current->guid,current->sock,current->ircx_flags);
 #else /* IRCD_EXTENSIONS */
-			sprintf(p,"f%i:%i",backup->guid,backup->sock);
+			sprintf(p,"f%i:%i",current->guid,current->sock);
 #endif /* IRCD_EXTENSIONS */
 			p = STREND(p);
 			n++;
+			to_server("PING :OT%lu\n",current->ontime);
 		}
-		for(client=backup->clientlist;client;client=client->next)
+		for(client=current->clientlist;client;client=client->next)
 		{
 #ifdef TELNET
 			if ((client->flags & (DCC_ACTIVE|DCC_TELNET)) == 0)
@@ -408,15 +421,16 @@ void do_reset(COMMAND_ARGS)
 					*(p++) = ' ';
 #ifdef TELNET
 				sprintf(p,(client->flags & DCC_TELNET) ? "t%i:%i:%s" : "c%i:%i:%s",
-					backup->guid,client->sock,client->user->name);
+					current->guid,current->sock,client->user->name);
 #else
-				sprintf(p,"c%i:%i:%s",backup->guid,client->sock,client->user->name);
+				sprintf(p,"c%i:%i:%s",current->guid,current->sock,client->user->name);
 #endif /* TELNET */
 				p = STREND(p);
 				n++;
 			}
 		}
 	}
+	current = backup;
 
 #ifdef DEBUG
 	debug("(do_reset) %s [%i]\n",env,(int)(p - env));

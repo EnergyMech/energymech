@@ -168,12 +168,6 @@ help_loop:
 		return;
 	}
 
-	/*
-	 *  We dont want to show help for "../../../../../../etc/passwd"
-	 */
-	if (!is_safepath(rest))
-		return;
-
 	pt = Strcpy(line,HELPDIR);
 	for(i=0;(rest[i]);i++)
 	{
@@ -184,6 +178,20 @@ help_loop:
 		pt++;
 	}
 	*pt = 0;
+
+	/*
+	 *  We dont want to show help for "../../../../../../etc/passwd"
+	 */
+	if (is_safepath(line,FILE_MUST_EXIST) != FILE_IS_SAFE)
+#ifdef DEBUG
+	{
+		debug("(do_help) unsafe help filename (%s), exiting\n",line);
+		return;
+	}
+#else
+		return;
+#endif /* DEBUG */
+
 #ifdef DEBUG
 	debug("(do_help) help file check: %s\n",line);
 #endif /* DEBUG */

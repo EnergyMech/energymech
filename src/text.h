@@ -1,7 +1,7 @@
 /*
 
     EnergyMech, IRC bot software
-    Copyright (c) 2000-2009 proton
+    Copyright (c) 2000-2018 proton
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -74,9 +74,8 @@
 #define TEXT_SERVERDELETED	"Server has been deleted: %s:%i"
 #define TEXT_MANYSERVMATCH	"Several entries for %s exists, please specify port also"
 /* do_core() */
-#define TEXT_CURRNICKWANT	"Current nick\t%s (Wanted: %s)"
-#define TEXT_CURRNICKHAS	"Current nick\t%s"
-#define TEXT_CURRGUID		"Guid\t%i"
+#define TEXT_CURRNICKWANT	"Current nick\t%s (Wanted: %s) [#%i]"
+#define TEXT_CURRNICKHAS	"Current nick\t%s [#%i]"
 #define TEXT_USERLISTSTATS	"Users in userlist\t%i (%i Superuser%s, %i Bot%s)"
 #define TEXT_ACTIVECHANS	"Active channels\t%s"
 #define TEXT_MOREACTIVECHANS	"\t%s"
@@ -87,6 +86,8 @@
 
 #define TEXT_CURRSERVER		"Current Server\t%s:%i"
 #define TEXT_CURRSERVERNOT	"Current Server\t" TEXT_NOTINSERVLIST
+#define TEXT_TRYNEWSERVER	"Trying new server, brb..."
+#define TEXT_SWITCHSERVER	"Switching servers..."
 #define TEXT_SERVERONTIME	"Server Ontime\t%s"
 #define TEXT_BOTMODES		"Mode\t+%s"
 
@@ -129,10 +130,16 @@
 #define TEXT_SIGUSR1		"QUIT :Switching servers... (SIGUSR1)\n"
 
 #define TEXT_USAGE		"Usage: %s [switches [args]]\n"
-#define TEXT_FSWITCH		" -f <file>   read configuration from <file>\n"
-#define TEXT_CSWITCH		" -c          make core file instead of coredebug/reset\n"
-#define TEXT_HSWITCH		" -h          show this help\n"
-#define TEXT_VSWITCH		" -v          show EnergyMech version\n"
+#define TEXT_FSWITCH		" -f <file>     read configuration from <file>\n"
+#define TEXT_CSWITCH		" -c            make core file instead of coredebug/reset\n"
+#define TEXT_HSWITCH		" -h            show this help\n"
+#define TEXT_VSWITCH		" -v            show EnergyMech version\n"
+#define TEXT_PSWITCH1		" -p <string>   encrypt <string> using the password hashing algorithm,\n"
+#define TEXT_PSWITCH2		"               output the result and then quit.\n"
+
+#define TEXT_DSWITCH		" -d            start mech in debug mode\n"
+#define TEXT_OSWITCH		" -o <file>     write debug output to <file>\n"
+#define TEXT_XSWITCH		" -X            write a debug file before exit\n"
 
 #define TEXT_HDR_VERS		"EnergyMech %s, %s\n"
 #define TEXT_HDR_DATE		"Compiled on " __DATE__ " " __TIME__ "\n"

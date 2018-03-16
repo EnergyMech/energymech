@@ -325,15 +325,15 @@ void on_nick(char *from, char *newnick)
 		if ((maxcount = chan->setting[INT_NCL].int_var) < 2)
 			continue;
 
-		if ((now - cu->nicktime) > NICKFLOODTIME)
+		if ((now - cu->action_time[INDEX_NICK]) > NICKFLOODTIME)
 		{
-			cu->nicktime = now + (NICKFLOODTIME / (maxcount - 1));
-			cu->nicknum = 1;
+			cu->action_time[INDEX_NICK] = now + (NICKFLOODTIME / (maxcount - 1));
+			cu->action_num[INDEX_NICK] = 1;
 		}
 		else
 		{
-			cu->nicktime += (NICKFLOODTIME / (maxcount - 1));
-			if (++cu->nicknum >= maxcount)
+			cu->action_time[INDEX_NICK] += (NICKFLOODTIME / (maxcount - 1));
+			if (++cu->action_num[INDEX_NICK] >= maxcount)
 			{
 				deop_ban(chan,cu,NULL);
 				send_kick(chan,newnick,KICK_NICKFLOOD);
@@ -342,7 +342,7 @@ void on_nick(char *from, char *newnick)
 	}
 }
 
-void on_msg(char *from, char *to, char *msg)
+void on_msg(char *from, char *to, char *rest)
 {
 #ifdef SCRIPTING
 	Hook	*hook;
@@ -368,7 +368,7 @@ void on_msg(char *from, char *to, char *msg)
 	 */
 
 #ifdef NOTE
-	if (notelist && catch_note(from,to,msg))
+	if (notelist && catch_note(from,to,rest))
 		return;
 #endif /* NOTE */
 
@@ -378,7 +378,7 @@ void on_msg(char *from, char *to, char *msg)
 	 */
 	if (CurrentChan && !CurrentChan->setting[TOG_PUB].int_var)
 	{
-		common_public(CurrentChan,from,"<%s> %s",msg);
+		common_public(CurrentChan,from,"<%s> %s",rest);
 		return;
 	}
 
@@ -398,7 +398,7 @@ void on_msg(char *from, char *to, char *msg)
 	/*
 	 *  remember where the string started
 	 */
-	origstart = msg;
+	origstart = rest;
 
 	if (from == CoreUser.name)
 	{
@@ -412,7 +412,7 @@ void on_msg(char *from, char *to, char *msg)
 	/*
 	 *  check for command bots nick replacing command char
 	 */
-	if ((p2 = (uchar*)(command = chop(&msg))) == NULL)
+	if ((p2 = (uchar*)(command = chop(&rest))) == NULL)
 		return;
 
 	p1 = (uchar*)current->nick;
@@ -421,7 +421,7 @@ void on_msg(char *from, char *to, char *msg)
 
 	if (!i || ((p2 > (uchar*)command) && (*p2 == ':' || *p2 == ';' || *p2 == ',') && p2[1] == 0))
 	{
-		if ((command = chop(&msg)) == NULL)
+		if ((command = chop(&rest)) == NULL)
 			return;
 		has_cc = TRUE;
 	}
@@ -449,12 +449,13 @@ recheck_alias:
 	{
 		if (!Strcasecmp(alias->alias,command))
 		{
-			afmt(amem,alias->format,msg);
+			unchop(command,rest);
+			afmt(amem,alias->format,command);
 #ifdef DEBUG
-			debug("(on_msg) [ALIAS] %s %s --> %s\n",command,msg,amem);
+			debug("(on_msg) [ALIAS] %s --> %s\n",command,amem);
 #endif /* DEBUG */
-			msg = amem;
-			pt = chop(&msg);
+			rest = amem;
+			pt = chop(&rest);
 			i = Strcasecmp(pt,command);
 			command = pt;
 			arec++;
@@ -482,7 +483,7 @@ recheck_alias:
 		 */
 		if (hook->flags == HOOK_COMMAND && !Strcasecmp(command,hook->type.command))
 		{
-			if (hook->func(from,msg,hook))
+			if (hook->func(from,rest,hook))
 				/* if the hook returns non-zero, the input should not be parsed internally */
 				i = 1;
 		}
@@ -517,7 +518,33 @@ recheck_alias:
 #endif /* DEBUG */
 			return;
 		}
+
 		CurrentCmd = &mcmd[i];
+
+#ifdef BOTNET
+		// experimental command supression
+		if (CurrentCmd->name == current->supres_cmd)
+		{
+			int	crc;
+
+			crc = makecrc(rest);
+			if (current->supres_crc == crc)
+			{
+				// another bot has already executed this command and is trying to supress its execution on other bots
+				current->supres_cmd = NULL;
+				current->supres_crc = 0;
+#ifdef DEBUG
+				debug("(on_msg) command \"%s\" from %s was supressed\n",CurrentCmd->name,CurrentNick);
+#endif
+				return;
+			}
+		}
+		//if command should be supressed ...
+		if (CurrentChan)
+		{
+			send_supress(CurrentCmd->name,rest);
+		}
+#endif
 
 		/*
 		 *  convert the command to uppercase
@@ -565,7 +592,7 @@ recheck_alias:
 		if (mcmd[i].caxs)
 		{
 			/* get channel name; 1: msg, 2: to, 3: active channel */
-			to = get_channel(to,&msg);
+			to = get_channel(to,&rest);
 			if (!ischannel(to))
 				return;
 			uaccess = get_authaccess(from,to);
@@ -592,7 +619,7 @@ recheck_alias:
 		/*
 		 *  CARGS check: at least one argument is required
 		 */
-		if (mcmd[i].args && !*msg)
+		if (mcmd[i].args && !*rest)
 		{
 			if (uaccess) usage_command(from,command);
 			return;
@@ -610,7 +637,7 @@ recheck_alias:
 				redirect.method = R_PRIVMSG;
 			}
 			else
-			if (begin_redirect(from,msg) < 0)
+			if (begin_redirect(from,rest) < 0)
 				return;
 		}
 #endif /* REDIRECT */
@@ -618,7 +645,7 @@ recheck_alias:
 		if (mcmd[i].dcc && dcc_only_command(from))
 			return;
 
-		mcmd[i].func(from,to,msg,acmd[i]);
+		mcmd[i].func(from,to,rest,acmd[i]);
 
 #ifdef DEBUG
 		CurrentCmd = NULL;
@@ -636,7 +663,7 @@ recheck_alias:
 	/*
 	 *  un-chop() the message string
 	 */
-	unchop(origstart,msg);
+	unchop(origstart,rest);
 
 	if (CurrentChan)
 	{

@@ -1,4 +1,18 @@
  
 Shows core information about the bot.
- 
-See also: ver, uptime, ontime
+
+Current nick        Nick of the bot you are connected to and its Guid.
+Users in userlist   Total number of userlist entries, as well as users with
+                    userlevel access (0-100) and bot level access (200).
+Active channels     Channels that the bot is active on, as well as channels
+                    that the bot is trying to rejoin.
+Current server      Which server the bot is connected to.
+Server ontime       How long the bot has been connected to the current server.
+Mode                User modes of the bot, like +i for invisible, etc.
+Current time        Time as reported by the machine that the bot is running on.
+Started             Time when the bot was first started.
+Uptime              How long (in days, hours, minutes and seconds) the bot has been running.
+Version             Source code version of the bot.
+Features            List of which features were compiled into the bot.
+
+See also: ver, uptime, ontime, features

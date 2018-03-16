@@ -1,7 +1,7 @@
 /*
 
     EnergyMech, IRC bot software
-    Copyright (c) 1997-2004 proton
+    Copyright (c) 1997-2018 proton
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -78,7 +78,7 @@ int begin_redirect(char *from, char *args)
 					to_user(from,"Missing name for redirect.");
 					return(-1);
 				}
-				if (!is_safepath(nick))
+				if (is_safepath(nick,FILE_MAY_EXIST) != FILE_IS_SAFE) // redirect output is appended
 				{
 					to_user(from,"Bad filename.");
 					return(-1);

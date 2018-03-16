@@ -1,7 +1,7 @@
 /*
 
     EnergyMech, IRC bot software
-    Copyright (c) 1997-2009 proton
+    Copyright (c) 1997-2018 proton
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 
 #define ischannel(x)		(*x == '#')
 
-#define nullstr(x)		(x) ? x : NULLSTR
+#define nullstr(x)		((x)) ? (x) : NULLSTR
 #define nullbuf(x)		(x && *x) ? x : NULLSTR
 
 #define chkhigh(x)		if (x > hisock) { hisock = x; }
@@ -106,9 +106,13 @@
 }
 
 #endif /* DEBUG */
+LS int makecrc(const char *);
+LS void send_supress(const char *, const char *);
+LS void netchanSupress(BotNet *, char *);
 
-LS Chan *find_channel_ac(char *)				__attr(CORE_SEG, __regparm (1) );
-LS Chan *find_channel_ny(char *)				__attr(CORE_SEG, __regparm (1) );
+LS Chan *find_channel(const char *, int)			__attr(CORE_SEG, __regparm (2) );
+LS Chan *find_channel_ac(const char *)				__attr(CORE_SEG, __regparm (1) );
+LS Chan *find_channel_ny(const char *)				__attr(CORE_SEG, __regparm (1) );
 LS ChanUser *find_chanuser(Chan *, const char *)		__attr(CORE_SEG, __regparm (2) );
 LS Client *find_client(const char *)				__page(CORE_SEG);
 LS Mech *add_bot(int, char *)					__page(CORE_SEG);
@@ -120,13 +124,13 @@ LS Shit *add_shit(char *, char *, char *, char *, int, int)	__page(CMD1_SEG);
 LS Shit *find_shit(const char *, const char *)			__page(CORE_SEG);
 LS Shit *get_shituser(char *, char *)				__page(CORE_SEG);
 LS User *add_user(char *, char *, int)				__page(CFG1_SEG);
-LS User *find_handle(char *)					__page(CORE_SEG);
+LS User *find_handle(const char *)				__page(CORE_SEG);
 LS User *get_authuser(char *, char *)				__page(CORE_SEG);
 LS User *get_user(const char *, const char *)			__page(CORE_SEG);
 LS int get_authaccess(char *, char *)				__page(CORE_SEG);
 LS int get_protaction(Chan *, char *)				__page(CORE_SEG);
 LS int get_shitaction(const char *, const char *)		__page(CORE_SEG);
-LS int get_useraccess(char *, char *)				__page(CORE_SEG);
+LS int get_useraccess(const char *, const char *)		__page(CORE_SEG);
 LS int get_maxaccess(const char *)				__page(CORE_SEG);
 
 LS int Strcasecmp(const char *, const char *)			__att2(CORE_SEG, const, __regparm (2) );
@@ -134,7 +138,7 @@ LS int Strcmp(const char *, const char *)			__att2(CORE_SEG, const, __regparm (2
 LS char *Strcat(char *, const char *)				__attr(CORE_SEG, __regparm (2) );
 LS char *Strchr(const char *, int)				__att2(CORE_SEG, const, __regparm (2) );
 LS char *Strcpy(char *, const char *)				__attr(CORE_SEG, __regparm (2) );
-LS char *Strdup(char *)						__page(CORE_SEG);
+LS char *Strdup(const char *)					__attr(CORE_SEG, __regparm (1) );
 LS void Strncpy(char *, const char *, int)			__attr(CORE_SEG, __regparm (3) );
 LS char *chop(char **)						__attr(CORE_SEG, __regparm (1) );
 LS int get_number(const char *)					__page(CORE_SEG);
@@ -208,12 +212,12 @@ LS ulong stringhash(char *)					__page(CORE_SEG);
  */
 LS void *Calloc(int)						__attr(CORE_SEG, __regparm (1) );
 LS void Free(char **)						__attr(CORE_SEG, __regparm (1) );
-LS int Strlen(const char *, ...)				__page(CORE_SEG);
-LS int Strlen2(const char *, const char *)			__attr(CORE_SEG, __regparm (2) );
+LS const int Strlen(const char *, ...)				__page(CORE_SEG);
+LS const int Strlen2(const char *, const char *)		__attr(CORE_SEG, __regparm (2) );
 LS int matches(const char *, const char *)			__att2(CORE_SEG, const, __regparm (2) );
 LS int num_matches(const char *, const char *)			__att2(CORE_SEG, const, __regparm (2) );
 LS int a2i(char *)						__attr(CORE_SEG, __regparm (1) );
-LS int is_safepath(const char *)				__page(CORE_SEG);
+LS int is_safepath(const char *, int)				__attr(CORE_SEG, __regparm (2) );
 
 LS void afmt(char *, const char *, const char *)		__page(CMD1_SEG);
 LS void aucheck(User *)						__attr(CORE_SEG, __regparm (1) );
@@ -256,7 +260,7 @@ LS void cfg_shit(char *)					__page(CFG1_SEG);
 LS void cfg_user(char *)					__page(CFG1_SEG);
 void mirror_user(User *)					__page(CORE_SEG);
 void mirror_userlist(void)					__page(CORE_SEG);
-LS void addtouser(Strp **, const char *)			__attr(CORE_SEG, __regparm (2) );
+LS void addtouser(Strp **, const char *, int)			__attr(CORE_SEG, __regparm (3) );
 LS int remfromuser(Strp **, const char *)			__attr(CORE_SEG, __regparm (2) );
 
 /*
@@ -397,6 +401,9 @@ LS void parse_mode(char *, char *)				__page(CORE_SEG);
 LS void parse_notice(char *, char *)				__page(CORE_SEG);
 LS void parse_part(char *, char *)				__page(CORE_SEG);
 LS void parse_ping(char *, char *)				__page(CORE_SEG);
+#ifdef URLCAPTURE
+LS void urlcapture(const char *)				__page(CORE_SEG);
+#endif /* URLCAPTURE */
 LS void parse_privmsg(char *, char *)				__page(CORE_SEG);
 LS void parse_quit(char *, char *)				__page(CORE_SEG);
 LS void parse_topic(char *, char *)				__page(CMD1_SEG);
@@ -527,6 +534,7 @@ LS void select_bounce(void)					__page(CORE_SEG);
 
 LS void do_chanban(COMMAND_ARGS)				__page(CMD1_SEG);
 LS void process_chanbans(void)					__page(CORE_SEG);
+LS void chanban_action(char *, char *, Shit *)			__page(CORE_SEG);
 
 #endif /* CHANBAN */
 
@@ -579,6 +587,13 @@ LS void check_dynamode(Chan *)					__page(CORE_SEG);
 
 #endif /* DYNAMODE */
 
+#ifdef HOSTINFO
+
+LS void do_hostinfo(COMMAND_ARGS)				__page(CMD1_SEG);
+LS void do_meminfo(COMMAND_ARGS)				__page(CMD1_SEG);
+LS void do_cpuinfo(COMMAND_ARGS)				__page(CMD1_SEG);
+
+#endif /* HOSTINFO */
 /*
  *
  */
@@ -762,6 +777,13 @@ LS void process_uptime(void)					__page(CORE_SEG);
 LS void uptime_death(int)					__page(RARE_SEG);	/* rare */
 
 #endif /* UPTIME */
+
+#ifdef URLCAPTURE
+
+LS void urlcapture(const char *)				__page(CORE_SEG);
+LS void do_urlhist(COMMAND_ARGS)				__page(CMD1_SEG);
+
+#endif /* ifdef URLCAPTURE */
 
 /*
  *  WEB prototypes
