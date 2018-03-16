@@ -1,7 +1,7 @@
 /*
 
     EnergyMech, IRC bot software
-    Parts Copyright (c) 1997-2004 proton
+    Parts Copyright (c) 1997-2018 proton
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -1295,7 +1295,7 @@ void do_core(COMMAND_ARGS)
 		else
 			pt = TEXT_VHINACTIVE;
 		table_buffer(TEXT_VIRTHOSTWINGATE,current->setting[STR_WINGATE].str_var,
-			current->setting[INT_WINGPORT].int_var,pt); 
+			current->setting[INT_WINGPORT].int_var,pt);
 	}
 #endif /* WINGATE */
 	sp = find_server(current->server);
