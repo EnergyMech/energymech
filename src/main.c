@@ -817,8 +817,10 @@ execve( ./energymech, argv = { ./energymech <NULL> <NULL> <NULL> <NULL> }, envp 
 		{
 			mechresetenv = p1;
 			do_fork = FALSE;
+#ifdef DEBUG
 			if (*p1 == 'd')
 				mechresetenv = recover_debug(p1+1);
+#endif /* DEBUG */
 			break;
 		}
 		envp++;
