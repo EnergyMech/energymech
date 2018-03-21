@@ -628,7 +628,7 @@ if [ -z "$endian" ]; then
   $CC -o $TESTP $TESTC 1> /dev/null 2> /dev/null
   if [ -x $TESTP ]; then
     endian=`$TESTP`
-    if [ "$endian" == "1" ]; then
+    if [ "$endian" = 1 ]; then
       endian="little"
     else
       endian="big"
