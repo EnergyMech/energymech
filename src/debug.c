@@ -1354,6 +1354,14 @@ void do_debug(COMMAND_ARGS)
 		to_user(from,"Unable to write debug information to file");
 }
 
+void do_crash(COMMAND_ARGS)
+{
+	int	*a;
+
+	a = NULL;
+	*a = 1; /* break time and space */
+}
+
 #endif /* ifndef TEST */
 
 void debug(char *format, ...)

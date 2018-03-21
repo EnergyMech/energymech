@@ -131,8 +131,10 @@ char *randstring(char *file)
  *  SIGALRM	Ignore ALRM signals
  *  SIGPIPE	Ignore PIPE signals
  *  SIGINT	Exit gracefully on ^C
- *  SIGBUS	(Try to) Exit gracefully on bus faults
- *  SIGSEGV	(Try to) Exit gracefully on segmentation violations
+ *  SIGILL	Illegal instruction (debug: report) quit
+ *  SIGABRT	abort(3) (debug: report) quit
+ *  SIGBUS	(Try to) Exit/restart gracefully on bus faults
+ *  SIGSEGV	(Try to) Exit/restart gracefully on segmentation violations
  *  SIGTERM	Exit gracefully when killed
  *  SIGUSR1	Jump (a) bot to a new server
  *  SIGUSR2	Call run_debug() (dump `everything' to a debug file)
@@ -338,6 +340,26 @@ void sig_int(int signum)
 }
 
 /*
+ *  SIGILL, Illegal instruction
+ */
+#ifdef DEBUG
+void sig_ill(int crap)
+{
+	debug("(sigill)\n");
+}
+#endif /* DEBUG */
+
+/*
+ *  SIGABRT, abort(3)
+ */
+#ifdef DEBUG
+void sig_abrt(int crap)
+{
+	debug("(sigabrt)\n");
+}
+#endif /* DEBUG */
+
+/*
  *  SIGBUS is a real killer and cant be scheduled.
  */
 void sig_bus(int crap)
@@ -360,8 +382,16 @@ void sig_bus(int crap)
 /*
  *  SIGSEGV shows no mercy, cant schedule it.
  */
-void sig_segv(int crap)
+#ifdef __x86_64__
+#include <sys/ucontext.h>
+#endif
+void sig_segv(int crap, siginfo_t *si, void *uap)
 {
+#ifdef __x86_64__
+	mcontext_t *mctx;
+	greg_t	*rsp,*rip; // general registers
+#endif /* __x86_64__ */
+
 	time(&now);
 
 	respawn++;
@@ -369,7 +399,17 @@ void sig_segv(int crap)
 		mechexit(1,exit);
 
 #ifdef DEBUG
-	debug("(sigsegv)\n");
+	debug("(sigsegv) trying to access "mx_pfmt"\n",(mx_ptr)si->si_addr);
+#ifdef __x86_64__
+	mctx = &((ucontext_t *)uap)->uc_mcontext;
+	rsp = &mctx->gregs[15];		// RSP, 64-bit stack pointer
+	rip = &mctx->gregs[16];		// RIP, 64-bit instruction pointer
+
+	debug("(sigsegv) Stack pointer: "mx_pfmt", Instruction pointer: "mx_pfmt"\n",(mx_ptr)*rsp,(mx_ptr)*rip);
+	debug("(sigsegv) sig_segv() = "mx_pfmt"\n",(mx_ptr)sig_segv);
+	debug("(sigsegv) do_crash() = "mx_pfmt"\n",(mx_ptr)do_crash);
+#endif /* __x86_64__ */
+
 	if (debug_on_exit)
 	{
 		run_debug();
@@ -859,15 +899,6 @@ execve( ./energymech, argv = { ./energymech <NULL> <NULL> <NULL> <NULL> }, envp 
 			versiononly = TRUE;
 			break;
 		case 'h':
-/*
-#define TEXT_PSWITCH1           " -p <string>   encrypt <string> using the password hashing algorithm,\n"
-#define TEXT_PSWITCH2           "               output the result and then quit.\n"
-
-#define TEXT_DSWITCH            " -d            start mech in debug mode\n"
-#define TEXT_OSWITCH            " -o <file>     write debug output to <file>\n"
-#define TEXT_XSWITCH            " -X            write a debug file before exit\n"
-*/
-
 			to_file(1,TEXT_USAGE,executable);
 			to_file(1,TEXT_FSWITCH
 				  TEXT_CSWITCH
@@ -1060,7 +1091,18 @@ execve( ./energymech, argv = { ./energymech <NULL> <NULL> <NULL> <NULL> }, envp 
 	 *  wait until after recover_reset() cuz it might change makecore
 	 */
 	if (!makecore)
-		signal(SIGSEGV,sig_segv);
+	{
+		struct sigaction s;
+		s.sa_flags = SA_SIGINFO;
+		sigemptyset(&s.sa_mask);
+		s.sa_sigaction = sig_segv;
+		sigaction(SIGSEGV, &s, NULL);
+		//signal(SIGSEGV,sig_segv);
+#ifdef DEBUG
+		signal(SIGILL,sig_ill);
+		signal(SIGABRT,sig_abrt);
+#endif /* DEBUG */
+	}
 
 	doit();
 }

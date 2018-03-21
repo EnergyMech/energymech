@@ -59,18 +59,12 @@ BEG const char ERR_NOCHANNELS[]		MDEF("I'm not active on any channels");
 BEG const char ERR_NOTOPPED[]		MDEF("I'm not opped on %s");
 BEG const char ERR_UNKNOWN_COMMAND[]	MDEF("Squeeze me?");
 
-BEG const char __SPYSTR_RAWIRC[]	MDEF("rawirc");
-BEG const char __SPYSTR_MESSAGE[]	MDEF("message");
-BEG const char __SPYSTR_STATUS[]	MDEF("status");
-BEG const char __SPYSTR_BOTNET[]	MDEF("botnet");
-#define SPYSTR_RAWIRC			__SPYSTR_RAWIRC
-#define SPYSTR_MESSAGE			__SPYSTR_MESSAGE
-#define SPYSTR_STATUS			__SPYSTR_STATUS
-#define SPYSTR_BOTNET			__SPYSTR_BOTNET
-
+BEG const char SPYSTR_RAWIRC[]		MDEF("rawirc");
+BEG const char SPYSTR_MESSAGE[]		MDEF("message");
+BEG const char SPYSTR_STATUS[]		MDEF("status");
+BEG const char SPYSTR_BOTNET[]		MDEF("botnet");
 #ifdef URLCAPTURE
-BEG const char __SPYSTR_URL[]		MDEF("url");
-#define SPYSTR_URL			__SPYSTR_URL
+BEG const char SPYSTR_URL[]		MDEF("url");
 #endif /* URLCAPTURE */
 
 BEG const char STR_MECHRESET[]		MDEF("MECHRESET=");

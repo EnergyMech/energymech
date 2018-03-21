@@ -339,50 +339,59 @@ void basicAuth(BotNet *bn, char *rest)
 	if (!pass || !*pass)
 		goto badpass;
 
+	if (linkpass == NULL || *linkpass == 0)
+		goto badpass;
+
 	switch(authtype)
 	{
 	case BNAUTH_PLAINTEXT:
+/*
+>> plain text given: "DomoOmiGato" stored "kooplook0988"
+(reset_linkable) guid 1337 reset to linkable
+(basicAuth) bad password [ guid = 1337 ]
+*/
+#ifdef DEBUG
+		debug(">> plain text given: \"%s\" stored \"%s\"\n",pass,rest);
+#endif /* DEBUG */
 		if (Strcmp(pass,rest))
 			goto badpass;
 		break;
 #ifdef SHACRYPT
 	case BNAUTH_SHA:
-		if (linkpass && *linkpass)
 		{
-			char	*enc,temppass[24 + Strlen2(pass,linkpass)]; // linkpass is never NULL
+		char	*enc,temppass[24 + Strlen2(pass,linkpass)]; // linkpass is never NULL
 
-			/* "mypass theirpass REMOTEsid LOCALsid" */
-			sprintf(temppass,"%s %s %i %i",linkpass,pass,bn->rsid,bn->lsid);
+		/* "mypass theirpass REMOTEsid LOCALsid" */
+		sprintf(temppass,"%s %s %i %i",linkpass,pass,bn->rsid,bn->lsid);
 #ifdef DEBUG
-			debug(">> sha pass exchange: \"%s\"\n",temppass);
+		debug(">> sha pass exchange: \"%s\"\n",temppass);
 #endif /* DEBUG */
-			enc = CRYPT_FUNC(temppass,rest);
+		enc = CRYPT_FUNC(temppass,rest);
 #ifdef DEBUG
-			debug("(basicAuth) their = %s, mypass = %s :: sha = %s\n",
-				pass,linkpass,enc);
+		debug("(basicAuth) their = %s, mypass = %s :: sha = %s\n",
+			pass,linkpass,enc);
 #endif /* DEBUG */
-			if (!Strcmp(enc,rest))
-				break;
+		if (!Strcmp(enc,rest))
+			break;
 		}
 #endif /* SHACRYPT */
 #ifdef MD5CRYPT
 	case BNAUTH_MD5:
-		if (linkpass && *linkpass)
 		{
-			char	*enc,temppass[24 + Strlen2(pass,linkpass)]; // linkpass is never NULL
+		char	*enc,temppass[24 + Strlen2(pass,linkpass)]; // linkpass is never NULL
 
-			/* "mypass theirpass REMOTEsid LOCALsid" */
-			sprintf(temppass,"%s %s %i %i",linkpass,pass,bn->rsid,bn->lsid);
+		/* "mypass theirpass REMOTEsid LOCALsid" */
+		sprintf(temppass,"%s %s %i %i",linkpass,pass,bn->rsid,bn->lsid);
 #ifdef DEBUG
-			debug(">> md5 pass exchange: \"%s\"\n",temppass);
+		debug(">> md5 pass exchange: \"%s\"\n",temppass);
 #endif /* DEBUG */
-			enc = CRYPT_FUNC(temppass,rest);
+		enc = CRYPT_FUNC(temppass,rest);
 #ifdef DEBUG
-			debug("(basicAuth) their = %s, mypass = %s :: md5 = %s\n",
-				pass,linkpass,enc);
+		debug("(basicAuth) their = %s, mypass = %s :: md5 = %s\n",
+			pass,linkpass,enc);
 #endif /* DEBUG */
-			if (!Strcmp(enc,rest))
-				break;
+		if (!Strcmp(enc,rest))
+			break;
 		}
 #endif /* MD5CRYPT */
 	default:

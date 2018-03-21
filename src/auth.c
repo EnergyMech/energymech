@@ -417,10 +417,20 @@ int make_auth(const char *userhost, const User *user)
  *
  */
 
-/*---Help:AUTH:<password>
- */
-/*---Help:VERIFY:<password>
- */
+/*
+help:AUTH
+help:VERIFY
+usage:AUTH <password>
+usage:VERIFY <password>
+file:../help/AUTH
+file:../help/VERIFY
+begin:
+
+Authenticate yourself with the bot.
+
+See also: passwd, setpass
+:end
+*/
 void do_auth(COMMAND_ARGS)
 {
 #ifdef BOTNET
