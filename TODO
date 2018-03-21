@@ -1,8 +1,10 @@
 /*
- *  EnergyMech TODO (March 9th, 2018)
+ *  EnergyMech TODO (March 16th, 2018)
  */
 
- - URL grabber/log
+ - Toybox hangman game
+
+ - Support for MD5 and SHA enabled at the same time for compatibility/fallback
 
  - SSL support for irc server/botnet
 

@@ -106,14 +106,132 @@
 }
 
 #endif /* DEBUG */
-LS int makecrc(const char *);
-LS void send_supress(const char *, const char *);
-LS void netchanSupress(BotNet *, char *);
 
-LS Chan *find_channel(const char *, int)			__attr(CORE_SEG, __regparm (2) );
-LS Chan *find_channel_ac(const char *)				__attr(CORE_SEG, __regparm (1) );
-LS Chan *find_channel_ny(const char *)				__attr(CORE_SEG, __regparm (1) );
-LS ChanUser *find_chanuser(Chan *, const char *)		__attr(CORE_SEG, __regparm (2) );
+/*
+ 170540    1728    3104  175372   2ad0c energymech-mega
+*/
+
+/* alias.c */
+
+LS void afmt(char *, const char *, const char *)		__page(CORE_SEG);
+void do_alias(COMMAND_ARGS)					__page(CMD1_SEG);
+void do_unalias(COMMAND_ARGS)					__page(CMD1_SEG);
+
+/* auth.c */
+/* bounce.c */
+/* chanban.c */
+/* channel.c */
+
+LS Chan *find_channel(const char *, int)			__attr(CORE_SEG, __regparm(2));
+LS Chan *find_channel_ac(const char *)				__attr(CORE_SEG, __regparm(1));
+LS Chan *find_channel_ny(const char *)				__attr(CORE_SEG, __regparm(1));
+
+/* core.c */
+/* ctcp.c */
+/* debug.c */
+
+void do_crash(COMMAND_ARGS)					__page(RARE_SEG);
+
+/* dns.c */
+/* dynamode.c */
+/* function.c */
+
+LS void *Calloc(int)						__attr(CORE_SEG, __regparm(1));
+LS void Free(char **)						__attr(CORE_SEG, __regparm(1));
+LS const int Strlen(const char *, ...)				__page(CORE_SEG);
+LS const int Strlen2(const char *, const char *)		__attr(CORE_SEG, __regparm(2));
+LS int matches(const char *, const char *)			__attr(CORE_SEG, __regparm(2));
+LS int num_matches(const char *, const char *)			__attr(CORE_SEG, __regparm(2));
+LS int a2i(char *)						__attr(CORE_SEG, __regparm(1));
+LS int is_safepath(const char *, int)				__attr(CORE_SEG, __regparm(2));
+
+/* greet.c */
+/* help.c */
+/* hostinfo.c */
+/* irc.c */
+/* kicksay.c */
+/* main.c */
+
+LS int sig_hup_callback(char *)					__page(RARE_SEG);		/* rare */
+LS void do_sighup(void)						__page(CMD1_SEG);
+LS void do_sigint(void)						__page(RARE_SEG);		/* rare */
+LS void do_sigusr1(void)					__page(CMD1_SEG);
+LS void sig_alrm(int)						__page(RARE_SEG);		/* rare */
+LS void sig_child(int)						__page(RARE_SEG);		/* rare */
+LS void sig_bus(int)						__page(CMD1_SEG);
+LS void sig_hup(int)						__page(RARE_SEG);		/* rare */
+LS void sig_int(int)						__page(RARE_SEG);		/* rare */
+LS void sig_pipe(int)						__page(CORE_SEG);
+LS void sig_ill(int)						__page(RARE_SEG);
+LS void sig_abrt(int)						__page(RARE_SEG);
+LS void sig_segv(int, siginfo_t *, void *)			__page(RARE_SEG);
+//LS void sig_segv(int)						__page(RARE_SEG);		/* rare */
+LS void sig_term(int)						__page(RARE_SEG);		/* rare */
+LS void sig_usr1(int)						__page(CMD1_SEG);
+LS void sig_usr2(int)						__page(DBUG_SEG);		/* DEBUG */
+LS void sig_suicide()						__attr(RARE_SEG, __noreturn__);	/* rare */
+
+/* net.c */
+/* net_chan.c */
+
+LS int makecrc(const char *)					__page(CORE_SEG);
+LS void send_supress(const char *, const char *)		__page(CORE_SEG);
+LS void netchanSupress(BotNet *, char *)			__page(CORE_SEG);
+
+/* note.c */
+/* notify.c */
+/* ons.c */
+/* parse.c */
+/* perl.c */
+/* prot.c */
+/* python.c */
+/* redirect.c */
+/* reset.c */
+/* seen.c */
+/* shit.c */
+/* socket.c */
+
+LS ulong get_ip(const char *)					__page(CORE_SEG);
+LS int SockAccept(int)						__page(CORE_SEG);
+LS int SockConnect(char *, int, int)				__page(CORE_SEG);
+LS void SockFlags(int)						__page(CORE_SEG);
+LS int SockListener(int)					__page(CORE_SEG);
+LS int SockOpts(void)						__page(CORE_SEG);
+
+/* spy.c */
+/* stats.c */
+/* tcl.c */
+/* telnet.c */
+/* toybox.c */
+/* trivia.c */
+/* uptime.c */
+/* urlcap.c */
+
+LS void urlcapture(const char *)				__page(CORE_SEG);
+LS void do_urlhist(COMMAND_ARGS)				__page(CMD1_SEG);
+
+/* user.c */
+
+LS void cfg_chan(char *)					__page(CFG1_SEG);
+LS void cfg_greet(char *)					__page(CFG1_SEG);
+LS void cfg_mask(char *)					__page(CFG1_SEG);
+LS void cfg_note(char *)					__page(CFG1_SEG);
+LS void cfg_opt(char *)						__page(CFG1_SEG);
+LS void cfg_pass(char *)					__page(CFG1_SEG);
+LS void cfg_shit(char *)					__page(CFG1_SEG);
+LS void cfg_user(char *)					__page(CFG1_SEG);
+void mirror_user(User *)					__page(CORE_SEG);
+void mirror_userlist(void)					__page(CORE_SEG);
+LS void addtouser(Strp **, const char *, int)			__attr(CORE_SEG, __regparm(3));
+LS int remfromuser(Strp **, const char *)			__attr(CORE_SEG, __regparm(2));
+
+/* vars.c */
+/* web.c */
+
+/* ---------------------- */
+
+
+LS ChanUser *find_chanuser(Chan *, const char *)		__attr(CORE_SEG, __regparm(2));
 LS Client *find_client(const char *)				__page(CORE_SEG);
 LS Mech *add_bot(int, char *)					__page(CORE_SEG);
 LS KickSay *find_kicksay(char *, char *)			__page(CORE_SEG);
@@ -133,23 +251,23 @@ LS int get_shitaction(const char *, const char *)		__page(CORE_SEG);
 LS int get_useraccess(const char *, const char *)		__page(CORE_SEG);
 LS int get_maxaccess(const char *)				__page(CORE_SEG);
 
-LS int Strcasecmp(const char *, const char *)			__att2(CORE_SEG, const, __regparm (2) );
-LS int Strcmp(const char *, const char *)			__att2(CORE_SEG, const, __regparm (2) );
-LS char *Strcat(char *, const char *)				__attr(CORE_SEG, __regparm (2) );
-LS char *Strchr(const char *, int)				__att2(CORE_SEG, const, __regparm (2) );
-LS char *Strcpy(char *, const char *)				__attr(CORE_SEG, __regparm (2) );
-LS char *Strdup(const char *)					__attr(CORE_SEG, __regparm (1) );
-LS void Strncpy(char *, const char *, int)			__attr(CORE_SEG, __regparm (3) );
-LS char *chop(char **)						__attr(CORE_SEG, __regparm (1) );
+LS int Strcasecmp(const char *, const char *)			__attr(CORE_SEG, __regparm(2));
+LS int Strcmp(const char *, const char *)			__attr(CORE_SEG, __regparm(2));
+LS char *Strcat(char *, const char *)				__attr(CORE_SEG, __regparm(2));
+LS char *Strchr(const char *, int)				__attr(CORE_SEG, __regparm(2));
+LS char *Strcpy(char *, const char *)				__attr(CORE_SEG, __regparm(2));
+LS char *Strdup(const char *)					__attr(CORE_SEG, __regparm(1));
+LS void Strncpy(char *, const char *, int)			__attr(CORE_SEG, __regparm(3));
+LS char *chop(char **)						__attr(CORE_SEG, __regparm(1));
 LS int get_number(const char *)					__page(CORE_SEG);
-LS int nickcmp(const char *, const char *)			__att2(CORE_SEG, const, __regparm (2) );
-LS char *nickcpy(char *, const char *)				__attr(CORE_SEG, __regparm (2) );
+LS int nickcmp(const char *, const char *)			__attr(CORE_SEG, __regparm(2));
+LS char *nickcpy(char *, const char *)				__attr(CORE_SEG, __regparm(2));
 
 LS char *cipher(char *)						__page(CMD1_SEG);
 LS char *cluster(char *)					__page(CMD1_SEG);
 LS char *find_nuh(char *)					__page(CORE_SEG);
 LS char *format_uh(char *, int)					__page(CMD1_SEG);
-LS char *get_channel(char *, char **)				__attr(CMD1_SEG, __regparm (2) );
+LS char *get_channel(char *, char **)				__attr(CMD1_SEG, __regparm(2));
 LS char *get_channel2(char *, char **)				__page(CMD1_SEG);
 LS char *get_nuh(ChanUser *)					__page(CORE_SEG);
 LS char *get_token(char **, const char *)			__page(CORE_SEG);
@@ -160,24 +278,13 @@ LS char *nick2uh(char *, char *)				__page(CMD1_SEG);
 LS char *randstring(char *)					__page(CORE_SEG);
 LS char *sockread(int, char *, char *)				__page(CORE_SEG);
 LS char *logtime(time_t)					__page(CORE_SEG);
-LS void table_buffer(const char *, ...)				__attr(CMD1_SEG, format (printf, 1, 2) );
-LS void table_send(const char *, const int)			__attr(CMD1_SEG, __regparm (2) );
+LS void table_buffer(const char *, ...)				__attr(CMD1_SEG, format(printf, 1, 2));
+LS void table_send(const char *, const int)			__attr(CMD1_SEG, __regparm(2));
 LS char *time2away(time_t)					__page(CORE_SEG);
 LS char *time2medium(time_t)					__page(CORE_SEG);
 LS char *time2small(time_t)					__page(CMD1_SEG);
 LS char *time2str(time_t)					__page(CMD1_SEG);
-LS char *tolowercat(char *dest, const char *src)		__attr(CMD1_SEG, __regparm (2) );
-
-/*
- *  socket.c
- */
-LS ulong get_ip(const char *)					__page(CORE_SEG);
-LS int SockAccept(int)						__page(CORE_SEG);
-LS int SockConnect(char *, int, int)				__page(CORE_SEG);
-LS void SockFlags(int)						__page(CORE_SEG);
-LS int SockListener(int)					__page(CORE_SEG);
-LS int SockOpts(void)						__page(CORE_SEG);
-
+LS char *tolowercat(char *dest, const char *src)		__attr(CMD1_SEG, __regparm(2));
 LS int capslevel(char *)					__page(CORE_SEG);
 LS int check_mass(Chan *, ChanUser *, int)			__page(CORE_SEG);
 LS int compile_timer(HookTimer *, char *)			__page(CORE_SEG);	/* SCRIPTING */
@@ -197,9 +304,9 @@ LS int read_seenlist_callback(char *)				__page(CFG1_SEG);
 LS int read_userlist(char *)					__page(CFG1_SEG);
 LS int read_userlist_callback(char *)				__page(CFG1_SEG);
 LS int reverse_mode(char *, Chan *, int, int)			__page(CORE_SEG);
-LS int to_file(int, const char *, ...)				__attr(CORE_SEG, format (printf, 2, 3) );
+LS int to_file(int, const char *, ...)				__attr(CORE_SEG, format(printf, 2, 3));
 LS int try_server(Server *, char *)				__page(CORE_SEG);
-LS int usercanmodify(const char *, const User *)		__attr(CORE_SEG, __regparm (2) );
+LS int usercanmodify(const char *, const User *)		__attr(CORE_SEG, __regparm(2));
 LS int write_seenlist(void)					__page(CORE_SEG);
 LS int write_session(void)					__page(CORE_SEG);
 LS int write_userlist(char *)					__page(CORE_SEG);
@@ -210,17 +317,8 @@ LS ulong stringhash(char *)					__page(CORE_SEG);
 /*
  *  function.c
  */
-LS void *Calloc(int)						__attr(CORE_SEG, __regparm (1) );
-LS void Free(char **)						__attr(CORE_SEG, __regparm (1) );
-LS const int Strlen(const char *, ...)				__page(CORE_SEG);
-LS const int Strlen2(const char *, const char *)		__attr(CORE_SEG, __regparm (2) );
-LS int matches(const char *, const char *)			__att2(CORE_SEG, const, __regparm (2) );
-LS int num_matches(const char *, const char *)			__att2(CORE_SEG, const, __regparm (2) );
-LS int a2i(char *)						__attr(CORE_SEG, __regparm (1) );
-LS int is_safepath(const char *, int)				__attr(CORE_SEG, __regparm (2) );
 
-LS void afmt(char *, const char *, const char *)		__page(CMD1_SEG);
-LS void aucheck(User *)						__attr(CORE_SEG, __regparm (1) );
+LS void aucheck(User *)						__attr(CORE_SEG, __regparm(1));
 LS void change_authnick(char *, char *)				__page(CORE_SEG);
 LS void change_pass(User *, char *)				__page(CMD1_SEG);
 LS void chan_modestr(Chan *, char *)				__page(CMD1_SEG);
@@ -237,7 +335,7 @@ LS void cycle_channel(Chan *)					__page(CORE_SEG);
 LS void dcc_banner(Client *)					__page(CORE_SEG);
 LS void dcc_chat(char *)					__page(CMD1_SEG);
 LS int dcc_only_command(char *)					__page(CMD1_SEG);
-LS void debug(char *, ...)					__attr(CORE_SEG, format (printf, 1, 2) );
+LS void debug(char *, ...)					__attr(CORE_SEG, format(printf, 1, 2));
 LS void delete_auth(char *)					__page(RARE_SEG);	/* rare */
 LS void delete_ban(Chan *, char *)				__page(CORE_SEG);
 LS void delete_modemask(Chan *, char *, int)			__page(CORE_SEG);
@@ -247,28 +345,8 @@ LS void deop_ban(Chan *, ChanUser *, char *)			__page(CMD1_SEG);
 LS void deop_screwban(Chan *, ChanUser *)			__page(CMD1_SEG);
 LS void deop_siteban(Chan *, ChanUser *)			__page(CMD1_SEG);
 
-/*
- *  user.c
- */
-LS void cfg_chan(char *)					__page(CFG1_SEG);
-LS void cfg_greet(char *)					__page(CFG1_SEG);
-LS void cfg_mask(char *)					__page(CFG1_SEG);
-LS void cfg_note(char *)					__page(CFG1_SEG);
-LS void cfg_opt(char *)						__page(CFG1_SEG);
-LS void cfg_pass(char *)					__page(CFG1_SEG);
-LS void cfg_shit(char *)					__page(CFG1_SEG);
-LS void cfg_user(char *)					__page(CFG1_SEG);
-void mirror_user(User *)					__page(CORE_SEG);
-void mirror_userlist(void)					__page(CORE_SEG);
-LS void addtouser(Strp **, const char *, int)			__attr(CORE_SEG, __regparm (3) );
-LS int remfromuser(Strp **, const char *)			__attr(CORE_SEG, __regparm (2) );
-
-/*
- *  commands
- */
 LS void do_8ball(COMMAND_ARGS)					__page(CMD1_SEG);	/* TOYBOX */
 LS void do_access(COMMAND_ARGS)					__page(CMD1_SEG);
-LS void do_alias(COMMAND_ARGS)					__page(CMD1_SEG);
 LS void do_auth(COMMAND_ARGS)					__page(CMD1_SEG);
 LS void do_away(COMMAND_ARGS)					__page(CMD1_SEG);
 LS void do_banlist(COMMAND_ARGS)				__page(CMD1_SEG);
@@ -332,14 +410,13 @@ LS void do_setpass(COMMAND_ARGS)				__page(CMD1_SEG);
 LS void do_shit(COMMAND_ARGS)					__page(CMD1_SEG);
 LS void do_shitlist(COMMAND_ARGS)				__page(CMD1_SEG);
 LS void do_showidle(COMMAND_ARGS)				__page(CMD1_SEG);
-LS void do_showusers(COMMAND_ARGS)				__page(CMD1_SEG);
+LS void do_who(COMMAND_ARGS)					__page(CMD1_SEG);
 LS void do_shutdown(COMMAND_ARGS)				__page(RARE_SEG);	/* rare */
 LS void do_siteban(COMMAND_ARGS)				__page(CMD1_SEG);
 LS void do_spy(COMMAND_ARGS)					__page(CMD1_SEG);
 LS void do_time(COMMAND_ARGS)					__page(CMD1_SEG);
 LS void do_topic(COMMAND_ARGS)					__page(CMD1_SEG);
 LS void do_trivia(COMMAND_ARGS)					__page(CMD1_SEG);	/* TRIVIA */
-LS void do_unalias(COMMAND_ARGS)				__page(CMD1_SEG);
 LS void do_unban(COMMAND_ARGS)					__page(CMD1_SEG);
 LS void do_upsend(COMMAND_ARGS)					__page(CMD1_SEG);
 LS void do_upontime(COMMAND_ARGS)				__page(CMD1_SEG);
@@ -352,16 +429,16 @@ LS void do_whom(COMMAND_ARGS)					__page(CMD1_SEG);
 /*
  *  end of commands
  */
-LS void fix_config_line(char *)					__attr(CORE_SEG, __regparm (1) );
+LS void fix_config_line(char *)					__attr(CORE_SEG, __regparm(1));
 LS void greet(void)						__page(CMD1_SEG);
 LS void join_channel(char *, char *)				__page(CORE_SEG);
-LS void kill_all_bots(char *)					__attr(RARE_SEG, __noreturn__ );		/* rare */
+LS void kill_all_bots(char *)					__attr(RARE_SEG, __noreturn__);		/* rare */
 LS int make_auth(const char *, const User *)			__page(CORE_SEG);
 LS Ban *make_ban(Ban **, char *, char *, time_t)		__page(CORE_SEG);
-LS void make_chanuser(char *, char *)				__attr(CORE_SEG, __regparm (2) );
+LS void make_chanuser(char *, char *)				__attr(CORE_SEG, __regparm(2));
 LS void make_ireq(int, char *, char *)				__page(CMD1_SEG);
 LS void mass_action(Chan *, ChanUser *)				__page(CORE_SEG);
-LS void mech_exec(void)						__attr(RARE_SEG, __noreturn__ );		/* rare */
+LS void mech_exec(void)						__attr(RARE_SEG, __noreturn__);		/* rare */
 LS void on_action(char *, char *, char *)			__page(CORE_SEG);
 LS void on_ctcp(char *, char *, char *)				__page(CORE_SEG);
 LS void on_join(Chan *, char *)					__page(CORE_SEG);
@@ -401,9 +478,6 @@ LS void parse_mode(char *, char *)				__page(CORE_SEG);
 LS void parse_notice(char *, char *)				__page(CORE_SEG);
 LS void parse_part(char *, char *)				__page(CORE_SEG);
 LS void parse_ping(char *, char *)				__page(CORE_SEG);
-#ifdef URLCAPTURE
-LS void urlcapture(const char *)				__page(CORE_SEG);
-#endif /* URLCAPTURE */
 LS void parse_privmsg(char *, char *)				__page(CORE_SEG);
 LS void parse_quit(char *, char *)				__page(CORE_SEG);
 LS void parse_topic(char *, char *)				__page(CMD1_SEG);
@@ -460,21 +534,6 @@ LS void whom_printbot(char *, BotInfo *, char *)		__page(CMD1_SEG);
 /*
  *  signals
  */
-LS int sig_hup_callback(char *)					__page(RARE_SEG);
-LS void do_sighup(void)						__page(CMD1_SEG);
-LS void do_sigint(void)						__page(RARE_SEG);
-LS void do_sigusr1(void)					__page(CMD1_SEG);
-LS void sig_alrm(int)						__page(RARE_SEG);
-LS void sig_child(int)						__page(RARE_SEG);
-LS void sig_bus(int)						__page(CMD1_SEG);
-LS void sig_hup(int)						__page(RARE_SEG);
-LS void sig_int(int)						__page(RARE_SEG);
-LS void sig_pipe(int)						__page(CORE_SEG);
-LS void sig_segv(int)						__page(RARE_SEG);
-LS void sig_term(int)						__page(RARE_SEG);
-LS void sig_usr1(int)						__page(CMD1_SEG);
-LS void sig_usr2(int)						__page(DBUG_SEG);		/* DEBUG */
-LS void sig_suicide()						__attr(RARE_SEG, __noreturn__);
 
 /*
  *  BOTNET prototypes
@@ -778,12 +837,6 @@ LS void uptime_death(int)					__page(RARE_SEG);	/* rare */
 
 #endif /* UPTIME */
 
-#ifdef URLCAPTURE
-
-LS void urlcapture(const char *)				__page(CORE_SEG);
-LS void do_urlhist(COMMAND_ARGS)				__page(CMD1_SEG);
-
-#endif /* ifdef URLCAPTURE */
 
 /*
  *  WEB prototypes

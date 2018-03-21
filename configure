@@ -26,6 +26,9 @@ compile=no
 install=no
 silentopt=no
 
+# default optimization goal, speed = -O2, size = -Os
+optitype=size
+
 for opt
 do
 
@@ -254,6 +257,8 @@ do
     --no-cpuflags)   cc_arch_opt=no ;;
     --use-optimize)  cc_optimize_opt=yes ;;
     --no-optimize)   cc_optimize_opt=no ;;
+    --optimize=speed) optitype=speed ;;
+    --optimize=size)  optitype=size ;;
     --use-gnudebug)  cc_g_opt=yes ;;
     --no-gnudebug)   cc_g_opt=no ;;
     --use-warnflag)  cc_wall_opt=yes ;;
@@ -539,10 +544,15 @@ if [ -z "$cc_pipe_opt" ]; then
   fi
 fi
 
+oflag="-O2"
+if [ "$optitype" = size ]; then
+  oflag="-Os"
+fi
+
 if [ -z "$cc_optimize_opt" ]; then
-  if $CC -O2 -o $TESTO $TESTC 1> /dev/null 2> /dev/null; then
-    cc_optimize_flag="-O2"
-    echo $ac_n "-O2 "$ac_c
+  if $CC $oflag -o $TESTO $TESTC 1> /dev/null 2> /dev/null; then
+    cc_optimize_flag="$oflag"
+    echo $ac_n "$oflag "$ac_c
   fi
   if [ -z "$cc_optimize_flag" ]; then
     if $CC -O -o $TESTO $TESTC 1> /dev/null 2> /dev/null; then
@@ -1308,12 +1318,12 @@ s|@PTSIZE_DEFINE64@|$PTSIZE_DEFINE64|;
 s|@UNALIGNED_MEM@|$UNALIGNED_MEM|;
 " < src/config.h.in >> src/config.h
 
-if [ "$install" == "yes" ]; then
+if [ "$install" = yes ]; then
   make -C src energymech
   exit
 fi
 
-if [ "$compile" == "yes" ]; then
+if [ "$compile" = yes ]; then
   make -C src energymech
   exit
 fi

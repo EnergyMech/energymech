@@ -18,6 +18,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
+#ifndef GENCMD_C
 #define SOCKET_C
 #include "config.h"
 
@@ -263,13 +264,15 @@ int SockAccept(int sock)
 	return(s);
 }
 
+#endif /* GENCMD_C */
+
 /*
  *  Format text and send to a socket or file descriptor
  */
 int to_file(int sock, const char *format, ...)
 {
 	va_list msg;
-#ifdef DEBUG
+#if defined(DEBUG) && !defined(GENCMD_C)
 	char	*line,*rest;
 	int	i;
 #endif /* DEBUG */
@@ -281,7 +284,7 @@ int to_file(int sock, const char *format, ...)
 	vsprintf(gsockdata,format,msg);
 	va_end(msg);
 
-#ifdef DEBUG
+#if defined(DEBUG) && !defined(GENCMD_C)
 	i = write(sock,gsockdata,strlen(gsockdata));
 	rest = gsockdata;
 	while((line = get_token(&rest,"\n")))	/* rest cannot be NULL */
@@ -293,6 +296,8 @@ int to_file(int sock, const char *format, ...)
 	return(write(sock,gsockdata,strlen(gsockdata)));
 #endif /* DEBUG */
 }
+
+#ifndef GENCMD_C
 
 /*
  *  Format a message and send it to the current bots server
@@ -672,3 +677,5 @@ int killsock(int sock)
 	}
 	return(TRUE);
 }
+
+#endif /* GENCMD_C */

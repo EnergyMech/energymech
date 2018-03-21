@@ -39,9 +39,7 @@ LS const char SPY_DEFS[][12] =
 	"SPY_MESSAGE",
 	"SPY_RAWIRC",
 	"SPY_BOTNET",
-#ifdef URLCAPTURE
 	"SPY_URL",
-#endif /* URLCAPTURE */
 };
 
 #endif /* DEBUG */

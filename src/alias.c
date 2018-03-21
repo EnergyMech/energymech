@@ -177,9 +177,15 @@ void afmt(char *copy_to, const char *src, const char *input)
  *  associated commands
  *
  */
-/*---Help:ALIAS
+/*
+help:ALIAS
+usage:ALIAS <newcommand> <command [arguments ...]>
+file:../help/ALIAS
+begin:
 
-Create a command alias. Arguments in the form $#, $#- and $#-# will
+Create or replace a command alias.
+
+Arguments in the form $#, $#- and $#-# will
 be replaced with the corresponding argument from input.
 
 $0     The zeroeth argument (the aliased command).
@@ -208,7 +214,8 @@ to replace built in commands. Aliases can recurse a
 maximum of 20 times (to prevent infinite loops).
 
 See also: unalias
----Helpend---*/
+:end
+*/
 void do_alias(COMMAND_ARGS)
 {
 	/*
@@ -268,6 +275,17 @@ void do_alias(COMMAND_ARGS)
 #endif
 }
 
+/*
+help:UNALIAS
+usage:UNALIAS <alias>
+file:../help/UNALIAS
+begin:
+
+Remove an existing alias.
+
+See also: alias
+:end
+*/
 void do_unalias(COMMAND_ARGS)
 {
 	/*
@@ -292,4 +310,3 @@ void do_unalias(COMMAND_ARGS)
 
 #endif /* not TEST */
 #endif /* ALIAS */
-

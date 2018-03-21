@@ -65,16 +65,21 @@ all:		$(INSTALLNAME)
 #   instead of doing extra parsing and handling while the bot is running.
 #
 
-mcmd.h:		gencmd.c config.h structs.h
+gencmd:		gencmd.c socket.c config.h structs.h
 		$(CC) $(LFLAGS) -o gencmd gencmd.c
-		./gencmd > mcmd.h
+
+mcmd.h:		gencmd
+		./gencmd mcmd.h
+
+usercombo.h:	gencmd
+		./gencmd usercombo.h
 
 install:	$(INSTALLNAME)
 		$(CHMOD) $(INSTALLMODE) $(INSTALLNAME)
 		$(MV) $(INSTALLNAME) $(INSTALLDIR)
 
 clean:		FORCE
-		$(RM) $(INSTALLNAME) gencmd mcmd.h core $(TESTFILES) $(OFILES)
+		$(RM) $(INSTALLNAME) gencmd mcmd.h usercombo.h core $(TESTFILES) $(OFILES)
 
 $(INSTALLNAME):	$(OFILES)
 		$(CROSS_COMPILE)$(CC) $(LFLAGS) -o $(INSTALLNAME) $(OFILES) $(LPROF) $(LIBS) $(LDSCRIPT)
@@ -245,7 +250,7 @@ uptime.o:	uptime.c $(INCS)
 urlcap.o:	urlcap.c $(INCS)
 		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
-user.o:		user.c $(INCS)
+user.o:		user.c $(INCS) usercombo.h
 		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
 vars.o:		vars.c $(INCS) settings.h

@@ -668,6 +668,17 @@ char *get_nuh(ChanUser *user)
  *
  */
 
+/*
+help:JOIN
+usage:JOIN <#channel> [key]
+file:../help/JOIN
+begin:
+
+Makes the bot join a channel
+
+See also: cycle, part
+:end
+*/
 void do_join(COMMAND_ARGS)
 {
 	/*
@@ -688,6 +699,13 @@ void do_join(COMMAND_ARGS)
 	join_channel(channel,key);
 }
 
+/*
+help:PART
+usage:PART <#channel>
+file:../help/PART
+begin:
+:end
+*/
 void do_part(COMMAND_ARGS)
 {
 	/*
@@ -708,6 +726,13 @@ void do_part(COMMAND_ARGS)
 	}
 }
 
+/*
+help:CYCLE
+usage:CYCLE [#channel]
+file:../help/CYCLE
+begin:
+:end
+*/
 void do_cycle(COMMAND_ARGS)
 {
 	/*
@@ -717,6 +742,13 @@ void do_cycle(COMMAND_ARGS)
 	cycle_channel(CurrentChan);
 }
 
+/*
+help:FORGET
+usage:FORGET <#channel>
+file:../help/FORGET
+begin:
+:end
+*/
 void do_forget(COMMAND_ARGS)
 {
 	/*
@@ -740,6 +772,13 @@ void do_forget(COMMAND_ARGS)
 	remove_chan(chan);
 }
 
+/*
+help:CHANNELS
+usage:CHANNELS (no arguments)
+file:../help/CHANNELS
+begin:
+:end
+*/
 void do_channels(COMMAND_ARGS)
 {
 	ChanUser *cu;
@@ -784,6 +823,13 @@ void do_channels(COMMAND_ARGS)
 	table_send(from,1);
 }
 
+/*
+help:WALL
+usage:WALL [#channel] <message>
+file:../help/WALL
+begin:
+:end
+*/
 void do_wall(COMMAND_ARGS)
 {
 	ChanUser *cu;
@@ -815,6 +861,13 @@ void do_wall(COMMAND_ARGS)
 	to_user(from,TEXT_SENTWALLOP,to);
 }
 
+/*
+help:MODE
+usage:MODE [#channel|botnick] <mode ...>
+file:../help/MODE
+begin:
+:end
+*/
 void do_mode(COMMAND_ARGS)
 {
 	/*
@@ -844,6 +897,13 @@ void do_mode(COMMAND_ARGS)
 	}
 }
 
+/*
+help:NAMES
+usage:NAMES [#channel]
+file:../help/NAMES
+begin:
+:end
+*/
 void do_names(COMMAND_ARGS)
 {
 	ChanUser *cu;
@@ -886,6 +946,13 @@ void do_names(COMMAND_ARGS)
 	}
 }
 
+/*
+help:CCHAN
+usage:CCHAN [#channel]
+file:../help/CCHAN
+begin:
+:end
+*/
 void do_cchan(COMMAND_ARGS)
 {
 	Chan	*chan;
@@ -907,6 +974,13 @@ void do_cchan(COMMAND_ARGS)
 		(current->activechan) ? current->activechan->name : TEXT_NONE);
 }
 
+/*
+help:INVITE
+usage:INVITE [#channel] [nick]
+file:../help/INVITE
+begin:
+:end
+*/
 void do_invite(COMMAND_ARGS)
 {
 	/*
@@ -922,6 +996,20 @@ void do_invite(COMMAND_ARGS)
 	to_user(from,"User(s) invited to %s",to);
 }
 
+/*
+help:ME
+usage:ME [#channel] <message>
+file:../help/ME
+begin:
+:end
+*/
+/*
+help:SAY
+usage:SAY [#channel] <message>
+file:../help/SAY
+begin:
+:end
+*/
 void do_sayme(COMMAND_ARGS)
 {
 	/*
@@ -951,7 +1039,14 @@ void do_sayme(COMMAND_ARGS)
 	to_user_q(from,(CurrentCmd->name == C_SAY) ? FMT_PLAIN : "\001ACTION %s\001",rest);
 }
 
-void do_showusers(COMMAND_ARGS)
+/*
+help:WHO
+usage:WHO
+file:../help/WHO
+begin:
+:end
+*/
+void do_who(COMMAND_ARGS)
 {
 	/*
 	 *  on_msg checks: CAXS
@@ -979,7 +1074,7 @@ void do_showusers(COMMAND_ARGS)
 		if (nuh)
 		{
 			if (!Strcasecmp(nuh,"-ops"))
-				flags = 1;	
+				flags = 1;
 			else
 			if (!Strcasecmp(nuh,"-nonops"))
 				flags = 2;
@@ -1035,6 +1130,13 @@ void do_showusers(COMMAND_ARGS)
 	table_send(from,0);
 }
 
+/*
+help:
+usage:
+file:../help/
+begin:
+:end
+*/
 void do_topic(COMMAND_ARGS)
 {
 	/*
@@ -1051,6 +1153,13 @@ void do_topic(COMMAND_ARGS)
 	to_user(from,ERR_NOTOPPED,to);
 }
 
+/*
+help:
+usage:
+file:../help/
+begin:
+:end
+*/
 void do_showidle(COMMAND_ARGS)
 {
 	/*
@@ -1081,6 +1190,13 @@ void do_showidle(COMMAND_ARGS)
 	table_send(from,1);
 }
 
+/*
+help:
+usage:
+file:../help/
+begin:
+:end
+*/
 void do_idle(COMMAND_ARGS)
 {
 	ChanUser *cu,*cu2;
