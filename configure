@@ -967,7 +967,7 @@ if [ "$ft_sha" = internal ]; then
 fi
 
 out=echo
-if [ "$silentopt" == yes ]; then
+if [ "$silentopt" = yes ]; then
   out=/bin/true
 fi
 
