@@ -1,7 +1,7 @@
 /*
 
     EnergyMech, IRC bot software
-    Copyright (c) 2000-2004 proton
+    Copyright (c) 2000-2018 proton
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -199,7 +199,7 @@ void do_bigsay(COMMAND_ARGS)
 	BigC	*bigc;
 	Strp	*sp;
 	char	output[MSGLEN];
-	char	*pt,*tail,*temp;
+	char	*pt,*tail,*temp,*temp2;
 	int	i,x,sz;
 
 #ifdef DEBUG
@@ -214,6 +214,7 @@ void do_bigsay(COMMAND_ARGS)
 		return;
 	}
 
+#define OEND	(output + MSGLEN - 1)
 	for(i=0;i<charheight;i++)
 	{
 		sz = 0;
@@ -225,7 +226,7 @@ void do_bigsay(COMMAND_ARGS)
 			if (*pt == ' ')
 			{
 				x = spacewidth;
-				while(x--)
+				while(x-- && tail < OEND)
 					*(tail++) = ' ';
 				*tail = 0;
 				continue;
@@ -237,17 +238,20 @@ void do_bigsay(COMMAND_ARGS)
 					sp = bigc->data;
 					for(x=0;x<i;x++)
 						if (sp) sp = sp->next;
-					temp = Strcat(tail,sp->p);
-					while(temp < (tail + bigc->width))
-						*(temp++) = ' ';
+					temp = sp->p;
+					temp2 = tail;
+					while(*temp && tail < OEND)
+						*(tail++) = *(temp++);
+					//temp = Strcat(tail,sp->p);
+					while(tail < (temp2 + bigc->width) && tail < OEND)
+						*(tail++) = ' ';
 					if (pt[1])
 					{
 						x = kerning;
-						while(x--)
-							*(temp++) = ' ';
+						while(x-- && tail < OEND)
+							*(tail++) = ' ';
 					}
-					*temp = 0;
-					tail = temp;
+					*tail = 0;
 					break;
 				}
 			}
