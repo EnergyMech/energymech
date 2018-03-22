@@ -1,5 +1,6 @@
 3.0.99p4 -- WORK IN PROGRESS (~March, 2018)
 
+ * Fixed: Crash bug in BIGSAY
  * Added: Signal handlers for SIGILL and SIGABRT ifdef DEBUG
  * Added: New command: CRASH, for debugging/development...
  * Changed: configure now defaults to optimizing for code size.
