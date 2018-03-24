@@ -298,22 +298,34 @@ int read_userlist(char *filename)
 	int	r;
 #endif
 
+#ifdef DEBUG
+	if (!filename)
+	{
+		debug("(read_userlist) filename is NULL\n");
+		return(FALSE);
+	}
+	if (*filename == '<') // read only userfile
+		filename++;
+	if ((r = is_safepath(filename,FILE_MUST_EXIST)) != FILE_IS_SAFE)
+	{
+		debug("(read_userlist) %s: unsafe filename (%i)...\n",filename,r);
+		return(FALSE);
+	}
+	if ((in = open(filename,O_RDONLY)) < 0)
+	{
+		debug("(read_userlist) failed to open \"%s\": %s\n",filename,strerror(errno));
+		return(FALSE);
+	}
+#else
 	if (!filename)
 		return(FALSE);
 	if (*filename == '<') // read only userfile
 		filename++;
-#ifdef DEBUG
-	if ((r = is_safepath(filename,FILE_MUST_EXIST)) != FILE_IS_SAFE)
-	{
-		debug("(write_userlist) %s: unsafe filename (%i)...\n",filename,r);
-		return(FALSE);
-	}
-#else
 	if (is_safepath(filename,FILE_MUST_EXIST) != FILE_IS_SAFE)
 		return(FALSE);
-#endif
 	if ((in = open(filename,O_RDONLY)) < 0)
 		return(FALSE);
+#endif
 
 	olduserlist = current->userlist;
 	cfgUser = current->userlist = NULL;
@@ -369,23 +381,20 @@ int write_userlist(char *filename)
 	if (!current->ul_save)
 		return(TRUE);
 
-	if (*filename == '<') // we dont write to read only userfiles
 #ifdef DEBUG
+	if (*filename == '<') // we dont write to read only userfiles
 	{
 		debug("(write_userlist) %s: writing to read only userfile is prohibited...\n",filename);
 		return(FALSE);
 	}
-#else
-		return(FALSE);
-#endif
-
-#ifdef DEBUG
 	if ((r = is_safepath(filename,FILE_MAY_EXIST)) != FILE_IS_SAFE)
 	{
 		debug("(write_userlist) %s: unsafe filename (%i)...\n",filename,r);
 		return(FALSE);
 	}
 #else
+	if (*filename == '<') // we dont write to read only userfiles
+		return(FALSE);
 	if (is_safepath(filename,FILE_MAY_EXIST) != FILE_IS_SAFE)
 		return(FALSE);
 #endif
