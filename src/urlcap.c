@@ -29,7 +29,6 @@
 #include "h.h"
 #include "text.h"
 
-__page(CORE_SEG)
 void urlcapture(const char *rest)
 {
 	Strp	*sp,*nx;
@@ -49,23 +48,18 @@ void urlcapture(const char *rest)
 
 	if ((n = urlhistmax))
 	{
-		set_mallocdoer(urlcapture);
-		sp = (Strp*)Calloc(sizeof(Strp) + strlen(url));
-		Strcpy(sp->p,url);
-		sp->next = urlhistory;
-		urlhistory = sp;
+		debug("prepend\n");
+		prepend_strp(&urlhistory,url);
 
+		debug("for...\n");
 		for(sp=urlhistory;sp;sp=sp->next)
 		{
 			if (n <= 0)
 			{
-				do
-				{
-					nx = sp->next;
-					Free((char**)&sp);
-					sp = nx;
-				}
-				while(sp);
+				debug("purge...\n");
+				purge_strplist(sp->next);
+				debug("return\n");
+				return;
 			}
 			n--;
 		}
@@ -84,7 +78,6 @@ Display a list of URLs seen by the bot in order most recent to oldest.
 
    [max]   Maximum number of URLs to display.
 */
-__page(CMD1_SEG)
 void do_urlhist(COMMAND_ARGS)
 {
 	Strp	*sp;

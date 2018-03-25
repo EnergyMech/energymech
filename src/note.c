@@ -61,13 +61,7 @@ int catch_note(char *from, char *to, char *rest)
 			}
 			if (!(u = find_handle(n->user)))
 				return(TRUE);
-			np = &u->note;
-			while(*np)
-				np = &(*np)->next;
-			set_mallocdoer(catch_note);
-			*np = sp = (Strp*)Calloc(sizeof(Strp) + strlen(rest));
-			/* Calloc sets to zero sp->next = NULL; */
-			Strcpy(sp->p,rest);
+			append_strp(&u->note,rest);
 			return(TRUE);
 		}
 		if ((now - n->start) > 120)
@@ -106,7 +100,7 @@ void do_note(COMMAND_ARGS)
 		u->name);
 
 	set_mallocdoer(do_note);
-	n = Calloc(sizeof(Note) + Strlen(from,to,u->name,NULL));
+	n = Calloc(sizeof(Note) + StrlenX(from,to,u->name,NULL));
 	n->start = now;
 	n->next = notelist;
 	notelist = n;
@@ -122,13 +116,7 @@ void do_note(COMMAND_ARGS)
 	 *  add a note header
 	 */
 	sprintf(header,"\001%s %s",from,time2str(now));
-	np = &u->note;
-	while(*np)
-		np = &(*np)->next;
-	set_mallocdoer(do_note);
-	*np = sp = (Strp*)Calloc(sizeof(Strp) + strlen(header));
-	/* Calloc sets to zero sp->next = NULL; */
-	Strcpy(sp->p,header);
+	append_strp(&u->note,header);
 }
 
 void do_read(COMMAND_ARGS)

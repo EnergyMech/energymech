@@ -21,7 +21,7 @@
 umask 077
 
 # perl still unsupported
-has_perl=no
+#has_perl=no
 compile=no
 install=no
 silentopt=no
@@ -1127,15 +1127,15 @@ fi
 #  perl support not yet functional (2009-05-11)
 #
 def_perl='#undef PERL'
-# unset ans
-# echo $ac_n "Perl scripting support? .................... [y/N] "$ac_c
-# if [ "$has_perl" = no ]; then
-#   echo 'no (unsupported)'
-# else
-#   test "$ft_perl" && echo "$ft_perl" && ans=$ft_perl
-#   test -z "$ft_perl" && read ans
-#   test "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_perl='#define PERL'
-# fi
+unset ans
+echo $ac_n "[ ALPHA] Perl scripting support? .................... [y/N] "$ac_c
+if [ "$has_perl" = no ]; then
+  echo 'no (unsupported)'
+else
+  test "$ft_perl" && echo "$ft_perl" && ans=$ft_perl
+  test -z "$ft_perl" && read ans
+  test "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_perl='#define PERL'
+fi
 
 def_python='#undef PYTHON'
 unset ans

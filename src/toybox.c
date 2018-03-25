@@ -69,13 +69,7 @@ int read_bigcharset_callback(char *rest)
 		sz = strlen(rest);
 		if (sz > newchar->width)
 			newchar->width = sz;
-		pp = &newchar->data;
-		while(*pp)
-			pp = &(*pp)->next;
-		set_mallocdoer(read_bigcharset_callback);
-		*pp = sp = (Strp*)Calloc(sizeof(Strp) + sz);
-		/* Calloc sets to zero sp->next = NULL; */
-		Strcpy(sp->p,rest);
+		append_strp(&newchar->data,rest);
 		return(FALSE);
 	}
 

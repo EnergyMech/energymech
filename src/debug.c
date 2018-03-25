@@ -141,6 +141,7 @@ LS struct
 {	make_ban,			"make_ban"			},
 {	make_chanuser,			"make_chanuser"			},
 {	make_ireq,			"make_ireq"			},
+{	make_strp,			"make_strp"			},
 {	mirror_user,			"mirror_user"			},
 {	on_join,			"on_join"			},
 {	on_kick,			"on_kick"			},

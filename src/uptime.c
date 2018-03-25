@@ -190,7 +190,7 @@ void send_uptime(int type)
 	}
 #endif /* ! RAWDNS */
 
-	sz = sizeof(PackStub) + 3 + Strlen(nick,server,VERSION,NULL);
+	sz = sizeof(PackStub) + 3 + StrlenX(nick,server,VERSION,NULL);
 	if (sz > sizeof(PackUp))
 		return;
 

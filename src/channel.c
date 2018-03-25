@@ -58,7 +58,6 @@ void check_idlekick(void)
 	}
 }
 
-__attr(CORE_SEG, __regparm(2))
 Chan *find_channel(const char *name, int anychannel)
 {
 	Chan	*chan;
@@ -78,13 +77,11 @@ Chan *find_channel(const char *name, int anychannel)
 	return(NULL);
 }
 
-__attr(CORE_SEG, __regparm (1))
 Chan *find_channel_ac(const char *name)
 {
 	return(find_channel(name,CHAN_ACTIVE));
 }
 
-__attr(CORE_SEG, __regparm (1))
 Chan *find_channel_ny(const char *name)
 {
 	return(find_channel(name,CHAN_ANY));
@@ -546,7 +543,6 @@ void channel_massunban(Chan *chan, char *pattern, time_t seconds)
  *  for each nickcmp call, 10-15% cpu is saved by skipping one char
  *  into both nicks (first-char comparison has already been made).
  */
-__attr(CORE_SEG, __regparm (2) )
 ChanUser *find_chanuser(Chan *chan, const char *nick)
 {
 	ChanUser *cu;
@@ -578,7 +574,6 @@ ChanUser *find_chanuser(Chan *chan, const char *nick)
 	return(NULL);
 }
 
-__attr(CORE_SEG, __regparm (2) )
 void remove_chanuser(Chan *chan, char *nick)
 {
 	ChanUser *cu,**pp;
@@ -625,7 +620,6 @@ void remove_chanuser(Chan *chan, char *nick)
 /*
  *  Requires CurrentChan to be set properly
  */
-__attr(CORE_SEG, __regparm(2))
 void make_chanuser(char *nick, char *userhost)
 {
 	ChanUser *new;

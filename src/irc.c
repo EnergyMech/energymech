@@ -37,7 +37,7 @@ void make_ireq(int t, char *from, char *nick)
 	char	*pt;
 
 	set_mallocdoer(make_ireq);
-	ir = (IReq*)Calloc(sizeof(IReq) + Strlen(from,nick,NULL)); // can not use Strlen2() if 2nd arg might be NULL, Strlen() handles NULLs.
+	ir = (IReq*)Calloc(sizeof(IReq) + StrlenX(from,nick,NULL)); // can not use Strlen2() if 2nd arg might be NULL, StrlenX() handles NULLs.
 
 	ir->t = t;
 	ir->when = now;

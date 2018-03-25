@@ -118,11 +118,11 @@
 #define TEXT_NAMETOOLONG	"Hostname exceeds maximum length"
 
 #define TEXT_SHUTDOWNBY		"Shutdown initiated by %s[100], flatlining ..."
+#define TEXT_SHUTDOWNCOMPLETE	"Shutdown Complete"
 
 /*
  *  main.c
  */
-
 #define TEXT_SIGINT		"Lurking interrupted by luser ... er, owner. (SIGINT)"
 #define TEXT_SIGSEGV		"Mary had a little signal segmentation fault (SIGSEGV)"
 #define TEXT_SIGBUS		"Another one drives the bus! (SIGBUS)"

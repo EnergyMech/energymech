@@ -442,7 +442,7 @@ int notify_callback(char *rest)
 	 *  src = description or NULL
 	 */
 	set_mallocdoer(notify_callback);
-	nf = (Notify*)Calloc(sizeof(Notify) + Strlen(nick,rest,src,NULL));
+	nf = (Notify*)Calloc(sizeof(Notify) + StrlenX(nick,rest,src,NULL));
 	dst = Strcat(nf->nick,nick);
 	if (*rest)
 	{

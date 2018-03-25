@@ -241,7 +241,6 @@ void usage_command(char *to, const char *arg)
 	to_user(to,"Usage: (missing)");
 }
 
-__attr(CMD1_SEG,__regparm(1))
 void usage(char *to)
 {
 	CurrentChan = NULL;
