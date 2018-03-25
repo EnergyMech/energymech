@@ -344,4 +344,29 @@ void do_8ball(COMMAND_ARGS)
 	to_user_q(from,FMT_PLAIN,message);
 }
 
+char *ascii_from;
+
+int read_ascii(char *rest)
+{
+	to_user_q(ascii_from,FMT_PLAIN,rest);
+}
+
+void do_ascii(COMMAND_ARGS)
+{
+	char	fname[MSGLEN];
+	int	fd;
+
+	Strcat(Strcpy(fname,"ascii/"),rest);
+#ifdef DEBUG
+	debug("(do_ascii) file = \"%s\"\n",fname);
+#endif
+	if (is_safepath(fname,FILE_MUST_EXIST) != FILE_IS_SAFE)
+		return;
+	if ((fd = open(fname,O_RDONLY)) < 0)
+		return;
+
+	ascii_from = from;
+	readline(fd,&read_ascii);		/* readline closes fd */
+}
+
 #endif /* TOYBOX */
