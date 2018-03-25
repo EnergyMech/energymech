@@ -80,7 +80,7 @@ void greet(void)
 	{
 		str = CurrentUser->greet;
 single_line:
-		*pp = sp = (Strp*)Calloc(sizeof(Strp) + 13 + Strlen(CurrentChan->name,CurrentNick,str,NULL));
+		*pp = sp = (Strp*)Calloc(sizeof(Strp) + 13 + StrlenX(CurrentChan->name,CurrentNick,str,NULL));
 		sprintf(sp->p,"PRIVMSG %s :[%s] %s",CurrentChan->name,CurrentNick,str);
 		/* Calloc sets to zero sp->next = NULL; */
 	}

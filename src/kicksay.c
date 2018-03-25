@@ -210,7 +210,7 @@ void do_kicksay(COMMAND_ARGS)
 		 *  add it to the list
 		 */
 		set_mallocdoer(do_kicksay);
-		kick = (KickSay*)Calloc(sizeof(KickSay) + Strlen(channel,mask,rest,NULL));
+		kick = (KickSay*)Calloc(sizeof(KickSay) + StrlenX(channel,mask,rest,NULL));
 
 		kick->next = current->kicklist;
 		current->kicklist = kick;

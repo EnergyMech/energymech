@@ -153,7 +153,7 @@ void send_redirect(char *message)
 	while(*pp)
 		pp = &(*pp)->next;
 
-	*pp = new = (Strp*)Calloc(sizeof(Strp) + Strlen(message,fmt,redirect.to,NULL));
+	*pp = new = (Strp*)Calloc(sizeof(Strp) + StrlenX(message,fmt,redirect.to,NULL));
 	/* Calloc sets to zero new->next = NULL; */
 	sprintf(new->p,fmt,redirect.to,message);
 }

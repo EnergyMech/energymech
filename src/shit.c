@@ -136,7 +136,7 @@ Shit *add_shit(char *from, char *chan, char *mask, char *reason, int axs, int ex
 	Shit	*shit;
 
 	set_mallocdoer(add_shit);
-	shit = (Shit*)Calloc(sizeof(Shit) + Strlen(from,chan,mask,reason,NULL));
+	shit = (Shit*)Calloc(sizeof(Shit) + StrlenX(from,chan,mask,reason,NULL));
 
 	shit->action = axs;
 	shit->time   = now;

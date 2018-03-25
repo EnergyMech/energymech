@@ -43,7 +43,6 @@ LS const char daylist[7][4] = {	"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" 
 
 #ifdef DEBUG
 
-__attr(CORE_SEG,__regparm(1))
 void *Calloc(int size)
 {
 	aME	*mmep;
@@ -98,7 +97,6 @@ void *Calloc(int size)
 	return((void*)mmep->area+4);
 }
 
-__attr(CORE_SEG,__regparm(1))
 void Free(char **mem)
 {
 	aME	*mmep;
@@ -145,7 +143,6 @@ void Free(char **mem)
 
 #else /* DEBUG */
 
-__attr(CORE_SEG,__regparm(1))
 void *Calloc(int size)
 {
 	void	*tmp;
@@ -158,7 +155,6 @@ void *Calloc(int size)
 /*
  *  Free() can be called with NULL's
  */
-__attr(CORE_SEG,__regparm(1))
 void Free(char **mem)
 {
 	if (*mem)
@@ -170,7 +166,70 @@ void Free(char **mem)
 
 #endif /* DEBUG */
 
-const int Strlen(const char *first, ...)
+Strp *make_strp(Strp **pp, const char *string)
+{
+	set_mallocdoer(make_strp);
+	*pp = (Strp*)Calloc(sizeof(Strp) + strlen(string));
+	Strcpy((*pp)->p,string);
+	return(*pp);
+}
+
+Strp *append_strp(Strp **pp, const char *string)
+{
+	while((*pp)->next != NULL)
+		pp = &((*pp)->next);
+	make_strp(pp,string);
+	return(*pp);
+}
+
+Strp *prepend_strp(Strp **pp, const char *string)
+{
+	Strp	*sp;
+
+	make_strp(&sp,string);
+	sp->next = *pp;
+	*pp = sp;
+	return(sp);
+}
+
+void purge_strplist(Strp *sp)
+{
+	Strp	*nxt;
+
+	debug("do...\n");
+	while(sp)
+	{
+		debug("nxt =...\n");
+		nxt = sp->next;
+		debug("free...\n");
+		Free((char**)&sp);
+		debug("sp = nx\n");
+		sp = nxt;
+		debug("while..\n");
+	}
+}
+
+/*
+ *  duplicate a list of Strp
+ */
+void dupe_strp(Strp *sp, Strp **pp)
+{
+	while(sp)
+	{
+		make_strp(pp,sp->p);
+		pp = &((*pp)->next);
+		sp = sp->next;
+/*
+		set_mallocdoer(dupe_strp);
+		*pp = (Strp*)Calloc(sizeof(Strp) + strlen(sp->p));
+		Strcpy((*pp)->p,sp->p);
+		pp = &((*pp)->next);
+		sp = sp->next;
+*/
+	}
+}
+
+const int StrlenX(const char *first, ...)
 {
 	const char *s,*o;
 	int n;
@@ -193,7 +252,6 @@ const int Strlen(const char *first, ...)
 	return(n);
 }
 
-__attr(CORE_SEG,__regparm(2))
 const int Strlen2(const char *one, const char *two)
 {
 	const char *s1,*s2;
@@ -206,7 +264,6 @@ const int Strlen2(const char *one, const char *two)
 	return((s1 - one) + (s2 - two));
 }
 
-__attr(CORE_SEG,__regparm(2))
 char *nickcpy(char *dest, const char *nuh)
 {
 	char	*ret;
@@ -405,7 +462,6 @@ char *idle2str(time_t when, int small)
 	return(idlestr);
 }
 
-__attr(CMD1_SEG,__regparm(2))
 char *get_channel(char *to, char **rest)
 {
 	char	*channel;
@@ -658,7 +714,6 @@ int capslevel(char *text)
 	return(upper >= sz);
 }
 
-__attr(CORE_SEG,__regparm(1))
 int a2i(char *anum)
 {
 	int	res = 0,neg;
@@ -698,7 +753,6 @@ int get_number(const char *rest)
 	return(n);
 }
 
-__attr(CORE_SEG,__regparm(1))
 void fix_config_line(char *text)
 {
 	char	*s,*space;
@@ -720,7 +774,6 @@ void fix_config_line(char *text)
 /*
  *  returns NULL or non-zero length string
  */
-__attr(CORE_SEG,__regparm(1))
 char *chop(char **src)
 {
 	char	*tok,*cut = *src;
@@ -749,7 +802,6 @@ char *chop(char **src)
 /*
  *  remove all '\0' in an array bounded by two pointers
  */
-__attr(CORE_SEG,__regparm(2))
 void unchop(char *orig, char *rest)
 {
 	for(;orig<rest;orig++)
@@ -759,7 +811,6 @@ void unchop(char *orig, char *rest)
 	}
 }
 
-__att2(CORE_SEG,const,__regparm(2))
 int Strcasecmp(const char *p1, const char *p2)
 {
 	int	ret;
@@ -773,7 +824,6 @@ int Strcasecmp(const char *p1, const char *p2)
 	return(0);
 }
 
-__att2(CORE_SEG,const,__regparm(2))
 int Strcmp(const char *p1, const char *p2)
 {
 	int	ret;
@@ -787,7 +837,6 @@ int Strcmp(const char *p1, const char *p2)
 	return(0);
 }
 
-__att2(CORE_SEG,const,__regparm(2))
 int nickcmp(const char *p1, const char *p2)
 {
 	int	ret;
@@ -802,7 +851,6 @@ int nickcmp(const char *p1, const char *p2)
 	return(0);
 }
 
-__attr(CORE_SEG,__regparm(3))
 void Strncpy(char *dst, const char *src, int sz)
 {
 	char	*stop = dst + sz - 1;
@@ -816,7 +864,6 @@ void Strncpy(char *dst, const char *src, int sz)
 	*dst = 0;
 }
 
-__attr(CORE_SEG,__regparm(2))
 char *Strcpy(char *dst, const char *src)
 {
 	while(*src)
@@ -825,7 +872,6 @@ char *Strcpy(char *dst, const char *src)
 	return(dst);
 }
 
-__att2(CORE_SEG,const,__regparm(2))
 char *Strchr(const char *t, int c)
 {
 	char	ch = c;
@@ -835,7 +881,6 @@ char *Strchr(const char *t, int c)
 	return((*t == ch) ? (char*)t : NULL);
 }
 
-__attr(CORE_SEG,__regparm(1))
 char *Strdup(const char *src)
 {
 	char	*dest;
@@ -845,7 +890,6 @@ char *Strdup(const char *src)
 	return(dest);
 }
 
-__attr(CMD1_SEG,__regparm(2))
 char *tolowercat(char *dest, const char *src)
 {
 	dest = STREND(dest);
@@ -858,7 +902,6 @@ char *tolowercat(char *dest, const char *src)
  *  This code might look odd but its optimized for size,
  *  so dont change it!
  */
-__attr(CORE_SEG,__regparm(2))
 char *Strcat(char *dst, const char *src)
 {
 	while(*(dst++))
@@ -874,7 +917,6 @@ char *Strcat(char *dst, const char *src)
  *  returns 0 for match
  *  returns 1 for non-match
  */
-__att2(CORE_SEG,const,__regparm(2))
 int matches(const char *mask, const char *text)
 {
 	const uchar *m = (uchar*)mask;
@@ -949,7 +991,6 @@ loop:
 	goto loop;
 }
 
-__att2(CORE_SEG,const,__regparm(2))
 int num_matches(const char *mask, const char *text)
 {
 	const char *p = mask;
@@ -989,7 +1030,6 @@ void table_buffer(const char *format, ...)
 	Strcpy((*sp)->p,gsockdata);
 }
 
-__attr(CMD1_SEG, __regparm (2) )
 void table_send(const char *from, const int space)
 {
 	char	message[MAXLEN];
@@ -1103,7 +1143,6 @@ int is_safepath(const char *path)
 #define FILE_MAY_EXIST          2
 #define FILE_MUST_NOTEXIST      3
 
-__attr(CORE_SEG,__regparm(2))
 int is_safepath(const char *path, int filemustexist)
 {
 	struct stat st;

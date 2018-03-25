@@ -558,9 +558,7 @@ PyObject *python_to_server(PyObject *self, PyObject *args, PyObject *keywds)
         else
         if (sz)
         {
-            *pp = sp = (Strp*) Calloc(sizeof(Strp) + sz);
-            /* Calloc sets to zero sp->next = NULL; */
-            Strcpy(sp->p, line);
+		make_strp(pp,line);
         }
     }
     else

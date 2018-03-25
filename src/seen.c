@@ -186,10 +186,10 @@ step_two:
 	/*
 	 *  dont fuck with this code unless you really know what you're doing
 	 *  pa might be NULL, but then pb is NULL also; pb might be NULL
-	 *  any NULL terminates the Strlen() check
+	 *  any NULL terminates the StrlenX() check
 	 */
 	set_mallocdoer(make_seen);
-	seen = (Seen*)Calloc(sizeof(Seen) + Strlen(nick,userhost,pa,pb,NULL));
+	seen = (Seen*)Calloc(sizeof(Seen) + StrlenX(nick,userhost,pa,pb,NULL));
 
 	seen->next = *pp;
 	*pp = seen;

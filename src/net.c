@@ -157,7 +157,7 @@ BotInfo *make_botinfo(int guid, int hops, char *nuh, char *server, char *version
 	BotInfo	*new;
 
 	set_mallocdoer(make_botinfo);
-	new = (BotInfo*)Calloc(sizeof(BotInfo) + Strlen(nuh,server,version,NULL));
+	new = (BotInfo*)Calloc(sizeof(BotInfo) + StrlenX(nuh,server,version,NULL));
 
 	new->guid = guid;
 	new->hops = hops;
@@ -210,7 +210,6 @@ void botnet_refreshbotinfo(void)
 #endif /* DEBUG */
 }
 
-__attr(CORE_SEG, __regparm (2))
 void botnet_binfo_relay(BotNet *source, BotInfo *binfo)
 {
 	botnet_relay(source,"BL%i %i %s %s %s\n",binfo->guid,(binfo->hops + 1),
@@ -219,7 +218,6 @@ void botnet_binfo_relay(BotNet *source, BotInfo *binfo)
 		(binfo->version) ? binfo->version : "-");
 }
 
-__attr(CORE_SEG, __regparm (2))
 void botnet_binfo_tofile(int sock, BotInfo *binfo)
 {
 	to_file(sock,"BL%i %i %s %s %s\n",binfo->guid,(binfo->hops + 1),
@@ -1567,7 +1565,7 @@ usage:
 			goto usage;
 
 		set_mallocdoer(do_link);
-		cfg = (NetCfg*)Calloc(sizeof(NetCfg) + Strlen(pass,host,NULL)); // host might be NULL, Strlen() handles NULLs, Strlen2() does not.
+		cfg = (NetCfg*)Calloc(sizeof(NetCfg) + StrlenX(pass,host,NULL)); // host might be NULL, StrlenX() handles NULLs, Strlen2() does not.
 
 		cfg->guid = iguid;
 		cfg->port = iport;

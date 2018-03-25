@@ -388,7 +388,7 @@ void to_user_q(const char *target, const char *format, ...)
 		pp = &(*pp)->next;
 
 	set_mallocdoer(to_user_q);
-	*pp = new = (Strp*)Calloc(sizeof(Strp) + Strlen(fmt,target,message,NULL));
+	*pp = new = (Strp*)Calloc(sizeof(Strp) + StrlenX(fmt,target,message,NULL));
 	/* Calloc sets to zero new->next = NULL; */
 	sprintf(new->p,fmt,target,message);
 }

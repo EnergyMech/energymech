@@ -368,7 +368,6 @@ char *random_question(char *triv_rand)
 void trivia_question(void)
 {
 	char	buffer[MSGLEN];
-	Strp	*ans,**pp;
 	char	*question,*answer,*rest;
 
 	if (triv_halt_flag)
@@ -392,15 +391,8 @@ stop_trivia:
 
 	question = get_token(&rest,MATCH_ALL);
 
-	pp = &triv_answers;
 	while((answer = get_token(&rest,MATCH_ALL)))
-	{
-		set_mallocdoer(trivia_question);
-		*pp = ans = (Strp*)Calloc(sizeof(Strp) + strlen(answer));
-		pp = &ans->next;
-		Strcpy(ans->p,answer);
-	}
-	*pp = NULL;
+		append_strp(&triv_answers,answer);
 
 	if (triv_answers == NULL)
 		goto bad_question;

@@ -138,7 +138,14 @@ void do_crash(COMMAND_ARGS)					__page(RARE_SEG);
 
 LS void *Calloc(int)						__attr(CORE_SEG, __regparm(1));
 LS void Free(char **)						__attr(CORE_SEG, __regparm(1));
-LS const int Strlen(const char *, ...)				__page(CORE_SEG);
+
+LS Strp *make_strp(Strp **, const char *)			__attr(CORE_SEG, __regparm(2));
+LS Strp *append_strp(Strp **, const char *)			__attr(CORE_SEG, __regparm(2));
+LS Strp *prepend_strp(Strp **, const char *)			__attr(CORE_SEG, __regparm(2));
+LS void purge_strplist(Strp *)					__attr(CORE_SEG, __regparm(1));
+LS void dupe_strp(Strp *, Strp **)				__attr(CORE_SEG, __regparm(2));
+
+LS const int StrlenX(const char *, ...)				__attr(CORE_SEG, __regparm(1));
 LS const int Strlen2(const char *, const char *)		__attr(CORE_SEG, __regparm(2));
 LS int matches(const char *, const char *)			__attr(CORE_SEG, __regparm(2));
 LS int num_matches(const char *, const char *)			__attr(CORE_SEG, __regparm(2));

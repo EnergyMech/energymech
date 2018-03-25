@@ -274,7 +274,6 @@ LS char *au_userhost;
 LS char *au_channel;
 LS int au_access;
 
-__attr(CORE_SEG, __regparm (1) )
 void aucheck(User *user)
 {
 	Strp	*ump;

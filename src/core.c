@@ -391,7 +391,7 @@ void signoff(char *from, char *reason)
 #endif /* NOTIFY */
 	if (from)
 	{
-		to_user(from,"ShutDown Complete");
+		to_user(from,TEXT_SHUTDOWNCOMPLETE);
 	}
 
 	while(current->chanlist)

@@ -479,7 +479,6 @@ int write_userlist(char *filename)
  *  remfromuser() remove a channel or mask from a user
  */
 
-__page(CORE_SEG)
 void rehash_chanusers(void)
 {
 	Chan *chan;
@@ -492,7 +491,6 @@ void rehash_chanusers(void)
 	}
 }
 
-__attr(CORE_SEG, __regparm (3))
 void addtouser(Strp **pp, const char *string, int rehash)
 {
 	Strp	*um;
@@ -512,7 +510,6 @@ void addtouser(Strp **pp, const char *string, int rehash)
 		rehash_chanusers();
 }
 
-__attr(CORE_SEG, __regparm (2))
 int remfromuser(Strp **pp, const char *string)
 {
 	Strp	*um;
@@ -530,21 +527,6 @@ int remfromuser(Strp **pp, const char *string)
 		pp = &um->next;
 	}
 	return(FALSE);
-}
-
-/*
- *  duplicate a list of Strp
- */
-void dupe_strp(Strp *sp, Strp **pp)
-{
-	while(sp)
-	{
-		set_mallocdoer(dupe_strp);
-		*pp = (Strp*)Calloc(sizeof(Strp) + strlen(sp->p));
-		Strcpy((*pp)->p,sp->p);
-		pp = &((*pp)->next);
-		sp = sp->next;
-	}
 }
 
 /*
@@ -762,7 +744,7 @@ User *add_user(char *handle, char *pass, int axs)
 #endif /* DEBUG */
 
 	set_mallocdoer(add_user);
-	user = (User*)Calloc(sizeof(User) + Strlen(handle,pass,NULL)); // Strlen() tolerates pass being NULL, Strlen2() does not.
+	user = (User*)Calloc(sizeof(User) + StrlenX(handle,pass,NULL)); // StrlenX() tolerates pass being NULL, Strlen2() does not.
 	user->x.x.access = axs;
 	user->next = current->userlist;
 	current->userlist = user;
@@ -927,7 +909,6 @@ int get_protaction(Chan *chan, char *userhost)
 	return(prot);
 }
 
-__attr(CORE_SEG, __regparm (2))
 int usercanmodify(const char *from, const User *user)
 {
 	User	*u;
