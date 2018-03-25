@@ -196,16 +196,11 @@ void purge_strplist(Strp *sp)
 {
 	Strp	*nxt;
 
-	debug("do...\n");
 	while(sp)
 	{
-		debug("nxt =...\n");
 		nxt = sp->next;
-		debug("free...\n");
 		Free((char**)&sp);
-		debug("sp = nx\n");
 		sp = nxt;
-		debug("while..\n");
 	}
 }
 

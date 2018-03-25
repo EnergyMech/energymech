@@ -46,23 +46,19 @@ void urlcapture(const char *rest)
 
 	send_spy(SPYSTR_URL,"%s",url);
 
-	if ((n = urlhistmax))
-	{
-		debug("prepend\n");
-		prepend_strp(&urlhistory,url);
+	if ((n = urlhistmax) < 0)
+		return;
 
-		debug("for...\n");
-		for(sp=urlhistory;sp;sp=sp->next)
+	prepend_strp(&urlhistory,url);
+
+	for(sp=urlhistory;sp;sp=sp->next)
+	{
+		if (n <= 0)
 		{
-			if (n <= 0)
-			{
-				debug("purge...\n");
-				purge_strplist(sp->next);
-				debug("return\n");
-				return;
-			}
-			n--;
+			purge_strplist(sp->next);
+			return;
 		}
+		n--;
 	}
 }
 
