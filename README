@@ -93,7 +93,7 @@ support when running ./configure from the compiling section above.
 
 Updated Files?
 ~~~~~~~~~~~~~~
-The main distro-site for the EnergyMech is:
+The main distribution site for the EnergyMech is:
 
    https://github.com/MadCamel/energymech
 
@@ -102,33 +102,6 @@ Files, documentation and tips can be found at:
    http://www.energymech.net
 
 ---*---
-
-More Help?
-~~~~~~~~~~
-
-Read the  website for  goodness sake!  Thats what  its there  for!
-
-        #emech is not a help channel
-
-If you HAVE to ask  a question in #emech  then make damn sure that
-its not covered by the website  documentation and try to ask it in
-a way so that  we dont have  to type half  a book just to tell you
-the answer.
-
-Do NOT ask to be guided in #emech.  We will under no circumstances
-help you compile, configure or run a bot.
-
-We absolutely hate people who come into the channel asking utterly
-simple  questions like  `Why doesnt  my bot connect',  `Whats  the
-command to add a user', etc.  If you manage to stay in the channel
-after asking something like that its simply because we're too damn
-lazy to kickban your ass.
-
-We will NOT teach  you how to work with UNIX  shells or how to use
-your mech, you have to learn that by yourself. Im noting this here
-since it seems to be a common misconception that we would.
-
-In short:
 
 THIS SOFTWARE IS PROVIDED AS IS. YOU ARE ENTIRELY ON YOUR OWN WHEN
 IT COMES TO CONFIGURING AND USING IT.

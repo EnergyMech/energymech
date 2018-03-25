@@ -158,6 +158,7 @@ struct
 	{ 0, "PICKUP",		"do_random_msg",	50	| CCPW					, RANDPICKUPFILE },
 	{ 0, "RSAY",		"do_random_msg",	50	| CCPW					, RANDSAYFILE },
 	{ 0, "RT",		"do_randtopic",		50	| CCPW	| CAXS | ACCHAN			},
+	{ 0, "ASCII",		"do_ascii",		50	| CCPW	| CAXS | CARGS			},
 #endif /* TOYBOX */
 #ifdef TRIVIA
 	{ 0, "TRIVIA",		"do_trivia",		50	| CCPW	| CAXS | CARGS | CBANG		},

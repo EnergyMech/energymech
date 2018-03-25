@@ -210,6 +210,9 @@ LS int SockOpts(void)						__page(CORE_SEG);
 /* tcl.c */
 /* telnet.c */
 /* toybox.c */
+
+LS void do_ascii(COMMAND_ARGS)					__page(CMD1_SEG);
+
 /* trivia.c */
 /* uptime.c */
 /* urlcap.c */
