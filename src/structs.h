@@ -785,7 +785,8 @@ typedef struct OnMsg
 			redir:1,
 			lbuf:1,
 			cbang:1,
-			acchan:1; // -- 20 bits
+			acchan:1,
+			supres:1; // -- 21 bits
 	char		*cmdarg;
 
 } OnMsg;

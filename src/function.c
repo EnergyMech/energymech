@@ -214,13 +214,6 @@ void dupe_strp(Strp *sp, Strp **pp)
 		make_strp(pp,sp->p);
 		pp = &((*pp)->next);
 		sp = sp->next;
-/*
-		set_mallocdoer(dupe_strp);
-		*pp = (Strp*)Calloc(sizeof(Strp) + strlen(sp->p));
-		Strcpy((*pp)->p,sp->p);
-		pp = &((*pp)->next);
-		sp = sp->next;
-*/
 	}
 }
 

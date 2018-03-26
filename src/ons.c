@@ -521,6 +521,7 @@ recheck_alias:
 
 		CurrentCmd = &mcmd[i];
 
+#ifdef SUPPRESS
 #ifdef BOTNET
 		// experimental command supression
 		if (CurrentCmd->name == current->supres_cmd)
@@ -540,12 +541,12 @@ recheck_alias:
 			}
 		}
 		//if command should be supressed ...
-		if (CurrentChan)
+		if (mcmd[i].supres && CurrentChan)
 		{
-			send_supress(CurrentCmd->name,rest);
+			send_suppress(CurrentCmd->name,rest);
 		}
 #endif
-
+#endif /* SUPPRESS */
 		/*
 		 *  convert the command to uppercase
 		 */

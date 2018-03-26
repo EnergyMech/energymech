@@ -1,7 +1,7 @@
 /*
 
     EnergyMech, IRC bot software
-    Parts Copyright (c) 1997-2004 proton
+    Parts Copyright (c) 1997-2018 proton
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -198,6 +198,11 @@
 @DEF_URLCAPTURE@
 
 /*
+ *  SUPPRESS: suppress duplication of certain commands
+ */
+@DEF_SUPPRESS@
+
+/*
  *  FASTNICK: faster nick regain if the nick is seen when released
  *  Enables code that is potentially dangerous if an attacker aquires
  *  the nick that the bot wants
@@ -368,20 +373,20 @@
  *  Defines for commandlist parsing
  */
 
-#define DCC	0x00100		/* requires DCC						*/
-#define CC	0x00200		/* requires commandchar					*/
-#define PASS	0x00400		/* requires password / authentication			*/
-#define CARGS	0x00800		/* requires args					*/
-#define NOPUB	0x01000		/* ignore in channel (for password commands)		*/
-#define NOCMD	0x02000		/* not allowed to be executed thru CMD			*/
-#define GAXS	0x04000		/* check global access					*/
-#define CAXS	0x08000		/* check channel access					*/
-#define REDIR	0x10000		/* may be redirected					*/
-#define LBUF	0x20000		/* should be linebuffered to server			*/
-#define CBANG	0x40000		/* command may be prefixed with a bang (!)		*/
-#define ACCHAN  0x80000		/* needs an active channel				*/
-
-#define CLEVEL	0x000ff
+#define CLEVEL	0x0000ff
+#define DCC	0x000100		/* requires DCC						*/
+#define CC	0x000200		/* requires commandchar					*/
+#define PASS	0x000400		/* requires password / authentication			*/
+#define CARGS	0x000800		/* requires args					*/
+#define NOPUB	0x001000		/* ignore in channel (for password commands)		*/
+#define NOCMD	0x002000		/* not allowed to be executed thru CMD			*/
+#define GAXS	0x004000		/* check global access					*/
+#define CAXS	0x008000		/* check channel access					*/
+#define REDIR	0x010000		/* may be redirected					*/
+#define LBUF	0x020000		/* should be linebuffered to server			*/
+#define CBANG	0x040000		/* command may be prefixed with a bang (!)		*/
+#define ACCHAN  0x080000		/* needs an active channel				*/
+#define SUPRES	0x100000		/* command is not suitable to run on many bots at once, try to suppress it */
 
 /*
  *  integer only version of RANDOM()

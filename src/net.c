@@ -78,7 +78,9 @@ LS const LinkCmd basicProto[] =
 { 'B', 'L', basicLink		},
 { 'B', 'Q', basicQuit		},
 { 'C', 'O', netchanNeedop	},
-{ 'C', 'S', netchanSupress	}, // experimental command supression
+#ifdef SUPPRESS
+{ 'C', 'S', netchanSuppress	}, // experimental command supression
+#endif /* SUPPRESS */
 { 'P', 'A', partyAuth		},
 #ifdef REDIRECT
 { 'P', 'C', partyCommand	},

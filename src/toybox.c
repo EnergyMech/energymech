@@ -356,14 +356,39 @@ void do_ascii(COMMAND_ARGS)
 	char	fname[MSGLEN];
 	int	fd;
 
-	Strcat(Strcpy(fname,"ascii/"),rest);
 #ifdef DEBUG
+	if (STRCHR(rest,'/'))
+	{
+		debug("(do_ascii) '/' not permitted in filename\n");
+ascii_badfile:
+		to_user_q(from,"%s","Bad filename or file does not exist");
+		return;
+	}
+	Strcat(Strcpy(fname,"ascii/"),rest);
 	debug("(do_ascii) file = \"%s\"\n",fname);
-#endif
 	if (is_safepath(fname,FILE_MUST_EXIST) != FILE_IS_SAFE)
-		return;
+	{
+		debug("(do_ascii) is_safepath() not safe\n");
+		goto ascii_badfile;
+	}
 	if ((fd = open(fname,O_RDONLY)) < 0)
+	{
+		debug("(do_ascii) open(%s): %s\n",fname,strerror(errno));
+		goto ascii_badfile;
+	}
+#else
+	if (STRCHR(rest,'/'))
+	{
+ascii_badfile:
+		to_user_q(from,"%s","Bad filename or file does not exist");
 		return;
+	}
+	Strcat(Strcpy(fname,"ascii/"),rest);
+	if (is_safepath(fname,FILE_MUST_EXIST) != FILE_IS_SAFE)
+		goto ascii_badfile;
+	if ((fd = open(fname,O_RDONLY)) < 0)
+		goto ascii_badfile;
+#endif
 
 	ascii_from = from;
 	readline(fd,&read_ascii);		/* readline closes fd */

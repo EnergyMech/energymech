@@ -134,12 +134,80 @@ void do_meminfo(COMMAND_ARGS)
 		vmsize,vmpeak,vmrss,vmexe,vmdata,vmlib,vmstk);
 }
 
+char *cpufrom,cpuline[MSGLEN];
+int sentmodel;
+int cpus;
+int cores;
+
+int parse_proc_cpuinfo(char *line)
+{
+	char	*src,*dst;
+
+	if (strncmp(line,"model name\t:",12) == 0)
+		;
+}
+
+/*
+proton@endemic:~/energymech/src> cat /proc/loadavg
+0.00 0.00 0.00 1/178 6759
+processor       : 0
+vendor_id       : GenuineIntel
+cpu family      : 6
+model           : 23
+model name      : Intel(R) Core(TM)2 Quad  CPU   Q8200  @ 2.33GHz
+stepping        : 7
+microcode       : 0x705
+cpu MHz         : 2024.267
+cache size      : 2048 KB
+physical id     : 0
+siblings        : 4
+core id         : 0
+cpu cores       : 4
+*/
+
 /*---Help:CPUINFO:(no arguments)
 
 See also: hostinfo, meminfo
 */
 void do_cpuinfo(COMMAND_ARGS)
 {
+	char	*a1,*a2,*a3;
+	int	fd,n;
+
+	if ((fd = open("/proc/loadavg",O_RDONLY)) < 0)
+#ifdef DEBUG
+	{
+		debug("(do_cpuinfo) /proc/loadavg: %s\n",strerror(errno));
+		return;
+	}
+#else
+		return;
+#endif
+	n = read(fd,gsockdata,MSGLEN-2);
+	gsockdata[n] = 0;
+	close(fd);
+
+	rest = gsockdata;
+	a1 = chop(&rest);
+	a2 = chop(&rest);
+	a3 = chop(&rest);
+
+	if (!a3 || !*a3)
+		return;
+
+	if ((fd = open("/proc/cpuinfo",O_RDONLY)) < 0)
+#ifdef DEBUG
+	{
+		debug("(do_cpuinfo) /proc/cpuinfo: %s\n",strerror(errno));
+		return;
+	}
+#else
+		return;
+#endif
+
+	cpufrom = from;
+	sentmodel = 0;
+	readline(fd,&parse_proc_cpuinfo);
 }
 
 #endif /* HOSTINFO */

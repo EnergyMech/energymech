@@ -30,18 +30,19 @@ char	gsockdata[MAXLEN];
 
 	These are defined in config.h
 
-	DCC	0x00100		requires DCC
-	CC	0x00200		requires commandchar
-	PASS	0x00400		requires password / authentication
-	CARGS	0x00800		requires args
-	NOPUB	0x01000		ignore in channel (for password commands)
-	NOCMD	0x02000		not allowed to be executed thru CMD
-	GAXS	0x04000		check global access
-	CAXS	0x08000		check channel access
-	REDIR	0x10000		may be redirected
-	LBUF	0x20000		can be linebuffered to server
-	CBANG	0x40000		command may be prefixed with a bang (!)
-	ACCHAN  0x80000		needs an active channel
+	DCC	0x000100		requires DCC
+	CC	0x000200		requires commandchar
+	PASS	0x000400		requires password / authentication
+	CARGS	0x000800		requires args
+	NOPUB	0x001000		ignore in channel (for password commands)
+	NOCMD	0x002000		not allowed to be executed thru CMD
+	GAXS	0x004000		check global access
+	CAXS	0x008000		check channel access
+	REDIR	0x010000		may be redirected
+	LBUF	0x020000		can be linebuffered to server
+	CBANG	0x040000		command may be prefixed with a bang (!)
+	ACCHAN  0x080000		needs an active channel
+	SUPRES  0x100000		command is not suitable to run on many bots at once, try to suppress it
 
 	CLEVEL	0x000ff
 
@@ -65,7 +66,7 @@ struct
 	{ 0, "AUTH",		"do_auth",		 0		| NOPUB	| CBANG			}, // double up on AUTH/VERIFY to better
 	{ 0, "VERIFY",		"do_auth",		 0		| NOPUB	| CBANG			}, // catch login attempts
 #ifdef TOYBOX
-	{ 0, "8BALL",		"do_8ball",		 0		| CBANG				},
+	{ 0, "8BALL",		"do_8ball",		 0		| CBANG	| SUPRES		},
 #endif /* TOYBOX */
 
 	/*
@@ -75,11 +76,11 @@ struct
 	{ 0, "BYE",		"do_bye",		10	| CC					},
 	{ 0, "CHAT",		"do_chat",		10	| CCPW	| NOCMD				},
 #ifdef RAWDNS
-	{ 0, "DNS",		"do_dns",		10	| CCPW	| GAXS | CARGS			},
+	{ 0, "DNS",		"do_dns",		10	| CCPW	| GAXS | CARGS | SUPRES		},
 #endif /* RAWDNS */
 	{ 0, "DOWN",		"do_opdeopme",		10	| CC	| CAXS				},
 	{ 0, "ECHO",		"do_echo",		10	| CCPW	| CARGS				},
-	{ 0, "HELP",		"do_help",		10	| CCPW	| REDIR | LBUF			},
+	{ 0, "HELP",		"do_help",		10	| CCPW	| REDIR | LBUF | SUPRES		},
 	{ 0, "PASSWD",		"do_passwd",		10	| PASS	| NOPUB | CARGS			},
 #ifdef DCC_FILE
 	{ 0, "SEND",		"do_send",		10	| CC	| NOCMD	| CBANG	| CARGS		},
@@ -125,7 +126,7 @@ struct
 	{ 0, "SITEBAN",		"do_kickban",		40	| CCPW	| CAXS | CARGS | ACCHAN		, "\\x01siteban\\0sitebann" },
 	{ 0, "SITEKB",		"do_kickban",		40	| CCPW	| CAXS | CARGS | ACCHAN		, "\\x05sitekickban\\0sitekickbann" },
 	{ 0, "TIME",		"do_time",		40	| CCPW					},
-	{ 0, "TOPIC",		"do_topic",		40	| CCPW	| CAXS | CARGS | ACCHAN		},
+	{ 0, "TOPIC",		"do_topic",		40	| CCPW	| CAXS | CARGS | ACCHAN	| SUPRES },
 	{ 0, "UNBAN",		"do_unban",		40	| CCPW	| CAXS				},
 	{ 0, "UNVOICE",		"do_opvoice",		40	| CCPW	| CAXS | CARGS			, "v-" },
 	{ 0, "UP",		"do_opdeopme",		40	| CCPW	| CAXS				},
@@ -158,7 +159,7 @@ struct
 	{ 0, "PICKUP",		"do_random_msg",	50	| CCPW					, RANDPICKUPFILE },
 	{ 0, "RSAY",		"do_random_msg",	50	| CCPW					, RANDSAYFILE },
 	{ 0, "RT",		"do_randtopic",		50	| CCPW	| CAXS | ACCHAN			},
-	{ 0, "ASCII",		"do_ascii",		50	| CCPW	| CAXS | CARGS			},
+	{ 0, "ASCII",		"do_ascii",		50	| CCPW	| CAXS | CARGS | SUPRES		},
 #endif /* TOYBOX */
 #ifdef TRIVIA
 	{ 0, "TRIVIA",		"do_trivia",		50	| CCPW	| CAXS | CARGS | CBANG		},
@@ -195,6 +196,7 @@ struct
 #if defined(BOTNET) && defined(REDIRECT)
 	{ 0, "CMD",		"do_cmd",		80	| CCPW	| CARGS				},
 #endif /* BOTNET && REDIRECT */
+	{ 0, "CQ",		"do_clearqueue",	80	| CCPW	| GAXS				},
 	{ 0, "LAST",		"do_last",		80	| CCPW	| DCC				},
 	{ 0, "LOAD",		"do_load",		80	| CCPW	| GAXS				},
 	{ 0, "MSG",		"do_msg",		80	| CCPW	| CARGS				},
@@ -208,7 +210,7 @@ struct
 	{ 0, "UNALIAS",		"do_unalias",		80	| CCPW	| GAXS | CARGS			},
 #endif /* ALIAS */
 #ifdef TOYBOX
-	{ 0, "BIGSAY",		"do_bigsay",		80	| CCPW	| CAXS | CARGS			},
+	{ 0, "BIGSAY",		"do_bigsay",		80	| CCPW	| CAXS | CARGS | SUPRES		},
 #endif /* TOYBOX */
 
 	/*
@@ -351,8 +353,9 @@ void make_mcmd(void)
 				v.lbuf   = (pre_mcmd[wh].flags & LBUF)   ? 1 : 0;
 				v.cbang  = (pre_mcmd[wh].flags & CBANG)  ? 1 : 0;
 				v.acchan = (pre_mcmd[wh].flags & ACCHAN) ? 1 : 0;
+				v.supres = (pre_mcmd[wh].flags & SUPRES) ? 1 : 0;
 
-				sprintf(tmp,"%3i,%2i,%2i,%2i,%2i,%2i,%2i,%2i,%2i,%2i,%2i,%2i,%2i",
+				sprintf(tmp,"%3i,%2i,%2i,%2i,%2i,%2i,%2i,%2i,%2i,%2i,%2i,%2i,%2i,%2i",
 					v.defaultaccess,
 					v.dcc,
 					v.cc,
@@ -365,7 +368,8 @@ void make_mcmd(void)
 					v.redir,
 					v.lbuf,
 					v.cbang,
-					v.acchan
+					v.acchan,
+					v.supres
 					);
 
 				sl = strlen(pre_mcmd[wh].func) + 1;
