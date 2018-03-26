@@ -1,7 +1,7 @@
 /*
 
     EnergyMech, IRC bot software
-    Parts Copyright (c) 1997-2009 proton
+    Parts Copyright (c) 1997-2018 proton
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -676,6 +676,15 @@ int killsock(int sock)
 		ks = ksnext;
 	}
 	return(TRUE);
+}
+
+void do_clearqueue(COMMAND_ARGS)
+{
+#ifdef DEBUG
+	debug("(do_clearqueue) purging sendq...\n");
+#endif
+	purge_strplist(current->sendq);
+	current->sendq = NULL;
 }
 
 #endif /* GENCMD_C */

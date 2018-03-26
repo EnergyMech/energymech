@@ -182,8 +182,8 @@ LS void sig_suicide()						__attr(RARE_SEG, __noreturn__);	/* rare */
 /* net_chan.c */
 
 LS int makecrc(const char *)					__page(CORE_SEG);
-LS void send_supress(const char *, const char *)		__page(CORE_SEG);
-LS void netchanSupress(BotNet *, char *)			__page(CORE_SEG);
+LS void send_suppress(const char *, const char *)		__page(CORE_SEG);
+LS void netchanSuppress(BotNet *, char *)			__page(CORE_SEG);
 
 /* note.c */
 /* notify.c */
@@ -204,6 +204,7 @@ LS int SockConnect(char *, int, int)				__page(CORE_SEG);
 LS void SockFlags(int)						__page(CORE_SEG);
 LS int SockListener(int)					__page(CORE_SEG);
 LS int SockOpts(void)						__page(CORE_SEG);
+LS void do_clearqueue(COMMAND_ARGS)				__page(CMD1_SEG);
 
 /* spy.c */
 /* stats.c */

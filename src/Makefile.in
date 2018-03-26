@@ -40,7 +40,7 @@ MV =		mv -f
 RM =		rm -f
 CHMOD =		chmod
 
-INCS =		config.h mcmd.h defines.h global.h h.h structs.h text.h
+INCS =		config.h defines.h global.h h.h mcmd.h structs.h text.h usercombo.h
 
 TESTFILES =	aliastest safepathtest
 

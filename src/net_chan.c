@@ -30,6 +30,8 @@
 #include "text.h"
 #include "mcmd.h"
 
+#ifdef SUPPRESS
+
 int makecrc(const char *args)
 {
 	int	crc = 0;
@@ -43,7 +45,7 @@ int makecrc(const char *args)
 	return(crc);
 }
 
-void send_supress(const char *command, const char *args)
+void send_suppress(const char *command, const char *args)
 {
 	Mech	*backup;
 	int	crc;
@@ -59,6 +61,8 @@ void send_supress(const char *command, const char *args)
 	}
 	botnet_relay(NULL,"CS%s %i\n",command,crc);
 }
+
+#endif /* SUPPRESS */
 
 ChanUser *find_chanbot(Chan *chan, char *nick)
 {
@@ -171,7 +175,9 @@ void netchanNeedop(BotNet *source, char *rest)
         }
 }
 
-void netchanSupress(BotNet *source, char *rest)
+#ifdef SUPPRESS
+
+void netchanSuppress(BotNet *source, char *rest)
 {
 	Mech	*backup;
 	const char *cmd;
@@ -205,5 +211,7 @@ void netchanSupress(BotNet *source, char *rest)
 		backup->supres_crc = crc;
 	}
 }
+
+#endif /* SUPPRESS */
 
 #endif /* BOTNET */

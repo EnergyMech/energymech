@@ -1,27 +1,30 @@
 3.0.99p4 -- WORK IN PROGRESS (~March, 2018)
 
- * Added: New toybox command: ASCII, load an ascii file and line
-          buffer it to target
+ * Added: Experimental code to suppress certain commands to run on only one bot even
+          if command is issued in public.
+ * Added: Some example ascii art: bbw, camel, goatse, mech, phooler
+ * Added: New command: CQ (Clear sendQueue), removes all previously buffered output.
+ * Added: New toybox command: ASCII, load an ascii file and line buffer it to target.
  * Fixed: Crash bug in BIGSAY
  * Added: Signal handlers for SIGILL and SIGABRT ifdef DEBUG
  * Added: New command: CRASH, for debugging/development...
- * Changed: configure now defaults to optimizing for code size.
+ * Changed: configure now defaults to optimizing for code size (--optimize=size).
  * Added: configuration option --optimize=speed or --optimize=size
- * Added: STABLE/BETA/ALPHA status to individual features in configure.
- * Fixed: If bot guid is changed or deleted in the config, and the bot
-          is reset, the connection associated with the removed guid
-          will be cleaned up and closed instead of lingering.
- * Added: Support for read only userfiles. If you prefix the filename
-          with < the file wil never be written to, only ever read.
+ * Added: ALPHA/BETA/STABLE status to individual features in configure.
+ * Fixed: If bot guid is changed or deleted in the config, and the bot is reset, the
+          connection associated with the removed guid will be cleaned up and closed
+          instead of lingering.
+ * Added: Support for read only userfiles. If you prefix the filename with < the file
+          will never be written to, only ever read.
  * Added: Bots now recover Ontime after a reset.
- * Added: URL capturing with command to display recent URLs seen
-          by the bot. Also spy source "URL" for spy channels.
+ * Added: URL capturing with command to display recent URLs seen by the bot. Also spy
+          source "URL" for spy channels.
  * Fixed: Rewrite of is_safepath() to conform with standard C
  * Fixed: Potential crash bug in send_uptime()
  * Fixed: Potential crash bug in debug()
  * Added: New host information commands: HOSTINFO, MEMINFO, CPUINFO.
  * Added: New configuration option: hostinfo
- * Fixed: Custom ld script fintuning the core order.
+ * Fixed: Custom ld script finetuning the code order.
  * Changed: Rewrite of ALIAS aliasing routine, adding features.
  * Fixed: RawDNS, again...
  * Fixed: Save procvars only once in session file.
@@ -32,7 +35,7 @@
  * Added: CORE & INFO (statistics) can now be output redirected.
  * Added: SPY to files saved in sessions.
  * Fixed: HELP command should now be working properly again.
- * Fixed: Strlen/Strlen2 code cleanup.
+ * Fixed: StrlenX/Strlen2 code cleanup.
  * Fixed: Various compiler warnings.
 
 3.0.99p3 -- July 24th, 2009.
