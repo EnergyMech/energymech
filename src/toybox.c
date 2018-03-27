@@ -32,30 +32,12 @@
 #define BIGSAY_DEFAULTFONT	"default"
 #define FONT_EXTENSION		".bigchars"
 
-typedef struct BigC
-{
-	struct	BigC *next;
-
-	int	width;
-	Strp	*data;
-	char	chars[1];
-
-} BigC;
-
-LS char *fontname = NULL;
-LS BigC *newchar;
-
-LS BigC *fontlist = NULL;
-LS int charlines;
-LS int charheight;
-LS int spacewidth;
-LS int kerning;
-
-LS BigC *orig_fontlist = NULL;
-LS int orig_charlines;
-LS int orig_charheight;
-LS int orig_spacewidth;
-LS int orig_kerning;
+BigC *newchar;
+BigC *orig_fontlist = NULL;
+int orig_charlines;
+int orig_charheight;
+int orig_spacewidth;
+int orig_kerning;
 
 int read_bigcharset_callback(char *rest)
 {
@@ -232,7 +214,7 @@ void do_bigsay(COMMAND_ARGS)
 					sp = bigc->data;
 					for(x=0;x<i;x++)
 						if (sp) sp = sp->next;
-					temp = sp->p;
+					temp = (sp) ? sp->p : "";
 					temp2 = tail;
 					while(*temp && tail < OEND)
 						*(tail++) = *(temp++);

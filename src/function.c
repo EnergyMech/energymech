@@ -176,7 +176,7 @@ Strp *make_strp(Strp **pp, const char *string)
 
 Strp *append_strp(Strp **pp, const char *string)
 {
-	while((*pp)->next != NULL)
+	while((*pp) != NULL)
 		pp = &((*pp)->next);
 	make_strp(pp,string);
 	return(*pp);

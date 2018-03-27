@@ -134,10 +134,10 @@ LS const Setting VarName[SIZE_VARS] =
 { STR_PROC,	100,	0,	STRPROC(uptimehost),	"UPHOST"		},	/* send uptime packets to <uphost> */
 { STR_PROC,	100,	0,	STRPROC(uptimenick),	"UPNICK"		},	/* send <upnick> as identifier instead of bots nick */
 { INT_PROC,	100,	0,	INTPROC(uptimeport),	"UPPORT",	65535	},	/* send packets to port <upport> */
+#endif /* UPTIME */
 #ifdef URLCAPTURE
 { INT_PROC,	100,	0,	INTPROC(urlhistmax),	"URLHIST",	100	},	/* max # of url's to keep in history */
 #endif /* URLCAPTURE */
-#endif /* UPTIME */
 { STR_GLOBAL,	90,	0,	VNULL,			"USERFILE"		},	/* what file to load/save userlist from/to */
 { STR_GLOBAL,	90,	0,	VNULL,			"VIRTUAL", 	0,	(&var_resolve_host) },	/* visual host */
 #ifdef WEB

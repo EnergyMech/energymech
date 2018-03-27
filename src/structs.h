@@ -46,6 +46,30 @@ typedef union usercombo
 
 } usercombo;
 
+typedef struct OnMsg
+{
+	const char	*name;
+	void		(*func)(char *, char *, char *, int);
+	ulong		defaultaccess:8,	/* defaultaccess */
+			dcc:1,
+			cc:1,
+			pass:1,
+			args:1,
+			nopub:1,
+			nocmd:1,
+			gaxs:1,
+			caxs:1,
+			redir:1,
+			lbuf:1,
+			cbang:1,
+			acchan:1,
+			supres:1; // -- 21 bits
+	char		*cmdarg;
+
+} OnMsg;
+
+typedef unsigned char OnMsg_access;
+
 #ifndef GENCMD_C
 
 typedef struct ircLink
@@ -767,32 +791,6 @@ typedef struct TrivScore
 
 } TrivScore;
 
-#endif /* GENCMD_C */
-
-typedef struct OnMsg
-{
-	const char	*name;
-	void		(*func)(char *, char *, char *, int);
-	ulong		defaultaccess:8,	/* defaultaccess */
-			dcc:1,
-			cc:1,
-			pass:1,
-			args:1,
-			nopub:1,
-			nocmd:1,
-			gaxs:1,
-			caxs:1,
-			redir:1,
-			lbuf:1,
-			cbang:1,
-			acchan:1,
-			supres:1; // -- 21 bits
-	char		*cmdarg;
-
-} OnMsg;
-
-typedef unsigned char OnMsg_access;
-
 typedef struct dnsAuthority
 {
 	struct dnsAuthority *next;
@@ -826,5 +824,17 @@ typedef struct dnsQuery
 	ushort		resources;
 
 } dnsQuery;
+
+typedef struct BigC
+{
+	struct	BigC *next;
+
+	int	width;
+	Strp	*data;
+	char	chars[1];
+
+} BigC;
+
+#endif /* ifndef GENCMD_C */
 
 #endif /* STRUCTS_H */
