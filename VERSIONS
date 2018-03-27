@@ -1,5 +1,7 @@
 3.0.99p4 -- WORK IN PROGRESS (~March, 2018)
 
+ * Changed: If compiled with debug, Free() on unknown memory no longer shuts down the bot,
+            now it just ignores the panic and swallows the (possible) leak.
  * Added: Experimental code to suppress certain commands to run on only one bot even
           if command is issued in public.
  * Added: Some example ascii art: bbw, camel, goatse, mech, phooler

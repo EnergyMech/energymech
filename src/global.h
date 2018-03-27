@@ -82,6 +82,7 @@ BEG int		makecore		MDEF(FALSE);
 BEG int		respawn			MDEF(0);
 BEG int		sigmaster		MDEF(0);
 BEG int		ctimeout		MDEF(30);	/* proc var */
+BEG int		startup			MDEF(TRUE);
 BEG ino_t	parent_inode;
 
 BEG KillSock	*killsocks		MDEF(NULL);
