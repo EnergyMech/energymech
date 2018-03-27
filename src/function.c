@@ -126,7 +126,8 @@ void Free(char **mem)
 			{
 				debug("(Free) PANIC: Free(0x"mx_pfmt"); Unregistered memory block\n",(mx_ptr)src);
 				run_debug();
-				exit(1);
+				//exit(1);	// overreacting. just ignore it and accept the leak.
+				return;
 			}
 			mp = mp->next;
 		}

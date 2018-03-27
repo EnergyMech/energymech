@@ -818,6 +818,9 @@ int main(int argc, char **argv, char **envp)
 	char	*opt;
 	int	do_fork = TRUE;
 	int	versiononly = FALSE;
+#ifdef NEWBIE
+	int	n = 0;
+#endif
 
 	uptime = time(&now);
 
@@ -1017,11 +1020,11 @@ execve( ./energymech, argv = { ./energymech <NULL> <NULL> <NULL> <NULL> }, envp 
 	LocalBot.x.x.aop = 1;
 	LocalBot.chan = CoreUser.chan = (Strp*)&CMA;
 
+	readcfgfile();
+
 #ifdef UPTIME
 	init_uptime();
 #endif /* UPTIME */
-
-	readcfgfile();
 
 #ifndef I_HAVE_A_LEGITIMATE_NEED_FOR_MORE_THAN_4_BOTS
 	if (spawning_lamer > 4)
@@ -1035,7 +1038,20 @@ execve( ./energymech, argv = { ./energymech <NULL> <NULL> <NULL> <NULL> }, envp 
 	{
 		if ((opt = current->setting[STR_USERFILE].str_var))
 			read_userlist(opt);
+#ifdef NEWBIE
+		if (current->userlist == NULL)
+		{
+			to_file(1,"init: No userlist loaded for %s\n",nullstr(current->nick));
+			n++;
+		}
 	}
+	if (n)
+	{
+		_exit(1);
+	}
+#else
+	}
+#endif /* NEWBIE */
 	for(current=botlist;current;current=current->next)
 	{
 		mirror_userlist();
@@ -1104,5 +1120,6 @@ execve( ./energymech, argv = { ./energymech <NULL> <NULL> <NULL> <NULL> }, envp 
 #endif /* DEBUG */
 	}
 
+	startup = FALSE;
 	doit();
 }

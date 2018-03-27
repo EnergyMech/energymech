@@ -149,12 +149,8 @@ int read_bigcharset(char *fname)
 	{
 		bigc = orig_fontlist;
 		orig_fontlist = bigc->next;
-		while(bigc->data)
-		{
-			sp = bigc->data;
-			bigc->data = sp->next;
-			Free((char**)&sp);
-		}
+		if (bigc->data)
+			purge_strplist(bigc->data);
 		Free((char**)&bigc);
 	}
 

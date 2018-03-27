@@ -296,36 +296,64 @@ int read_userlist(char *filename)
 	int	in;
 #ifdef DEBUG
 	int	r;
-#endif
 
-#ifdef DEBUG
 	if (!filename)
 	{
+#ifdef NEWBIE
+		if (startup)
+			to_file(1,"read_userlist: USERFILE filename empty\n");
+#endif /* NEWBIE */
 		debug("(read_userlist) filename is NULL\n");
 		return(FALSE);
 	}
 	if (*filename == '<') // read only userfile
 		filename++;
-	if ((r = is_safepath(filename,FILE_MUST_EXIST)) != FILE_IS_SAFE)
+	if ((r = is_safepath(filename,FILE_MAY_EXIST)) != FILE_IS_SAFE)
 	{
+#ifdef NEWBIE
+		if (startup)
+			to_file(1,"read_userlist: USERFILE filename is unsafe\n");
+#endif /* NEWBIE */
 		debug("(read_userlist) %s: unsafe filename (%i)...\n",filename,r);
 		return(FALSE);
 	}
 	if ((in = open(filename,O_RDONLY)) < 0)
 	{
+#ifdef NEWBIE
+		if (startup)
+			to_file(1,"read_userlist: USERFILE \"%s\": %s\n",filename,strerror(errno));
+#endif /* NEWBIE */
 		debug("(read_userlist) failed to open \"%s\": %s\n",filename,strerror(errno));
 		return(FALSE);
 	}
-#else
+#else /* ifdef DEBUG */
 	if (!filename)
+	{
+#ifdef NEWBIE
+		if (startup)
+			to_file(1,"read_userlist: USERFILE filename empty\n");
+#endif /* NEWBIE */
 		return(FALSE);
+	}
 	if (*filename == '<') // read only userfile
 		filename++;
-	if (is_safepath(filename,FILE_MUST_EXIST) != FILE_IS_SAFE)
+	if (is_safepath(filename,FILE_MAY_EXIST) != FILE_IS_SAFE)
+	{
+#ifdef NEWBIE
+		if (startup)
+			to_file(1,"read_userlist: USERFILE filename is unsafe\n");
+#endif /* NEWBIE */
 		return(FALSE);
+	}
 	if ((in = open(filename,O_RDONLY)) < 0)
+	{
+#ifdef NEWBIE
+		if (startup)
+			to_file(1,"read_userlist: USERFILE \"%s\": %s\n",filename,strerror(errno));
+#endif /* NEWBIE */
 		return(FALSE);
-#endif
+	}
+#endif /* ifdef DEBUG */
 
 	olduserlist = current->userlist;
 	cfgUser = current->userlist = NULL;

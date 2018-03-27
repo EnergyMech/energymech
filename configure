@@ -1011,7 +1011,7 @@ test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$
 
 def_suppress='#undef SUPPRESS'
 unset ans
-$out $ac_n "[ ALPHA] Command duplication suppression? ............ [Y/n] "$ac_c
+$out $ac_n "[ ALPHA] Command duplication suppression? ........... [Y/n] "$ac_c
 test "$ft_suppress" && $out "$ft_suppress" && ans=$ft_suppress
 test -z "$ft_suppress" && read ans
 test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_suppress='#define SUPPRESS'
