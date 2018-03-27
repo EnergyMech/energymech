@@ -761,6 +761,9 @@ void debug_core(void)
 	Spy	*spy;
 	Strp	*st;
 	Shit	*shit;
+#ifdef TOYBOX
+	BigC	*bigc;
+#endif /* TOYBOX */
 #ifdef TRIVIA
 	TrivScore *triv;
 #endif /* TRIVIA */
@@ -797,6 +800,7 @@ void debug_core(void)
 	debug("> servergrouplist\t"mx_pfmt"\n",(mx_ptr)servergrouplist);
 	for(sg=servergrouplist;sg;sg=sg->next)
 	{
+		memtouch(sg);
 		debug("  ; next\t\t"mx_pfmt"\n",(mx_ptr)sg->next);
 		debug("  ; servergroup\t\t%i\n",sg->servergroup);
 		debug("  ; name\t\t\"%s\"\n",nullbuf(sg->name));
@@ -1158,6 +1162,26 @@ void debug_core(void)
 		debug("  ; ---\n");
 	}
 #endif /* SEEN */
+#ifdef TOYBOX
+	if (fontname)
+		memtouch(fontname);
+	debug("; fontname*\t\t"mx_pfmt" { \"%s\" }\n",
+		(mx_ptr)fontname,nullstr(fontname));
+	debug("> fontlist\t\t"mx_pfmt"\n",(mx_ptr)fontlist);
+	for(bigc=fontlist;bigc;bigc=bigc->next)
+	{
+		memtouch(bigc);
+		debug("  ; width\t\t%i\n",bigc->width);
+		debug("  ; chars\t\t\"%s\"\n",bigc->chars);
+		debug("  > data\t\t"mx_pfmt"\n",(mx_ptr)bigc->data);
+		for(st=bigc->data;st;st=st->next)
+		{
+			memtouch(st);
+			debug("    ; Strp*\t\t"mx_pfmt" { "mx_pfmt", \"%s\" }\n",
+				(mx_ptr)st,(mx_ptr)st->next,st->p);
+		}
+	}
+#endif /* TOYBOX */
 #ifdef TRIVIA
 	debug("> scorelist\t\t"mx_pfmt"\n",(mx_ptr)scorelist);
 	for(triv=scorelist;triv;triv=triv->next)

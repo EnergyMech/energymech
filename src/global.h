@@ -224,6 +224,13 @@ BEG Seen	*seenlist		MDEF(NULL);
 
 #endif /* SEEN */
 
+BEG char *fontname			MDEF(NULL);
+BEG BigC *fontlist			MDEF(NULL);
+BEG int charlines;
+BEG int charheight;
+BEG int spacewidth;
+BEG int kerning;
+
 #ifdef TRIVIA
 
 BEG int		triv_qdelay		MDEF(30);	/* proc var */
@@ -260,7 +267,6 @@ BEG int		websock			MDEF(-1);
 BEG int		webport			MDEF(0);
 
 #endif /* WEB */
-
 
 #ifndef I_HAVE_A_LEGITIMATE_NEED_FOR_MORE_THAN_4_BOTS
 

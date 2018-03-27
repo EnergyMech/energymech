@@ -1249,11 +1249,6 @@ void do_user(COMMAND_ARGS)
 			to_user(from,"Problem adding %s (global mask)",tmpmask);
 			return;
 		}
-		if (matches("*@?*.?*",tmpmask))
-		{
-			to_user(from,"Problem adding %s (invalid mask)",tmpmask);
-			return;
-		}
 #endif /* NEWBIE */
 		format_uh(tmpmask,FUH_USERHOST); // format_uh uses local temporary buffer but copies result back into tmpmask
 		/*
