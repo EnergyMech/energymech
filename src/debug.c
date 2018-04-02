@@ -1238,7 +1238,7 @@ void debug_rawdns(void)
 
 #endif /* RAWDNS */
 
-#if defined(TCL) || defined(PYTHON)
+#if defined(TCL) || defined(PYTHON) || defined(PERL)
 
 #if 0
 typedef struct

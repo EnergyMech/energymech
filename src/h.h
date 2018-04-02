@@ -190,6 +190,10 @@ LS void netchanSuppress(BotNet *, char *)			__page(CORE_SEG);
 /* ons.c */
 /* parse.c */
 /* perl.c */
+
+LS void do_perl(COMMAND_ARGS)					__page(CMD1_SEG);
+LS void do_perlscript(COMMAND_ARGS)				__page(CMD1_SEG);
+
 /* prot.c */
 /* python.c */
 /* redirect.c */

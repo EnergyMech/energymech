@@ -20,14 +20,49 @@
 
 umask 077
 
-# perl still unsupported
-#has_perl=no
 compile=no
 install=no
 silentopt=no
+try_libmusl=no
 
 # default optimization goal, speed = -O2, size = -Os
 optitype=size
+
+set_feature_defaults() {
+  ft_alias=$ft_default
+  ft_botnet=$ft_default
+  ft_bounce=$ft_default
+  ft_chanban=$ft_default
+  ft_ctcp=$ft_default
+  ft_dccfile=$ft_default
+  ft_debug=$ft_default
+  ft_dynamode=$ft_default
+  ft_dyncmd=$ft_default
+  ft_greet=$ft_default
+  ft_hostinfo=$ft_default
+  ft_ircd_ext=$ft_default
+  ft_md5=$ft_default
+  ft_newbie=$ft_default
+  ft_note=$ft_default
+  ft_notify=$ft_default
+  ft_perl=$ft_default
+  ft_python=$ft_default
+  ft_rawdns=$ft_default
+  ft_redirect=$ft_default
+  ft_seen=$ft_default
+  ft_session=$ft_default
+  ft_sha=$ft_default
+  ft_stats=$ft_default
+  ft_suppress=$ft_default
+  ft_tcl=$ft_default
+  ft_telnet=$ft_default
+  ft_toybox=$ft_default
+  ft_trivia=$ft_default
+  ft_uptime=$ft_default
+  ft_urlcapture=$ft_default
+  ft_web=$ft_default
+  ft_wingate=$ft_default
+}
 
 for opt
 do
@@ -41,10 +76,10 @@ do
 
   yesno=
   case "$opt" in
-    --with=* ) yesno=yes ;;
-    --enable=* ) yesno=yes ;;
-    --without=* ) yesno=no ;;
-    --disable=* ) yesno=no ;;
+    --with=* )		yesno=yes ;;
+    --enable=* )	yesno=yes ;;
+    --without=* )	yesno=no ;;
+    --disable=* )	yesno=no ;;
   esac
 
   if [ "$yesno" = yes -o "$yesno" = no ]; then
@@ -55,40 +90,40 @@ do
     do
       if [ "$notfirst" ]; then
         case "$nn" in
-          alias )    ft_alias=$yesno ;;
-          botnet )   ft_botnet=$yesno ;;
-          bounce )   ft_bounce=$yesno ;;
-	  chanban )  ft_chanban=$yesno ;;
-          ctcp )     ft_ctcp=$yesno ;;
-          dccfile )  ft_dccfile=$yesno ;;
-          debug )    ft_debug=$yesno ;;
-          dynamode ) ft_dynamode=$yesno ;;
-          dyncmd )   ft_dyncmd=$yesno ;;
-          greet )    ft_greet=$yesno ;;
-          hostinfo ) ft_hostinfo=$yesno ;;
-          idwrap )   ft_idwrap=$yesno ;;
-          ircd_ext ) ft_ircd_ext=$yesno ;;
-          md5 )      ft_md5=$yesno ;;
-          newbie )   ft_newbie=$yesno ;;
-          note )     ft_note=$yesno ;;
-          notify )   ft_notify=$yesno ;;
-          perl )     ft_perl=$yesno ;;
-	  python )   ft_python=$yesno ;;
-          rawdns )   ft_rawdns=$yesno ;;
-          redirect ) ft_redirect=$yesno ;;
-          seen )     ft_seen=$yesno ;;
-          session )  ft_session=$yesno ;;
-          sha )      ft_sha=$yesno ;;
-          stats )    ft_stats=$yesno ;;
-	  suppress )  ft_suppress=$yesno ;;
-          tcl )      ft_tcl=$yesno ;;
-          telnet )   ft_telnet=$yesno ;;
-          toybox )   ft_toybox=$yesno ;;
-          trivia )   ft_trivia=$yesno ;;
-          uptime )   ft_uptime=$yesno ;;
-          urlcapture ) ft_urlcapture=$yesno ;;
-          web )      ft_web=$yesno ;;
-          wingate )  ft_wingate=$yesno ;;
+          alias )	ft_alias=$yesno ;;
+          botnet )	ft_botnet=$yesno ;;
+          bounce )	ft_bounce=$yesno ;;
+	  chanban )	ft_chanban=$yesno ;;
+          ctcp )	ft_ctcp=$yesno ;;
+          dccfile )	ft_dccfile=$yesno ;;
+          debug )	ft_debug=$yesno ;;
+          dynamode )	ft_dynamode=$yesno ;;
+          dyncmd )	ft_dyncmd=$yesno ;;
+          greet )	ft_greet=$yesno ;;
+          hostinfo )	ft_hostinfo=$yesno ;;
+          idwrap )	ft_idwrap=$yesno ;;
+          ircd_ext )	ft_ircd_ext=$yesno ;;
+          md5 )		ft_md5=$yesno ;;
+          newbie )	ft_newbie=$yesno ;;
+          note )	ft_note=$yesno ;;
+          notify )	ft_notify=$yesno ;;
+          perl )	ft_perl=$yesno ;;
+	  python )	ft_python=$yesno ;;
+          rawdns )	ft_rawdns=$yesno ;;
+          redirect )	ft_redirect=$yesno ;;
+          seen )	ft_seen=$yesno ;;
+          session )	ft_session=$yesno ;;
+          sha )		ft_sha=$yesno ;;
+          stats )	ft_stats=$yesno ;;
+	  suppress )	ft_suppress=$yesno ;;
+          tcl )		ft_tcl=$yesno ;;
+          telnet )	ft_telnet=$yesno ;;
+          toybox )	ft_toybox=$yesno ;;
+          trivia )	ft_trivia=$yesno ;;
+          uptime )	ft_uptime=$yesno ;;
+          urlcapture )	ft_urlcapture=$yesno ;;
+          web )		ft_web=$yesno ;;
+          wingate )	ft_wingate=$yesno ;;
         esac
       else
         notfirst=yes
@@ -115,17 +150,20 @@ do
   esac
 
   case "$feature" in
-    debug | botnet | telnet | alias | seen | session | dyncmd | newbie | wingate | md5 | sha \
-    | ctcp | dccfile | uptime | redirect | greet | perl | profiling | tcl | dynamode | web | hostinfo \
-    | note | notify | trivia | toybox | bounce | stats | suppress | rawdns | ircd_ext | idwrap | chanban | python | urlcapture )
+    alias | botnet | bounce | chanban | ctcp | dccfile | debug | dynamode | dyncmd | greet | hostinfo | idwrap | ircd_ext | libmusl | md5 | newbie | note | notify | perl \
+    | profiling | python | rawdns | redirect | seen | session | sha | stats | suppress | tcl | telnet | toybox | trivia | uptime | urlcapture | web | wingate )
       case _"$optarg"_ in
         _yes_ | _no_ | __ )
           ;;
         *)
-          echo "unknown argument for $feature":" $optarg"
-          echo "Usage: configure [options]"
-          echo "use \"$0 --help\" for help"
-          exit 1
+	  if [ "$feature" = libmusl ]; then
+	    try_libmusl="$optarg"
+	  else
+	    echo "unknown argument for $feature":" $optarg"
+	    echo "Usage: configure [options]"
+	    echo "use \"$0 --help\" for help"
+	    exit 1
+	  fi
       esac
       ;;
     ___none___ )
@@ -141,76 +179,76 @@ do
     --with=* | --without=* | --enable=* | --disable=* ) ;;
     --enable-* | --with-*)
       case "$feature"_"$optarg" in
-        alias_yes | alias_ ) ft_alias=yes ;;
-        alias_no ) ft_alias=no ;;
-        botnet_yes | botnet_ ) ft_botnet=yes ;;
-        botnet_no ) ft_botnet=no ;;
-        bounce_yes | bounce_ ) ft_bounce=yes ;;
-        bounce_no ) ft_bounce=no ;;
-	chanban_yes | chanban_ ) ft_chanban=yes ;;
-	chanban_no ) ft_chanban=no ;;
-        ctcp_yes | ctcp_ ) ft_ctcp=yes ;;
-        ctcp_no ) ft_ctcp=no ;;
-        dccfile_yes | dccfile_ ) ft_dccfile=yes ;;
-        dccfile_no ) ft_dccfile=no ;;
-        debug_yes | debug_ ) ft_debug=yes ;;
-        debug_no ) ft_debug=no ;;
-        dynamode_yes | dynamode_ ) ft_dynamode=yes ;;
-        dynamode_no ) ft_dynamode=no ;;
-        dyncmd_yes | dyncmd_ ) ft_dyncmd=yes ;;
-        dyncmd_no ) ft_dyncmd=no ;;
-        greet_yes | greet_ ) ft_greet=yes ;;
-        greet_no ) ft_greet=no ;;
-        hostinfo_yes | hostinfo_ ) ft_hostinfo=yes ;;
-        hostinfo_no ) ft_hostinfo=no ;;
-        idwrap_yes | idwrap_ ) ft_idwrap=yes ;;
-        idwrap_no ) ft_idwrap=no ;;
-        ircd_ext_yes | ircd_ext_ ) ft_ircd_ext=yes ;;
-        ircd_ext_no ) ft_ircd_ext=no ;;
-        md5_yes | md5_ ) ft_md5=yes ;;
-        md5_no ) ft_md5=no ;;
-        newbie_yes | newbie_ ) ft_newbie=yes ;;
-        newbie_no ) ft_newbie=no ;;
-        note_yes | note_ ) ft_note=yes ;;
-        note_no ) ft_note=no ;;
-        notify_yes | notify_ ) ft_notify=yes ;;
-        notify_no ) ft_notify=no ;;
-        perl_yes | perl_ ) ft_perl=yes ;;
-        perl_no ) ft_perl=no ;;
-	python_yes | python_ ) ft_python=yes ;;
-	python_no ) ft_python=no ;;
-        rawdns_yes | rawdns_ ) ft_rawdns=yes ;;
-        rawdns_no ) ft_rawdns=no ;;
-        redirect_yes | redirect_ ) ft_redirect=yes ;;
-        redirect_no ) ft_redirect=no ;;
-        seen_yes | seen_ ) ft_seen=yes ;;
-        seen_no ) ft_seen=no ;;
-        session_yes | session_ ) ft_session=yes ;;
-        session_no ) ft_session=no ;;
-        sha_yes | sha_ ) ft_seen=yes ;;
-        sha_no ) ft_sha=no ;;
-        stats_yes | stats_ ) ft_stats=yes ;;
-        stats_no ) ft_stats=no ;;
-	suppress_yes | suppress_ ) ft_suppress=yes ;;
-	suppress_no ) ft_suppress=no ;;
-        tcl_yes | tcl_ ) ft_tcl=yes ;;
-        tcl_no ) ft_tcl=no ;;
-        telnet_yes | telnet_ ) ft_telnet=yes ;;
-        telnet_no ) ft_telnet=no ;;
-        toybox_yes | toybox_ ) ft_toybox=yes ;;
-        toybox_no ) ft_toybox=no ;;
-        trivia_yes | trivia_ ) ft_trivia=yes ;;
-        trivia_no ) ft_trivia=no ;;
-        uptime_yes | uptime_ ) ft_uptime=yes ;;
-        uptime_no ) ft_uptime=no ;;
-        urlcapture_yes | urlcapture_ ) ft_urlcapture=yes ;;
-        urlcapture_no ) ft_urlcapture=no ;;
-        web_yes | web_ ) ft_web=yes ;;
-        web_no ) ft_web=no ;;
-        wingate_yes | wingate_ ) ft_wingate=yes ;;
-        wingate_no ) ft_wingate=no ;;
-        profiling_yes | profiling_ ) ft_prof=yes ;;
-        profiling_no ) ft_prof=no ;;
+        alias_yes | alias_ )		ft_alias=yes ;;
+        alias_no )			ft_alias=no ;;
+        botnet_yes | botnet_ )		ft_botnet=yes ;;
+        botnet_no )			ft_botnet=no ;;
+        bounce_yes | bounce_ )		ft_bounce=yes ;;
+        bounce_no )			ft_bounce=no ;;
+	chanban_yes | chanban_ )	ft_chanban=yes ;;
+	chanban_no )			ft_chanban=no ;;
+        ctcp_yes | ctcp_ )		ft_ctcp=yes ;;
+        ctcp_no )			ft_ctcp=no ;;
+        dccfile_yes | dccfile_ )	ft_dccfile=yes ;;
+        dccfile_no )			ft_dccfile=no ;;
+        debug_yes | debug_ )		ft_debug=yes ;;
+        debug_no )			ft_debug=no ;;
+        dynamode_yes | dynamode_ )	ft_dynamode=yes ;;
+        dynamode_no )			ft_dynamode=no ;;
+        dyncmd_yes | dyncmd_ )		ft_dyncmd=yes ;;
+        dyncmd_no )			ft_dyncmd=no ;;
+        greet_yes | greet_ )		ft_greet=yes ;;
+        greet_no )			ft_greet=no ;;
+        hostinfo_yes | hostinfo_ )	ft_hostinfo=yes ;;
+        hostinfo_no )			ft_hostinfo=no ;;
+        idwrap_yes | idwrap_ )		ft_idwrap=yes ;;
+        idwrap_no )			ft_idwrap=no ;;
+        ircd_ext_yes | ircd_ext_ )	ft_ircd_ext=yes ;;
+        ircd_ext_no )			ft_ircd_ext=no ;;
+        md5_yes | md5_ )		ft_md5=yes ;;
+        md5_no )			ft_md5=no ;;
+        newbie_yes | newbie_ )		ft_newbie=yes ;;
+        newbie_no )			ft_newbie=no ;;
+        note_yes | note_ )		ft_note=yes ;;
+        note_no )			ft_note=no ;;
+        notify_yes | notify_ )		ft_notify=yes ;;
+        notify_no )			ft_notify=no ;;
+        perl_yes | perl_ )		ft_perl=yes ;;
+        perl_no )			ft_perl=no ;;
+	python_yes | python_ )		ft_python=yes ;;
+	python_no )			ft_python=no ;;
+        rawdns_yes | rawdns_ )		ft_rawdns=yes ;;
+        rawdns_no )			ft_rawdns=no ;;
+        redirect_yes | redirect_ )	ft_redirect=yes ;;
+        redirect_no )			ft_redirect=no ;;
+        seen_yes | seen_ )		ft_seen=yes ;;
+        seen_no )			ft_seen=no ;;
+        session_yes | session_ )	ft_session=yes ;;
+        session_no )			ft_session=no ;;
+        sha_yes | sha_ )		ft_seen=yes ;;
+        sha_no )			ft_sha=no ;;
+        stats_yes | stats_ )		ft_stats=yes ;;
+        stats_no )			ft_stats=no ;;
+	suppress_yes | suppress_ )	ft_suppress=yes ;;
+	suppress_no )			ft_suppress=no ;;
+        tcl_yes | tcl_ )		ft_tcl=yes ;;
+        tcl_no )			ft_tcl=no ;;
+        telnet_yes | telnet_ )		ft_telnet=yes ;;
+        telnet_no )			ft_telnet=no ;;
+        toybox_yes | toybox_ )		ft_toybox=yes ;;
+        toybox_no )			ft_toybox=no ;;
+        trivia_yes | trivia_ )		ft_trivia=yes ;;
+        trivia_no )			ft_trivia=no ;;
+        uptime_yes | uptime_ )		ft_uptime=yes ;;
+        uptime_no )			ft_uptime=no ;;
+        urlcapture_yes | urlcapture_ )	ft_urlcapture=yes ;;
+        urlcapture_no )			ft_urlcapture=no ;;
+        web_yes | web_ )		ft_web=yes ;;
+        web_no )			ft_web=no ;;
+        wingate_yes | wingate_ )	ft_wingate=yes ;;
+        wingate_no )			ft_wingate=no ;;
+        profiling_yes | profiling_ )	ft_prof=yes ;;
+        profiling_no )			ft_prof=no ;;
       esac
     ;;
     --disable-* | --without-*)
@@ -241,7 +279,7 @@ do
         session )      ft_session=no ;;
         sha )          ft_sha=yes ;;
         stats )        ft_stats=no ;;
-	suppress )      ft_suppress=no ;;
+	suppress )     ft_suppress=no ;;
         tcl )          ft_tcl=no ;;
         telnet )       ft_telnet=no ;;
         toybox )       ft_toybox=no ;;
@@ -252,90 +290,80 @@ do
         wingate )      ft_wingate=no ;;
       esac
     ;;
-    --compile)   compile=yes ;;
-    --install)   install=yes ;;
-    --silence=options) silentopt=yes ;;
-    --md5=internal)  ft_md5=internal ;;
-    --sha=internal)  ft_sha=internal ;;
-    --use-cpuflags)  cc_arch_opt=yes ;;
-    --no-cpuflags)   cc_arch_opt=no ;;
-    --use-optimize)  cc_optimize_opt=yes ;;
-    --no-optimize)   cc_optimize_opt=no ;;
-    --optimize=speed) optitype=speed ;;
-    --optimize=size)  optitype=size ;;
-    --use-gnudebug)  cc_g_opt=yes ;;
-    --no-gnudebug)   cc_g_opt=no ;;
-    --use-warnflag)  cc_wall_opt=yes ;;
-    --no-warnflag)   cc_wall_opt=no ;;
-    --use-pipeflag)  cc_pipe_opt=yes ;;
-    --no-pipeflag)   cc_pipe_opt=no ;;
-    --use-ofp)       cc_ofp_opt=yes ;;
-    --no-ofp)        cc_ofp_opt=no ;;
-    --yes)           ft_alias=yes
-                     ft_botnet=yes
-		     ft_bounce=yes
-		     ft_chanban=yes
-		     ft_ctcp=yes
-		     ft_dccfile=yes
-                     ft_debug=yes
-		     ft_dynamode=yes
-                     ft_dyncmd=yes
-		     ft_greet=yes
-		     ft_hostinfo=yes
-		     ft_ircd_ext=yes
-		     ft_md5=yes
-                     ft_newbie=yes
-		     ft_note=yes
-		     ft_notify=yes
-		     ft_python=yes
-		     ft_rawdns=yes
-		     ft_redirect=yes
-                     ft_seen=yes
-                     ft_session=yes
-                     ft_sha=yes
-		     ft_stats=yes
-		     ft_suppress=yes
-                     ft_tcl=yes
-                     ft_telnet=yes
-		     ft_toybox=yes
-		     ft_trivia=yes
-		     ft_uptime=yes
-		     ft_urlcapture=yes
-		     ft_web=yes
-                     ft_wingate=yes
-                     ;;
+    --compile)		compile=yes ;;
+    --install)		install=yes ;;
+    --with-libmusl)	try_libmusl=/usr/local/musl/bin/musl-gcc ;;
+    --silence=options)	silentopt=yes ;;
+    --md5=internal)	ft_md5=internal ;;
+    --sha=internal)	ft_sha=internal ;;
+    --use-cpuflags)	cc_arch_opt=yes ;;
+    --no-cpuflags)	cc_arch_opt=no ;;
+    --use-optimize)	cc_optimize_opt=yes ;;
+    --no-optimize)	cc_optimize_opt=no ;;
+    --optimize=speed)	optitype=speed ;;
+    --optimize=size)	optitype=size ;;
+    --use-gnudebug)	cc_g_opt=yes ;;
+    --no-gnudebug)	cc_g_opt=no ;;
+    --use-warnflag)	cc_wall_opt=yes ;;
+    --no-warnflag)	cc_wall_opt=no ;;
+    --use-pipeflag)	cc_pipe_opt=yes ;;
+    --no-pipeflag)	cc_pipe_opt=no ;;
+    --use-ofp)		cc_ofp_opt=yes ;;
+    --no-ofp)		cc_ofp_opt=no ;;
+    --default-yes)	ft_default=yes set_feature_defaults ;;
+    --default-no)	ft_default=no set_feature_defaults ;;
     --help | -h)
         cat <<__EOT__
 Usage: configure [options]
 Configuration:
   --help                   print this message
 Features and packages:
-  --disable-FEATURE        do not include FEATURE (same as --enable-FEATURE=no)
-  --enable-FEATURE[=ARG]   include FEATURE [ARG=yes]
-  --with-FEATURE[=ARG]     use FEATURE [ARG=yes]
-  --without-FEATURE        do not use FEATURE (same as --with-FEATURE=no)
-  --md5=internal           Use internal routines for MD5 password hashes instead of system libraries
-  --sha=internal           Use internal routines for SHA password hashes instead of system libraries
-  --use-ofp                Try to use compiler flag -fomit-frame-pointer
-  --no-ofp                 Do not use compiler flag -fomit-frame-pointer
-#md5 | ctcp | dccfile | uptime | redirect | greet | perl | dynamode | web \
-#note | notify | trivia | toybox | bounce | stats | rawdns | ircd_ext | idwrap | chanban | python )
-  --with-alias             ALIAS support
-  --with-botnet            Botnet support
-  --with-debug             Debug support
-  --with-dyncmd            Dynamic command levels support
-  --with-hostinfo	   Support for code that reveals/displays/shares information about the host
-			   that the bot is running on
-  --with-newbie            Newbie support
-  --with-profiling         Profiling (gcc+gprof)
-  --with-seen              SEEN support
-  --with-session           Session support
-  --with-suppress	   Command duplication suppression
-  --with-tcl               Tcl support
-  --with-telnet            Telnet support
-  --with-uptime            Include code that sends uptime reports to the IRC bot uptime contest server
-  --with-urlcapture        URL capture support
-  --with-wingate           Wingate support
+  --disable-FEATURE		do not include FEATURE (same as --enable-FEATURE=no)
+  --enable-FEATURE[=ARG]	include FEATURE [ARG=yes]
+  --with-FEATURE[=ARG]		include FEATURE [ARG=yes]
+  --without-FEATURE		do not include FEATURE (same as --with-FEATURE=no)
+  --default-yes			Default answer for all feature selections is Yes
+  --default-no			Default answer for all feature selections is No
+  --md5=internal		Use internal routines for MD5 password hashes instead of system libraries
+  --sha=internal		Use internal routines for SHA password hashes instead of system libraries
+  --use-ofp			Try to use compiler flag -fomit-frame-pointer
+  --no-ofp			Do not use compiler flag -fomit-frame-pointer
+  --with-alias			ALIAS support
+  --with-botnet			Botnet support
+  --with-bounce
+  --with-chanban
+  --with-ctcp
+  --with-dccfile
+  --with-debug			Debug support
+  --with-dynamode
+  --with-dyncmd			Dynamic command levels support
+  --with-greet
+  --with-hostinfo		Support for code that reveals/displays/shares information about the host that the bot is running on
+  --with-ircd_ext
+  --with-libmusl[=/PATH/TO/musl-gcc]
+				Try to use libmusl instead of system default
+  --with-md5
+  --with-newbie			Newbie support for extra sanity checks and error messages
+  --with-note
+  --with-notify
+  --with-perl
+  --with-profiling		Profiling (gcc+gprof)
+  --with-python
+  --with-rawdns
+  --with-redirect
+  --with-seen			SEEN support
+  --with-session		Session support
+  --with-sha
+  --with-stats
+  --with-suppress		Command duplication suppression
+  --with-tcl			Tcl scripting support
+  --with-telnet			Telnet support
+  --with-toybox
+  --with-trivia
+  --with-uptime			Include code that sends uptime reports to the IRC bot uptime contest server
+  --with-urlcapture		URL capture support
+  --with-web
+  --with-wingate		Wingate support
 __EOT__
       exit 0
       ;;
@@ -433,6 +461,32 @@ echo $ac_t "$CC"
 TESTO=./test$$.o
 TESTP=./test$$
 rm -f $TESTO $TESTP
+
+has_musl=no
+#
+#  if directed to use libmusl instead of (g)libc ...
+#
+if [ ! "$try_libmusl" = no ]; then
+  echo $ac_n "checking for libmusl ... "$ac_c
+  mgcc=`config/which musl-gcc`
+  if [ -x "$mgcc" ]; then
+    CC="$mgcc"
+  fi
+  if [ -x "$try_musl" ]; then
+    CC="$try_musl"
+  fi
+  if [ -x "$try_musl/musl-gcc" ]; then
+    CC="$try_musl/musl-gcc"
+  fi
+  if [ -x "$try_musl/bin/musl-gcc" ]; then
+    CC="$try_musl/bin/musl-gcc"
+  fi
+  if [ -x /opt/musl/bin/musl-gcc ]; then
+    CC=/opt/musl/bin/musl-gcc
+  fi
+  CCshort=$CC
+  echo $ac_t yes
+fi
 
 #
 #  does the C compile work?
@@ -830,6 +884,29 @@ elif [ ! "$ft_md5" = no ]; then
 fi
 
 #
+#  check for perl scripting support
+#
+has_perl=no
+perlinclude=
+libperl=
+if [ ! "$ft_perl" = no ]; then
+  echo $ac_n "checking for perl ... "$ac_c
+  pinc1=`perl -MConfig -e 'print $Config{archlib}'`
+  if [ -r $pinc1/CORE/perl.h -a -r $pinc1/CORE/EXTERN.h -a -r $pinc1/CORE/XSUB.h ]; then
+    perlinclude=$pinc1/CORE
+    TESTC=config/perl.c
+    if $CC -o $TESTP $TESTC -I$perlinclude -L$perlinclude -lperl 1> /dev/null 2> /dev/null; then
+      has_perl=yes
+      libperl=-lperl
+      I_PERL=-I$perlinclude
+      L_PERL=-L$perlinclude
+    fi
+    rm -f $TESTP
+  fi
+  echo $ac_t "$has_perl"
+fi
+
+#
 #  check for tcl
 #
 has_tcl=no
@@ -975,6 +1052,28 @@ fi
 out=echo
 if [ "$silentopt" = yes ]; then
   out=/bin/true
+fi
+
+#
+#   is this a git environment
+#
+echo $ac_n "checking for git ... "$ac_c
+GITEXE=`config/which git`
+echo $ac_t "$GITEXE"
+
+#
+#  multiple cpus/cores for multiple parallell compiler jobs (make -j#)
+#
+cores=1
+if [ -r /proc/cpuinfo ]; then
+  echo $ac_n "checking for multiple cpus or multiple cores ... "$ac_c
+  cores=`cat /proc/cpuinfo | grep '^processor' | wc -l`
+  echo $ac_t "$cores cpus/cores"
+fi
+
+makejobs=
+if [ ! "$cores" = 1 ]; then
+  makejobs="-j$cores"
 fi
 
 echo
@@ -1141,11 +1240,11 @@ fi
 #
 def_perl='#undef PERL'
 unset ans
-echo $ac_n "[ ALPHA] Perl scripting support? .................... [y/N] "$ac_c
+$out $ac_n "[ ALPHA] Perl scripting support? .................... [y/N] "$ac_c
 if [ "$has_perl" = no ]; then
-  echo 'no (unsupported)'
+  $out 'no (unsupported)'
 else
-  test "$ft_perl" && echo "$ft_perl" && ans=$ft_perl
+  test "$ft_perl" && $out "$ft_perl" && ans=$ft_perl
   test -z "$ft_perl" && read ans
   test "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_perl='#define PERL'
 fi
@@ -1248,7 +1347,7 @@ echo "Creating src/Makefile"
 
 O_FLAGS="$cc_optimize_flag $cc_arch_flag $cc_march_flag $cc_ofp_flag"
 W_FLAGS="$cc_wall_flag $cc_wshadow_flag $cc_fnostrictalias"
-libflags="$libcrypt $libtcl $libnsl $libsocket $libresolv $libpython"
+libflags="$libcrypt $libtcl $libnsl $libsocket $libresolv $libpython $libperl"
 lflags="$cc_g_flag -o"
 cprof="$cc_pg_flag $cc_pg_define"
 lprof="$cc_pg_flag $cc_pg_define $libpgdl"
@@ -1265,12 +1364,15 @@ s%@gdbflag@%$cc_g_flag%;
 /@libflags@/  { s,@libflags@,$libflags,;   };
 /@W_FLAGS@/   { s/@W_FLAGS@/$W_FLAGS/;     };
 /@O_FLAGS@/   { s/@O_FLAGS@/$O_FLAGS/;     };
+/@I_PERL@/ { s,@I_PERL@,$I_PERL,; };
+/@L_PERL@/ { s,@L_PERL@,$L_PERL,; };
 /@PYINCLUDE@/ { s,@PYINCLUDE@,$incpython,; };
 /@TCLINCLUDE@/ { s,@TCLINCLUDE@,$inctcl,; };
 s|@MD5_O@|$MD5_O|;
 s|@SHA_O@|$SHA_O|;
 s%@oc@%$objcomment%;
 s%@sz@%$sizecomment%;
+s%@makejobs@%$makejobs%;
 s/[ 	]*\$//g;
 " < src/Makefile.in >> src/Makefile || exit 1
 
@@ -1333,19 +1435,26 @@ s|@UNALIGNED_MEM@|$UNALIGNED_MEM|;
 " < src/config.h.in >> src/config.h
 
 if [ "$install" = yes ]; then
-  make -C src energymech
+  make $makejobs -C src energymech
   exit
 fi
 
 if [ "$compile" = yes ]; then
-  make -C src energymech
+  make $makejobs -C src energymech
   exit
 fi
 
 echo ''
-echo 'All done. You can now "make clean install"'
+echo 'All done. You can now "make install"'
+if [ ! "$cores" = 1 ]; then
+  echo "For speedy compiling, use \`\`make -j$cores''"
+fi
 echo ''
 echo 'Submit your bugreports at https://github.com/MadCamel/energymech/issues'
 echo ''
 echo 'You have read the README file I hope?'
 echo ''
+
+# make:		7.962u 0.870s 0:08.52 103.6%    0+0k 0+0io 0pf+0w
+# make -j4:	8.779u 1.069s 0:03.11 316.0%    0+0k 0+0io 0pf+0w
+# make -j8:	8.977u 1.064s 0:02.92 343.4%    0+0k 0+0io 0pf+0w

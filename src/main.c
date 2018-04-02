@@ -402,8 +402,8 @@ void sig_segv(int crap, siginfo_t *si, void *uap)
 	debug("(sigsegv) trying to access "mx_pfmt"\n",(mx_ptr)si->si_addr);
 #ifdef __x86_64__
 	mctx = &((ucontext_t *)uap)->uc_mcontext;
-	rsp = &mctx->gregs[15];		// RSP, 64-bit stack pointer
-	rip = &mctx->gregs[16];		// RIP, 64-bit instruction pointer
+	rsp = &mctx->gregs[15];	// RSP, 64-bit stack pointer
+	rip = &mctx->gregs[16]; // RIP, 64-bit instruction pointer
 
 	debug("(sigsegv) Stack pointer: "mx_pfmt", Instruction pointer: "mx_pfmt"\n",(mx_ptr)*rsp,(mx_ptr)*rip);
 	debug("(sigsegv) sig_segv() = "mx_pfmt"\n",(mx_ptr)sig_segv);
@@ -948,6 +948,9 @@ execve( ./energymech, argv = { ./energymech <NULL> <NULL> <NULL> <NULL> }, envp 
 			else
 				to_file(1,"error: Missing argument for -p <string>\n");
 			_exit(0);
+		case 't':
+			startup = 666;
+			break;
 		case 'X':
 			debug_on_exit = TRUE;
 			break;
@@ -1120,6 +1123,8 @@ execve( ./energymech, argv = { ./energymech <NULL> <NULL> <NULL> <NULL> }, envp 
 #endif /* DEBUG */
 	}
 
+	if (startup == 666)
+		exit(0);
 	startup = FALSE;
 	doit();
 }

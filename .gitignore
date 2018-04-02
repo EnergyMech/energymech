@@ -6,6 +6,7 @@ src/Makefile
 src/config.h
 src/mcmd.h
 src/usercombo.h
+trivia/*.index
 
 # compiled files
 energymech
@@ -14,6 +15,7 @@ src/*.o
 src/gencmd
 src/aliastest
 src/safepathtest
+trivia/mkindex
 
 # mech typical user config files
 *~

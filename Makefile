@@ -18,7 +18,9 @@
 #
 
 MISCFILES =	CREDITS LICENSE README README.TCL TODO VERSIONS VERSIONS-1 Makefile configure \
-		checkmech sample.conf sample.py sample.tcl sample.userfile default.bigchars public/README
+		checkmech sample.conf sample.py sample.tcl sample.userfile default.bigchars public/README trivia/README
+
+ASCIIFILES =	ascii/README ascii/bbw ascii/camel ascii/goatse ascii/mech ascii/phooler
 
 HELPFILES =	help/8BALL help/ACCESS help/ALIAS help/AWAY help/BAN help/BANLIST help/BYE \
 		help/CCHAN help/CHACCESS help/CHANBAN help/CHANNELS help/CHAT help/CLEARSHIT \
@@ -47,11 +49,9 @@ RANDFILES =	messages/8ball.txt messages/away.txt messages/insult.txt \
 
 STUBFILES =	src/Makefile.in src/config.h.in src/ld/README src/ld/elf32-i386 src/ld/elf64-x86-64
 
-TESTFILES =	config/cc.c config/endian.c config/inet_addr.c config/ldtest.c \
-		config/ptr_size.c config/socket.c config/tcl.c config/which \
-		config/md5.h config/md5_internal.c config/pw.c \
-		config/sha_internal.c config/sha1.h \
-		config/inet_aton.c config/unaligned.c config/python.c
+TESTFILES =	config/cc.c config/endian.c config/inet_addr.c config/inet_aton.c config/ldtest.c config/md5.h config/md5_internal.c \
+		config/perl.c config/ptr_size.c config/python.c config/pw.c config/sha1.h config/sha_internal.c config/socket.c config/tcl.c \
+		config/unaligned.c config/which
 
 TRIVFILES =	trivia/mkindex.c
 
@@ -69,12 +69,14 @@ HDRFILES =	src/defines.h src/global.h src/h.h src/settings.h src/structs.h src/t
 
 CONFFILES =	src/Makefile src/config.h
 
-DISTFILES =	$(MISCFILES) $(RANDFILES) $(SRCFILES) $(HELPFILES) \
+DISTFILES =	$(MISCFILES) $(RANDFILES) $(SRCFILES) $(HELPFILES) $(ASCIIFILES) \
 		$(STUBFILES) $(HDRFILES) $(TRIVFILES) $(TESTFILES)
 
 #
 # simple make rules
 #
+
+.PHONY:		clean install mech mega mega-install test dist dist2
 
 mech:		$(SRCFILES) $(CONFFILES)
 		$(MAKE) -C src energymech
@@ -82,33 +84,33 @@ mech:		$(SRCFILES) $(CONFFILES)
 energymech:	$(SRCFILES) $(CONFFILES)
 		$(MAKE) -C src energymech
 
-clean:		FORCE
+clean:
 		$(MAKE) -C src clean
 
-install:	FORCE
+install:
 		$(MAKE) -C src install
 
-mega:		FORCE
+mega:
 		$(MAKE) -C src mega
 
-mega-install:	FORCE
+mega-install:
 		$(MAKE) -C src mega-install
 
 #
 #  code validation tests
 #
 
-test:		FORCE
+test:
 		$(MAKE) -C src test
 
 #
 # packing things up for distribution
 #
 
-dist:		FORCE
+dist:
 		$(MAKE) dist2 DISTDIR=`sed 's/^.*VERSION.*"\(.*\)".*$$/emech-\1/p; d;' src/global.h`
 
-dist2:		FORCE
+dist2:
 		rm -rf /tmp/$(DISTDIR)
 		mkdir /tmp/$(DISTDIR)
 		tar cf - $(DISTFILES) | ( cd /tmp/$(DISTDIR) ; tar --preserve-permissions -xf - )
@@ -116,4 +118,3 @@ dist2:		FORCE
 		rm -rf /tmp/$(DISTDIR)
 		chmod 644 /tmp/$(DISTDIR).tar.gz
 
-FORCE:

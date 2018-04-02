@@ -1,0 +1,7 @@
+Trivia game files
+
+trivia question file needs to be 1 line per question, each line in the form ``question*answer''
+
+compile mkindex and run ``./mkindex <triviafile>'' to build the necessary index
+
+put ``set qfile <triviafile>'' in your mechs config file, the mech will try to open ``trivia/<triviafile>'' when you start trivia
