@@ -37,6 +37,10 @@ To compile the source:
    export CROSS_COMPILE="armv7a-hardfloat-linux-gnueabi-"
 
 4) make clean install
+-- On a modern multi-core cpu, you can run make with the appropriate
+   -j switch to shave off a few seconds of compile time.
+   For example:
+     ``make -j4'' for a 4 core cpu system.
 
 If  all  went  well  you  should  now  have  an executable  called
 ``energymech''.
@@ -88,6 +92,7 @@ to see what's going on with...
 
 If you get an 'Unknown option -d', you need to answer 'Y' to debug
 support when running ./configure from the compiling section above.
+Or run with ``./configure --with-debug''.
 
 ---*---
 

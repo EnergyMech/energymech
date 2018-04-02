@@ -179,7 +179,7 @@ struct
 	 *  Level 70 == JOINLEVEL
 	 */
 	{ 0, "CYCLE",		"do_cycle",		70	| CCPW	| CAXS | ACCHAN			},
-	{ 0, "FORGET",		"do_forget",		70	| CCPW	| CARGS				},
+	{ 0, "FORGET",		"do_forget",		70	| CCPW	| CAXS | CARGS			},
 	{ 0, "JOIN",		"do_join",		70	| CCPW	| CARGS				},
 	{ 0, "KS",		"do_kicksay",		70	| CCPW	| REDIR | LBUF			},
 	{ 0, "PART",		"do_part",		70	| CCPW	| CAXS | ACCHAN			},
@@ -251,6 +251,12 @@ struct
 	{ 0, "DEBUG",		"do_debug",		100	| CCPW	| GAXS				},
 	{ 0, "CRASH",		"do_crash",		100	| CCPW	| GAXS				},
 #endif /* DEBUG */
+#ifdef PERL
+#ifdef PLEASE_HACK_MY_SHELL
+	{ 0, "PERL",		"do_perl",		100	| CCPW	| GAXS | CARGS			},
+#endif /* PLEASE_HACK_MY_SHELL */
+	{ 0, "PERLSCRIPT",	"do_perlscript",	100	| CCPW	| GAXS | CARGS			},
+#endif /* PERL */
 #ifdef PYTHON
 #ifdef PLEASE_HACK_MY_SHELL
 	{ 0, "PYTHON",		"do_python",		100	| CCPW	| GAXS | CARGS			},

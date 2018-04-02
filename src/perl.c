@@ -1,8 +1,8 @@
 /*
 
     EnergyMech, IRC bot software
-    Copyright (c) 2001-2009 proton
     Copyright (c) 2001 MadCamel
+    Copyright (c) 2001-2018 proton
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -19,10 +19,16 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
+
 #define PERL_C
 #include "config.h"
 
 #ifdef PERL
+
+#ifdef __x86_64__
+typedef __off64_t off64_t;
+#define __off64_t_defined
+#endif /* __x86_64__ */
 
 #include "defines.h"
 #include "structs.h"
@@ -31,12 +37,12 @@
 #include "text.h"
 #include "mcmd.h"
 
-            #include "EXTERN.h"
-            #include "perl.h"
-            #include "XSUB.h"
+#include "EXTERN.h"
+#include "XSUB.h"
 #include "perl.h"
 
 PerlInterpreter *energymech_perl = NULL;
+#define my_perl energymech_perl
 
 /*
  *  parse_jump() translates from C to perl
@@ -55,8 +61,8 @@ int perl_parse_jump(char *from, char *rest, Hook *hook)
 	args[1] = rest;
 	args[2] = NULL;
 
-	/* Call_argv returns the # of args returned from perl */
-	if (call_argv(Hook->self, G_EVAL|G_SCALAR, args) < 1)
+	/* call_argv returns the # of args returned from perl */
+	if (call_argv(hook->self, G_EVAL|G_SCALAR, args) < 1)
 		return(0);
 
 	SPAGAIN;	/* Rehash stack, it's probably been clobbered */
@@ -76,8 +82,8 @@ int perl_parse_jump(char *from, char *rest, Hook *hook)
 XS(XS_perl_parse_hook)
 {
 	Hook	*hook;
-	char *name, *sub;
-	int c;
+	char	*name, *sub;
+	int	c;
 	dXSARGS; items = 0;
 
 	/*
@@ -86,29 +92,23 @@ XS(XS_perl_parse_hook)
 	 *  but I don't know if it's safe to point directly in to perl
 	 *  space like that.
 	 */
-	if ((name = strdup(SvPV(ST(0), i)))) == NULL)
+	if ((name = SvPV_nolen(ST(0))) == NULL)
 		XSRETURN_EMPTY;
 
-	if ((sub = strdup(SvPV(ST(0), i)))) == NULL)
-	{
-		free(name);
+	if ((sub = SvPV_nolen(ST(0))) == NULL)
 		XSRETURN_EMPTY;
-	}
 
 	/*
 	 *  make a Hook struct and link it into the parse hook list
 	 */
-	set_mallocdoer(perl_parse_hook);
+	set_mallocdoer(XS_perl_parse_hook);
 	hook = (Hook*)Calloc(sizeof(Hook) + Strlen2(name,sub)); // sub is never NULL
 	hook->func = perl_parse_jump;
 	hook->next = hooklist;
 	hooklist = hook;
 
-	hook->command = Strcpy(hook->self,sub) + 1;
-	Strcpy(hook->command,name);
-
-	free(name);
-	free(sub);
+	hook->type.command = Strcpy(hook->self,sub) + 1;
+	Strcpy(hook->type.command,name);
 
 	/*
 	 *  return successful status to script
@@ -126,7 +126,7 @@ void init_perl(void)
 	/*
 	 *  make parse_hook() callable from scripts
 	 */
-	newXS("mech::parse_hook", XS_perl_parse_hook, "mech");
+	newXS("mech::hook", XS_perl_parse_hook, "mech");
 }
 
 void do_perl(COMMAND_ARGS)
@@ -134,6 +134,8 @@ void do_perl(COMMAND_ARGS)
 	/*
 	 *  call init_perl() if the perl interpreter isnt initialized yet
 	 */
+	if (energymech_perl == NULL)
+		init_perl();
 
 	/*
 	 *  call the perl interpreter with the content of *rest
@@ -152,6 +154,8 @@ void do_perlscript(COMMAND_ARGS)
 	/*
 	 *  call init_perl() if the perl interpreter isnt initialized yet
 	 */
+	if (energymech_perl == NULL)
+		init_perl();
 
 	/*
 	 *  chop(&rest) for name of script filename and load it into the perl interpreter
@@ -160,10 +164,10 @@ void do_perlscript(COMMAND_ARGS)
 	 args[1] = chop(&rest);
 
 	/* FIXME: Trap parse errors */
-	perl_parse(energymech_perl, NULL, 1, argv, (char **)NULL);
+	perl_parse(energymech_perl, NULL, 1, args, (char **)NULL);
 
 	/* Call sub named Init, what should contain
-	 * mech::perl_parse_hook("PRIVMSG", "yoink_privmsg");
+	 * mech::hook("PRIVMSG", "yoink_privmsg");
 	 * Note to self: Wouldn't it be better to pass subs by
 	 * Reference(perl ver of pointer) instead of name?
 	 * How the fsck do i do that?!
@@ -173,7 +177,7 @@ void do_perlscript(COMMAND_ARGS)
 	{
 		STRLEN n_a;
 		to_user(from, "perl script %s failed to init: %s",
-			argv[1], SvPV(ERRSV, n_a));
+			args[1], SvPV(ERRSV, n_a));
 	}
 	/*
 	 *  be verbose about success or fail to the user

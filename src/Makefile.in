@@ -31,6 +31,8 @@ WARNFLAG =	@W_FLAGS@
 OPTIMIZE =	@O_FLAGS@
 PYINCLUDE =	@PYINCLUDE@
 TCLINCLUDE =	@TCLINCLUDE@
+I_PERL =	@I_PERL@
+L_PERL =	@L_PERL@
 
 CFLAGS =	$(PIPEFLAG) $(GDBFLAG) $(WARNFLAG) $(OPTIMIZE)
 LFLAGS =	$(PIPEFLAG) $(GDBFLAG)
@@ -58,6 +60,8 @@ SRCFILES =	alias.c auth.c bounce.c chanban.c channel.c core.c \
 		spy.c stats.c tcl.c telnet.c toybox.c trivia.c uptime.c urlcap.c \
 		user.c vars.c web.c
 
+.PHONY:		all clean mega-install mega mega-static test commands
+
 all:		$(INSTALLNAME)
 
 #
@@ -78,16 +82,16 @@ install:	$(INSTALLNAME)
 		$(CHMOD) $(INSTALLMODE) $(INSTALLNAME)
 		$(MV) $(INSTALLNAME) $(INSTALLDIR)
 
-clean:		FORCE
+clean:
 		$(RM) $(INSTALLNAME) gencmd mcmd.h usercombo.h core $(TESTFILES) $(OFILES)
 
 $(INSTALLNAME):	$(OFILES)
-		$(CROSS_COMPILE)$(CC) $(LFLAGS) -o $(INSTALLNAME) $(OFILES) $(LPROF) $(LIBS) $(LDSCRIPT)
+		$(CROSS_COMPILE)$(CC) $(LFLAGS) -o $(INSTALLNAME) $(OFILES) $(LPROF) $(LIBS) $(LDSCRIPT) $(L_PERL)
 @oc@		$(CROSS_COMPILE)objcopy -R .note -R .comment $(INSTALLNAME)
 @sz@		size $(INSTALLNAME)
 
 $(INSTALLNAME)-static:	$(OFILES)
-		$(CROSS_COMPILE)$(CC) $(LFLAGS) -o $(INSTALLNAME) $(OFILES) $(LPROF) $(LIBS) $(LDSCRIPT) -static
+		$(CROSS_COMPILE)$(CC) $(LFLAGS) -o $(INSTALLNAME) $(OFILES) $(LPROF) $(LIBS) $(LDSCRIPT) $(L_PERL) -static
 @oc@		$(CROSS_COMPILE)objcopy -R .note -R .comment $(INSTALLNAME)
 @sz@		size $(INSTALLNAME)
 
@@ -103,12 +107,12 @@ mega-install:	mega $(SRCFILES) $(INCS) usage.h
 		$(MV) $(INSTALLNAME) $(INSTALLDIR)
 
 mega:		$(SRCFILES) $(INCS) usage.h
-		$(CROSS_COMPILE)$(CC) $(CFLAGS) -o $(INSTALLNAME) mega.c $(LPROF) $(LIBS) $(LDSCRIPT) $(PYINCLUDE) $(TCLINCLUDE)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -o $(INSTALLNAME) mega.c $(LPROF) $(LIBS) $(LDSCRIPT) $(PYINCLUDE) $(TCLINCLUDE) $(I_PERL) $(L_PERL)
 @oc@		$(CROSS_COMPILE)objcopy -R .note -R .comment $(INSTALLNAME)
 @sz@		size $(INSTALLNAME)
 
 mega-static:	$(SRCFILES) $(INCS) usage.h
-		$(CROSS_COMPILE)$(CC) $(CFLAGS) -o $(INSTALLNAME) mega.c $(LPROF) $(LIBS) $(LDSCRIPT) $(PYINCLUDE) $(TCLINCLUDE) -static
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -o $(INSTALLNAME) mega.c $(LPROF) $(LIBS) $(LDSCRIPT) $(PYINCLUDE) $(TCLINCLUDE) $(I_PERL) $(L_PERL) -static
 @oc@		$(CROSS_COMPILE)objcopy -R .note -R .comment $(INSTALLNAME)
 @sz@		size $(INSTALLNAME)
 
@@ -203,7 +207,7 @@ parse.o:	parse.c $(INCS)
 		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
 perl.o:		perl.c $(INCS)
-		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) $(I_PERL) -c $< $(CPROF)
 
 prot.o:		prot.c $(INCS)
 		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
@@ -265,4 +269,3 @@ md5/md5.o:	md5/md5.c $(INCS)
 sha/sha1.o:	sha/sha1.c $(INCS)
 		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< -o $@ -Isha1 $(CPROF)
 
-FORCE:

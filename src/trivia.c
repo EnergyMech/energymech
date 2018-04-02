@@ -325,7 +325,7 @@ void trivia_no_answer(void)
 
 char *random_question(char *triv_rand)
 {
-	char	*p;
+	char	*p,tmpname[120];
 	off_t	sz;
 	int	fd,ifd;
 	int	n;
@@ -336,10 +336,22 @@ char *random_question(char *triv_rand)
 
 	} entry;
 
-	if ((fd = open(triv_qfile,O_RDONLY)) < 0)
+	if (STRCHR(triv_qfile,'/') || strlen(triv_qfile) > 100) // really bad filenames...
 		return(NULL);
 
-	Strcpy(triv_rand,triv_qfile);
+	Strcat(Strcpy(tmpname,"trivia/"),triv_qfile);
+
+	if ((fd = open(tmpname,O_RDONLY)) < 0)
+#ifdef DEBUG
+	{
+		debug("(random_question) %s: %s\n",tmpname,strerror(errno));
+		return(NULL);
+	}
+#else
+		return(NULL);
+#endif /* DEBUG */
+
+	Strcpy(triv_rand,tmpname);
 	if ((p = STRCHR(triv_rand,'.')) == NULL)
 		p = STREND(triv_rand);
 	Strcpy(p,".index");
