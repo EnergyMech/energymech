@@ -80,8 +80,8 @@
 #define TEXT_SERVERDELETED	"Server has been deleted: %s:%i"
 #define TEXT_MANYSERVMATCH	"Several entries for %s exists, please specify port also"
 /* do_core() */
-#define TEXT_CURRNICKWANT	"Current nick\t%s (Wanted: %s) [#%i]"
-#define TEXT_CURRNICKHAS	"Current nick\t%s [#%i]"
+#define TEXT_CURRNICKWANT	"Current nick\t%s (Wanted: %s) [guid #%i]"
+#define TEXT_CURRNICKHAS	"Current nick\t%s [guid #%i]"
 #define TEXT_USERLISTSTATS	"Users in userlist\t%i (%i Superuser%s, %i Bot%s)"
 #define TEXT_ACTIVECHANS	"Active channels\t%s"
 #define TEXT_MOREACTIVECHANS	"\t%s"

@@ -27,6 +27,7 @@ try_libmusl=no
 
 # default optimization goal, speed = -O2, size = -Os
 optitype=size
+cc_arch_flag=
 
 set_feature_defaults() {
   ft_alias=$ft_default
@@ -151,8 +152,9 @@ do
   esac
 
   case "$feature" in
-    alias | botnet | bounce | chanban | ctcp | dccfile | debug | dynamode | dyncmd | greet | hostinfo | idwrap | ircd_ext | libmusl | md5 | newbie | note | notify | perl \
-    | profiling | python | rawdns | redirect | seen | session | sha | stats | suppress | tcl | telnet | toybox | trivia | uptime | urlcapture | web | wingate )
+    alias | botnet | bounce | chanban | ctcp | dccfile | debug | dynamode | dyncmd | greet | hostinfo | idwrap | ircd_ext | libmusl | md5 \
+    | newbie | note | notify | perl | profiling | python | rawdns | redirect | seen | session | sha | stats | suppress | tcl | telnet | toybox \
+    | trivia | uptime | urlcapture | web | wingate )
       case _"$optarg"_ in
         _yes_ | _no_ | __ )
           ;;
@@ -345,27 +347,27 @@ Features and packages:
   --with-ircd_ext
   --with-libmusl[=/PATH/TO/musl-gcc]
 				Try to use libmusl instead of system default
-  --with-md5
+  --with-md5			Support for hashing passwords with the MD5 hashing algorithm
   --with-newbie			Newbie support for extra sanity checks and error messages
   --with-note
   --with-notify
-  --with-perl
+  --with-perl			Perl scripting support
   --with-profiling		Profiling (gcc+gprof)
-  --with-python
-  --with-rawdns
-  --with-redirect
+  --with-python			Python scripting support
+  --with-rawdns			Asynchronous DNS lookups
+  --with-redirect		Support fo sending command output to other channels/nicks/files
   --with-seen			SEEN support
   --with-session		Session support
-  --with-sha
+  --with-sha			Support for hashing passwords with the SHA (SHA-512)
   --with-stats
   --with-suppress		Command duplication suppression
   --with-tcl			Tcl scripting support
   --with-telnet			Telnet support
-  --with-toybox
-  --with-trivia
-  --with-uptime			Include code that sends uptime reports to the IRC bot uptime contest server
+  --with-toybox			An assortment of fun commands
+  --with-trivia			A trivia game
+  --with-uptime			Include code that sends uptime reports to the IRC bot uptime contest server (https://www.eggheads.org/irc/uptime_stats)
   --with-urlcapture		URL capture support
-  --with-web
+  --with-web			Support for EnergyMech serving documents via the HTTP protocol
   --with-wingate		Wingate support
 __EOT__
       exit 0
@@ -570,7 +572,7 @@ if [ -n "$cf_GNUCC" ]; then
     echo $ac_n "-fno-strict-aliasing "$ac_c
   fi
   #
-  #  -march=i386/i486/i586
+  #  -mtune=i386/i486/i586/i686/core2
   #
   test -z "$cc_arch_opt" && cc_arch_opt=yes
   if [ "$cc_arch_opt" = yes ]; then
@@ -578,16 +580,19 @@ if [ -n "$cf_GNUCC" ]; then
       _95_i486_ | _33_i486_ )
         if $CC -march=i486 -S -o - -xc /dev/null 1> /dev/null 2> /dev/null; then
           cc_arch_flag="-march=i486"
-          echo $ac_n "-march=i486 "$ac_c
         fi
         ;;
       _95_i[56789]86_ | _33_i[56789]86_ )
         if $CC -march=i586 -S -o - -xc /dev/null 1> /dev/null 2> /dev/null; then
           cc_arch_flag="-march=i586"
-          echo $ac_n "-march=i586 "$ac_c
         fi
         ;;
+      _33_x86_64_ )
+        if $CC -march=native -mtune=native -S -o - -xc /dev/null 1> /dev/null 2> /dev/null; then
+          cc_arch_flag="-march=native -mtune=native"
+	fi
     esac
+    echo $ac_n "$cc_arch_flag "$ac_c
   fi
   #
   #  -fomit-frame-pointer

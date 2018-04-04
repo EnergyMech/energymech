@@ -364,7 +364,6 @@ LS int nickcmp(const char *, const char *)			__attr(CORE_SEG, __regparm(2));
 LS char *nickcpy(char *, const char *)				__attr(CORE_SEG, __regparm(2));
 LS void stringcpy_n(char *, const char *, int)			__attr(CORE_SEG, __regparm(3));
 LS char *stringcpy(char *, const char *)			__attr(CORE_SEG, __regparm(2));
-LS char *stringcpy2(char *, const char *, const char *)		__attr(CORE_SEG, __regparm(3));
 LS char *stringchr(const char *, int)				__attr(CORE_SEG, __regparm(2));
 LS char *stringdup(const char *)				__attr(CORE_SEG, __regparm(1));
 LS char *stringcat(char *, const char *)			__attr(CORE_SEG, __regparm(2));

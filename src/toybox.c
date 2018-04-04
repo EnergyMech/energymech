@@ -361,7 +361,7 @@ ascii_badfile:
 		to_user_q(from,"%s","Bad filename or file does not exist");
 		return;
 	}
-	stringcat(stringcpy2(fname,"ascii/"),rest);
+	stringcat(stringcpy(fname,"ascii/"),rest);
 	if (is_safepath(fname,FILE_MUST_EXIST) != FILE_IS_SAFE)
 		goto ascii_badfile;
 	if ((fd = open(fname,O_RDONLY)) < 0)
