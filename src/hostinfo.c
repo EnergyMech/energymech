@@ -29,6 +29,15 @@
 
 #include <sys/utsname.h>
 
+char	omni[224]; // 32*7
+#define vmpeak	&omni[0]
+#define vmsize	&omni[32]
+#define vmrss	&omni[64]
+#define vmdata	&omni[96]
+#define vmstk	&omni[128]
+#define vmexe	&omni[160]
+#define vmlib	&omni[192]
+/*
 char	vmpeak[32];
 char	vmsize[32];
 char	vmrss[32];
@@ -36,6 +45,7 @@ char	vmdata[32];
 char	vmstk[32];
 char	vmexe[32];
 char	vmlib[32];
+*/
 
 struct // statusvalues
 {
@@ -86,7 +96,7 @@ int parse_proc_status(char *line)
 	return(FALSE);
 }
 
-char *cpufrom,cpuline[MSGLEN];
+char *cpufrom;
 int sentmodel;
 int cpus;
 int cores;
@@ -112,9 +122,36 @@ cpu cores       : 4
 int parse_proc_cpuinfo(char *line)
 {
 	char	*src,*dst;
+	int	spc;
 
-	if (strncmp(line,"model name\t:",12) == 0)
-		;
+	if (sentmodel == 0 && strncmp(line,"model name\t:",12) == 0)
+	{
+		spc = 0;
+		src = line+12;
+		while(*src == ' ')
+			src++;
+		dst = omni;
+		while(*src)
+		{
+			if (*src == ' ')
+			{
+				if (spc++)
+				{
+					src++;
+					continue;
+				}
+			}
+			else
+				spc = 0;
+			*dst++ = *src++;
+		}
+		*dst = 0;
+#ifdef DEBUG
+		debug("(parse_proc_cpuinfo) model name = %s\n",omni);
+#endif
+		to_user_q(cpufrom,"Cpu: %s\n",omni);
+		sentmodel++;
+	}
 }
 
 /*
@@ -175,6 +212,21 @@ void do_cpuinfo(COMMAND_ARGS)
 	char	*a1,*a2,*a3;
 	int	fd,n;
 
+	if ((fd = open("/proc/cpuinfo",O_RDONLY)) < 0)
+#ifdef DEBUG
+	{
+		debug("(do_cpuinfo) /proc/cpuinfo: %s\n",strerror(errno));
+		return;
+	}
+#else
+		return;
+#endif
+
+	debug("%s\n",from);
+	cpufrom = from;
+	sentmodel = 0;
+	readline(fd,&parse_proc_cpuinfo); // readline closes fd
+
 	if ((fd = open("/proc/loadavg",O_RDONLY)) < 0)
 #ifdef DEBUG
 	{
@@ -196,19 +248,7 @@ void do_cpuinfo(COMMAND_ARGS)
 	if (!a3 || !*a3)
 		return;
 
-	if ((fd = open("/proc/cpuinfo",O_RDONLY)) < 0)
-#ifdef DEBUG
-	{
-		debug("(do_cpuinfo) /proc/cpuinfo: %s\n",strerror(errno));
-		return;
-	}
-#else
-		return;
-#endif
-
-	cpufrom = from;
-	sentmodel = 0;
-	readline(fd,&parse_proc_cpuinfo);
+	to_user_q(from,"Load: %s(1m) %s(5m) %s(15m)\n",a1,a2,a3);
 }
 
 #endif /* HOSTINFO */
