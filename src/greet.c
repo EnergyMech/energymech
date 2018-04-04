@@ -138,7 +138,7 @@ void do_greet(COMMAND_ARGS)
 		user->x.x.randline  = (isfile == '%') ? TRUE : FALSE;
 
 		set_mallocdoer(do_greet);
-		user->greet = Strdup(rest);
+		user->greet = stringdup(rest);
 
 		to_user(from,"greeting for user %s has been set to: %s%s",user->name,user->greet,
 			(isfile == '@') ? " (file)" : ((isfile == '%') ? " (random line from file)" : ""));

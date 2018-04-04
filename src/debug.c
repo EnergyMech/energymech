@@ -347,8 +347,8 @@ void strflags(char *dst, const DEFstruct *flagsstruct, int flags)
 		if (flagsstruct[i].v.id & flags)
 		{
 			if (*dst)
-				Strcat(dst,"|");
-			Strcat(dst,flagsstruct[i].idstr);
+				stringcat(dst,"|");
+			stringcat(dst,flagsstruct[i].idstr);
 		}
 	}
 }
@@ -608,7 +608,7 @@ void debug_memory(void)
 				funcname = (char*)proc_lookup(mea->mme[i].doer,mea->mme[i].size);
 				if (funcname)
 				{
-					Strcpy(t,funcname);
+					stringcpy(t,funcname);
 				}
 				else
 				{
@@ -635,14 +635,14 @@ void debug_memory(void)
 		while(n > 0)
 		{
 			n = n - 8;
-			Strcat(t,"\t");
+			stringcat(t,"\t");
 		}
-		Strcat(t,ProcList[i].name);
+		stringcat(t,ProcList[i].name);
 		n = 32 - strlen(ProcList[i].name);
 		while(n > 0)
 		{
 			n = n - 8;
-			Strcat(t,"\t");
+			stringcat(t,"\t");
 		}
 
 		debug("%s%i\t\t%i\t\t%i\n",t,ProcList[i].num,ProcList[i].size,ProcList[i].mall_size);

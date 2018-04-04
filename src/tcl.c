@@ -233,16 +233,16 @@ int tcl_hook(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[])
 	if (!mode || !sz1 || !sz2)
 		return(TCL_ERROR);
 
-	if (!Strcasecmp(type,"command"))
+	if (!stringcasecmp(type,"command"))
 		mode = HOOK_COMMAND;
 	else
-	if (!Strcasecmp(type,"dcc_complete"))
+	if (!stringcasecmp(type,"dcc_complete"))
 		mode = HOOK_DCC_COMPLETE;
 	else
-	if (!Strcasecmp(type,"parse"))
+	if (!stringcasecmp(type,"parse"))
 		mode = HOOK_PARSE;
 	else
-	if (!Strcasecmp(type,"timer"))
+	if (!stringcasecmp(type,"timer"))
 	{
 		if (compile_timer(&hooktimer,command) < 0)
 			return(TCL_ERROR);
@@ -261,13 +261,13 @@ int tcl_hook(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[])
 	hook->next = hooklist;
 	hooklist = hook;
 
-	hook->type.any = (void*)(Strcpy(hook->self,self) + 1);
+	hook->type.any = (void*)(stringcpy(hook->self,self) + 1);
 
 	switch(mode)
 	{
 	case HOOK_COMMAND:
 	case HOOK_PARSE:
-		Strcpy(hook->type.command,command);
+		stringcpy(hook->type.command,command);
 		hook->func = tcl_parse_jump;
 		break;
 	default:
@@ -384,7 +384,7 @@ int tcl_to_server(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[])
 		{
 			*pp = sp = (Strp*)Calloc(sizeof(Strp) + sz);
 			/* Calloc sets to zero sp->next = NULL; */
-			Strcpy(sp->p,line);
+			stringcpy(sp->p,line);
 		}
 	}
 	else
@@ -502,8 +502,8 @@ int tcl_dns(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[])
 	hook->flags = HOOK_DNS;
 	hook->next = hooklist;
 	hooklist = hook;
-	hook->type.host = Strcpy(hook->self,callback) + 1;
-	Strcpy(hook->type.host,host);
+	hook->type.host = stringcpy(hook->self,callback) + 1;
+	stringcpy(hook->type.host,host);
 	hook->func = tcl_dns_jump;
 
 	rawdns(host);

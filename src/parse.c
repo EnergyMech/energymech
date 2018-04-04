@@ -202,7 +202,7 @@ void parse_mode(char *from, char *rest)
 		on_mode(from,to,rest);
 	}
 	else
-	if (!Strcasecmp(current->nick,to))
+	if (!stringcasecmp(current->nick,to))
 	{
 		char	*dst;
 		char	sign;
@@ -256,7 +256,7 @@ void parse_notice(char *from, char *rest)
 		rest++;
 		ctcp = get_token(&rest," \001");	/* rest cannot be NULL */
 
-		if (!Strcasecmp(ctcp,"PING") && ((pingtime = get_number(rest)) != -1))
+		if (!stringcasecmp(ctcp,"PING") && ((pingtime = get_number(rest)) != -1))
 		{
 			send_spy(SPYSTR_STATUS,"[CTCP PING Reply From %s] %i second(s)",
 				CurrentNick,(int)(now - pingtime));
@@ -298,7 +298,7 @@ void parse_part(char *from, char *rest)
 		return;
 
 	nick = from;
-	if ((from = Strchr(from,'!')))
+	if ((from = stringchr(from,'!')))
 	{
 		*from = 0;
 		from++;
@@ -549,7 +549,7 @@ void parse_251(char *from, char *rest)
 		setbotnick(current,nick);
 		for(sp=serverlist;sp;sp=sp->next)
 		{
-			if (!Strcasecmp(sp->name,from) || !Strcasecmp(sp->realname,from))
+			if (!stringcasecmp(sp->name,from) || !stringcasecmp(sp->realname,from))
 			{
 				sp->lastconnect = now;
 				current->ontime = now;
@@ -706,7 +706,7 @@ void parse_311(char *from, char *rest)
 	{
 		Free((char**)&current->userhost);
 		set_mallocdoer(parse_311);
-		current->userhost = Strdup(user);
+		current->userhost = stringdup(user);
 #ifdef BOTNET
 		botnet_refreshbotinfo();
 #endif /* BOTNET */
@@ -1059,7 +1059,7 @@ void parse_376(char *from, char *rest)
 	if ((sp = find_server(current->server)))
 	{
 		if (*sp->realname == 0)
-			Strncpy(sp->realname,from,NAMELEN);
+			stringcpy_n(sp->realname,from,NAMELEN);
 		sp->lastconnect = now;
 	}
 	if (current->connect != CN_ONLINE)
@@ -1107,20 +1107,20 @@ void parse_433(char *from, char *rest)
 
 		chop(&rest);
 		trynick = chop(&rest);
-		Strcpy(scopy,s);
+		stringcpy(scopy,s);
 		s = scopy;
 		nick = NULL;
 		do
 		{
 			s2 = chop(&s);
-			if (current->connect == CN_ONLINE && !Strcasecmp(current->nick,s2))
+			if (current->connect == CN_ONLINE && !stringcasecmp(current->nick,s2))
 			{
 				/* nicks listed first are more worth, dont try nicks after */
 				break;
 			}
 			if (!nick)
 				nick = s2;
-			if (!Strcasecmp(trynick,s2))
+			if (!stringcasecmp(trynick,s2))
 			{
 				nick = NULL;
 			}
@@ -1141,7 +1141,7 @@ void parse_433(char *from, char *rest)
 			{
 				Free((char**)&current->nick);
 				set_mallocdoer(parse_433);
-				current->nick = Strdup(nick);
+				current->nick = stringdup(nick);
 			}
 			return;
 		}
@@ -1313,7 +1313,7 @@ void parse_005(char *from, char *rest)
 			break;
 		if (!matches("modes=?",opt))
 		{
-			n = a2i(opt+6);
+			n = asc2int(opt+6);
 			if (!errno && n >= 1 && n <= 20)
 			{
 				current->setting[INT_MODES].int_var = n;
@@ -1323,7 +1323,7 @@ void parse_005(char *from, char *rest)
 			}
 		}
 		else
-		if (!Strcasecmp("WALLCHOPS",opt))
+		if (!stringcasecmp("WALLCHOPS",opt))
 		{
 			current->ircx_flags |= IRCX_WALLCHOPS;
 #ifdef DEBUG
@@ -1331,7 +1331,7 @@ void parse_005(char *from, char *rest)
 #endif /* DEBUG */
 		}
 		else
-		if (!Strcasecmp("WALLVOICES",opt))
+		if (!stringcasecmp("WALLVOICES",opt))
 		{
 			current->ircx_flags |= IRCX_WALLVOICES;
 #ifdef DEBUG
@@ -1513,7 +1513,7 @@ void parseline(char *rest)
 		/*
 		 *  does the hook match?
 		 */
-		if (hook->flags == HOOK_PARSE && !Strcasecmp(command,hook->type.command))
+		if (hook->flags == HOOK_PARSE && !stringcasecmp(command,hook->type.command))
 		{
 			if (hook->func(from,rest,hook))
 				/* if the hook returns non-zero, the input should not be parsed internally */

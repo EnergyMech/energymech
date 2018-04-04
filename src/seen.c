@@ -81,11 +81,11 @@ int read_seenlist_callback(char *rest)
 	nick = chop(&rest);
 	uh   = chop(&rest);
 
-	when = a2i(chop(&rest)); /* seen time, a2i handles NULL */
+	when = asc2int(chop(&rest)); /* seen time, asc2int handles NULL */
 	if (errno)
 		return(FALSE);
 
-	t    = a2i(chop(&rest)); /* seen type, a2i handles NULL */
+	t    = asc2int(chop(&rest)); /* seen type, asc2int handles NULL */
 	if (errno)
 		return(FALSE);
 
@@ -197,16 +197,16 @@ step_two:
 	seen->t = t;
 	/* Calloc sets to zero seen->pa = seen->pb = NULL; */
 
-	seen->userhost = Strcpy(seen->nick,nick) + 1;
-	pt = Strcpy(seen->userhost,userhost) + 1;
+	seen->userhost = stringcpy(seen->nick,nick) + 1;
+	pt = stringcpy(seen->userhost,userhost) + 1;
 	if (pa)
 	{
 		seen->pa = pt;
-		pt = Strcpy(seen->pa,pa) + 1;
+		pt = stringcpy(seen->pa,pa) + 1;
 		if (pb)
 		{
 			seen->pb = pt;
-			Strcpy(seen->pb,pb);
+			stringcpy(seen->pb,pb);
 		}
 	}
 
@@ -222,7 +222,8 @@ void do_seen(COMMAND_ARGS)
 {
 	Seen	*seen;
 	char	ago[35];		/* enought for "36500 days, 23 hours and 59 minutes" (100 years) */
-	char	*chan,*fmt,*n,*u,*c1,*c2,*c3;
+	const char *chan;
+	char	*fmt,*n,*u,*c1,*c2,*c3;
 	time_t	when;
 	int	d,h,m,mul;
 
@@ -255,7 +256,7 @@ void do_seen(COMMAND_ARGS)
 	{
 		for(seen=seenlist;seen;seen=seen->next)
 		{
-			if (!Strcasecmp(n,seen->nick))
+			if (!stringcasecmp(n,seen->nick))
 				break;
 		}
 

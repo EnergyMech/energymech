@@ -504,6 +504,13 @@ const char __mx_opts[] =	""
 #undef	OPT_COREONLY
 #endif /* NEWBIE */
 
+#ifdef PERL
+			OPT_COMMA "perl"
+#undef OPT_COMMA
+#define OPT_COMMA ", "
+#undef OPT_COREONLY
+#endif /* PERL */
+
 #ifdef PYTHON
 			OPT_COMMA "python"
 #undef OPT_COMMA
@@ -545,6 +552,20 @@ const char __mx_opts[] =	""
 #define OPT_COMMA	", "
 #undef	OPT_COREONLY
 #endif /* TELNET */
+
+#ifdef TOYBOX
+			OPT_COMMA "toybox"
+#undef	OPT_COMMA
+#define OPT_COMMA	", "
+#undef	OPT_COREONLY
+#endif /* TOYBOX */
+
+#ifdef TRIVIA
+			OPT_COMMA "trivia"
+#undef	OPT_COMMA
+#define OPT_COMMA	", "
+#undef	OPT_COREONLY
+#endif /* TRIVIA */
 
 #ifdef WINGATES
 			OPT_COMMA "wingate"

@@ -334,16 +334,16 @@ PyObject *python_hook(PyObject *self, PyObject *args, PyObject *keywds)
         return NULL;
     }
 
-    if (!Strcasecmp(type, "command"))
+    if (!stringcasecmp(type, "command"))
         mode = HOOK_COMMAND;
     else
-    if (!Strcasecmp(type, "dcc_complete"))
+    if (!stringcasecmp(type, "dcc_complete"))
         mode = HOOK_DCC_COMPLETE;
     else
-    if (!Strcasecmp(type, "parse"))
+    if (!stringcasecmp(type, "parse"))
         mode = HOOK_PARSE;
     else
-    if (!Strcasecmp(type, "timer"))
+    if (!stringcasecmp(type, "timer"))
     {
         if (compile_timer(&hooktimer, command) < 0)
         {
@@ -374,13 +374,13 @@ PyObject *python_hook(PyObject *self, PyObject *args, PyObject *keywds)
     hook->next = hooklist;
     hooklist = hook;
 
-    hook->type.any = (void*) (Strcpy(hook->self, cbname) + 1);
+    hook->type.any = (void*) (stringcpy(hook->self, cbname) + 1);
 
     switch(mode)
     {
     case HOOK_COMMAND:
     case HOOK_PARSE:
-        Strcpy(hook->type.command, command);
+        stringcpy(hook->type.command, command);
         hook->func = python_parse_jump;
         break;
     default:
@@ -718,8 +718,8 @@ static PyObject *python_dns(PyObject *self, PyObject *args, PyObject *keywds)
     hook->flags = HOOK_DNS;
     hook->next = hooklist;
     hooklist = hook;
-    hook->type.host = Strcpy(hook->self, cbname) + 1;
-    Strcpy(hook->type.host, host);
+    hook->type.host = stringcpy(hook->self, cbname) + 1;
+    stringcpy(hook->type.host, host);
     hook->func = python_dns_jump;
 
     rawdns(host);
@@ -737,7 +737,7 @@ static PyObject *python_execute(PyObject *self, PyObject *args)
     PyObject *cmd, *from, *to, *rest;
     char *c_cmd, *c_from, *c_to, *c_rest;
     int cmdaccess, i;
-    void (*found)(char*,char*,char*,int) = NULL;
+    void (*found)(char*, const char*,char*, const int) = NULL;
 
     if (!PyArg_ParseTuple(args, "OOOOi", &cmd, &from, &to, &rest, &cmdaccess))
         return NULL;
@@ -781,7 +781,7 @@ static PyObject *python_execute(PyObject *self, PyObject *args)
     /* check command exists */
     for (i = 0; mcmd[i].name; ++i)
     {
-        if (!Strcmp(mcmd[i].name, c_cmd))
+        if (!stringcmp(mcmd[i].name, c_cmd))
         {
             found = mcmd[i].func;
             break;

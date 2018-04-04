@@ -97,7 +97,7 @@ struct in_addr dnsroot_lookup(const char *hostname)
 
 	for(da=dnsroot;da;da=da->next)
 	{
-		if (!Strcasecmp(hostname,da->hostname))
+		if (!stringcasecmp(hostname,da->hostname))
 		{
 #ifdef DEBUG
 			debug("(dnsroot_lookup) %s = %s\n",hostname,inet_ntoa(da->ip));
@@ -208,7 +208,7 @@ void dns_hook(char *host, char * resolved)
 	backbot = current;
 	for(hook=hooklist;hook;hook=hook->next)
 	{
-		if (hook->flags == HOOK_DNS && !Strcasecmp(host,hook->type.host))
+		if (hook->flags == HOOK_DNS && !stringcasecmp(host,hook->type.host))
 		{
 			for(current=botlist;current;current=current->next)
 			{
@@ -294,7 +294,7 @@ void parse_query(int psz, dnsQuery *query)
 				Free((char**)&dns->cname);
 			dns->when = now + 30;
 			set_mallocdoer(parse_query);
-			dns->cname = Strdup(token2);
+			dns->cname = stringdup(token2);
 		}
 
 		if ((unpack_ushort(&rtyp[0]) == DNS_TYPE_A) &&
@@ -302,7 +302,7 @@ void parse_query(int psz, dnsQuery *query)
 		    (unpack_ushort(&rtyp[8]) == 4))
 		{
 			ip = get_stored_ip(src);
-			if (dns->auth && !Strcasecmp(dns->auth->hostname,token))
+			if (dns->auth && !stringcasecmp(dns->auth->hostname,token))
 			{
 				dns->auth->ip.s_addr = ip->s_addr;
 				dns->when = now + 60;
@@ -311,7 +311,7 @@ void parse_query(int psz, dnsQuery *query)
 #endif /* DEBUG */
 			}
 			else
-			if (!Strcasecmp(dns->host,token) || (dns->cname && !Strcasecmp(dns->cname,token)))
+			if (!stringcasecmp(dns->host,token) || (dns->cname && !stringcasecmp(dns->cname,token)))
 			{
 				dns->ip.s_addr = ip->s_addr;
 				dns->when = now + 3600;
@@ -359,7 +359,7 @@ void parse_query(int psz, dnsQuery *query)
 					set_mallocdoer(parse_query);
 					da = dns->auth = (dnsAuthority*)Calloc(sizeof(dnsAuthority) + strlen(token2));
 					/* Calloc sets to zero da->ip.s_addr = 0; */
-					Strcpy(da->hostname,token2);
+					stringcpy(da->hostname,token2);
 				}
 				else
 				if (dns->findauth == 1)
@@ -370,7 +370,7 @@ void parse_query(int psz, dnsQuery *query)
 					set_mallocdoer(parse_query);
 					da = dns->auth2 = (dnsAuthority*)Calloc(sizeof(dnsAuthority) + strlen(token2));
 					/* Calloc sets to zero da->ip.s_addr = 0; */
-					Strcpy(da->hostname,token2);
+					stringcpy(da->hostname,token2);
 #ifdef DEBUG
 					debug("(parse_query) 2nd auth set: %s\n",token2);
 #endif /* DEBUG */
@@ -407,9 +407,9 @@ void parse_query(int psz, dnsQuery *query)
 			(unpack_ushort(&rtyp[8]) == 4))
 		{
 			ip = get_stored_ip(src);
-			if (dns->auth && !Strcasecmp(dns->auth->hostname,token))
+			if (dns->auth && !stringcasecmp(dns->auth->hostname,token))
 				dns->auth->ip.s_addr = ip->s_addr;
-			if (dns->auth2 && !Strcasecmp(dns->auth2->hostname,token))
+			if (dns->auth2 && !stringcasecmp(dns->auth2->hostname,token))
 				dns->auth2->ip.s_addr = ip->s_addr;
 #ifdef DEBUG
 			debug("(parse_query) resources: %s = %s\n",token,inet_ntoa(*ip));
@@ -569,7 +569,7 @@ void rawdns(const char *hostname)
 
 	set_mallocdoer(rawdns);
 	item = (dnsList*)Calloc(sizeof(dnsList) + strlen(hostname));
-	Strcpy(item->host,hostname);
+	stringcpy(item->host,hostname);
 	item->id = ntohs(query->qid);
 	item->when = now + 30;
 	item->next = dnslist;
@@ -664,7 +664,7 @@ char *poll_rawdns(char *hostname)
 
 	for(dns=dnslist;dns;dns=dns->next)
 	{
-		if (dns->ip.s_addr && !Strcasecmp(dns->host,hostname))
+		if (dns->ip.s_addr && !stringcasecmp(dns->host,hostname))
 		{
 #ifdef DEBUG
 			debug("(poll_rawdns) a: %s ==> %s\n",hostname,inet_ntoa(dns->ip));
@@ -685,11 +685,11 @@ int read_dnsroot(char *line)
 
 	name = chop(&line);
 	a    = chop(&line);	/* TTL is optional */
-	if (a && Strcmp(a,"A"))
+	if (a && stringcmp(a,"A"))
 		a = chop(&line);
 	ip   = chop(&line);
 
-	if (a && !Strcmp(a,"A") && ip && inet_aton(ip,&ia) != 0)
+	if (a && !stringcmp(a,"A") && ip && inet_aton(ip,&ia) != 0)
 	{
 		/* remove trailing dot */
 		for(src=name;*src;)
@@ -701,7 +701,7 @@ int read_dnsroot(char *line)
 		}
 		set_mallocdoer(read_dnsroot);
 		da = (dnsAuthority*)Calloc(sizeof(dnsAuthority) + strlen(name));
-		Strcpy(da->hostname,name);
+		stringcpy(da->hostname,name);
 		da->ip.s_addr = ia.s_addr;
 		da->next = dnsroot;
 		dnsroot = da;
@@ -747,7 +747,7 @@ void do_dnsroot(COMMAND_ARGS)
 
 		p = (Strp*)Calloc(strlen(rest)+1);
 		p->next = dnsrootfiles;
-		Strcpy(p->p,rest);
+		stringcpy(p->p,rest);
 		dnsrootfiles = p;
 #endif /* SESSION */
 #ifdef DEBUG
@@ -785,14 +785,14 @@ void do_dnsserver(COMMAND_ARGS)
 				}
 				else
 				{
-					p = Strcpy(p,inet_ntoa(ia_ns[i]));
+					p = stringcpy(p,inet_ntoa(ia_ns[i]));
 					*(p++) = ' ';
 					*p = 0;
 				}
 			}
 		}
 		if (*tempservers == 0)
-			Strcpy(tempservers,"\037127.0.0.1\037");
+			stringcpy(tempservers,"\037127.0.0.1\037");
 		to_user(from,"Current DNS Servers: %s",tempservers);
 		return;
 	}
@@ -900,7 +900,7 @@ flipstep:
 			*dst++ = '.';
 			goto flipstep;
 		}
-		Strcpy(Strcpy(dst,host),".in-addr.arpa");
+		stringcpy(stringcpy(dst,host),".in-addr.arpa");
 #ifdef DEBUG
 		debug("(do_dns) host flipped to %s\n",gsockdata);
 #endif /* DEBUG */

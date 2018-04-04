@@ -112,7 +112,7 @@ char *makepass(char *plain)
 
 int passmatch(char *plain, char *encoded)
 {
-	return(!Strcmp(cipher(plain),encoded));
+	return(!stringcmp(cipher(plain),encoded));
 }
 
 #endif /* not SHACRYPT */
@@ -141,7 +141,7 @@ int passmatch(char *plain, char *encoded)
 	if (matches("$6$????$*",encoded))
 		return(FALSE);
 	enc = CRYPT_FUNC(plain,encoded);
-	return(!Strcmp(enc,encoded));
+	return(!stringcmp(enc,encoded));
 }
 
 #endif /* SHACRYPT */
@@ -170,7 +170,7 @@ int passmatch(char *plain, char *encoded)
 	if (matches("$1$????$*",encoded))
 		return(FALSE);
 	enc = CRYPT_FUNC(plain,encoded);
-	return(!Strcmp(enc,encoded));
+	return(!stringcmp(enc,encoded));
 }
 
 #endif /* MD5CRYPT */
@@ -185,7 +185,7 @@ void delete_auth(char *userhost)
 	pp = &current->authlist;
 	while(*pp)
 	{
-		if (!Strcasecmp(userhost,(*pp)->nuh))
+		if (!stringcasecmp(userhost,(*pp)->nuh))
 		{
 			auth = *pp;
 			*pp = auth->next;
@@ -238,10 +238,10 @@ void change_authnick(char *nuh, char *newnuh)
 			if ((n1 - nuh) >= (n2 - newnuh))
 			{
 #ifdef DEBUG
-				debug("(change_authnick) auth->nuh = `%s'; was `%s' (Strcpy) (L1 = %i, L2 = %i)\n",
+				debug("(change_authnick) auth->nuh = `%s'; was `%s' (stringcpy) (L1 = %i, L2 = %i)\n",
 					newnuh,nuh,(int)(n1 - nuh),(int)(n2 - newnuh));
 #endif /* DEBUG */
-				Strcpy(auth->nuh,newnuh);
+				stringcpy(auth->nuh,newnuh);
 			}
 			else
 			{
@@ -260,7 +260,7 @@ void change_authnick(char *nuh, char *newnuh)
 				auth->active = now;
 				auth->next = current->authlist;
 				current->authlist = auth;
-				Strcpy(auth->nuh,newnuh);
+				stringcpy(auth->nuh,newnuh);
 				Free((char**)&oldauth);
 			}
 			return;
@@ -270,8 +270,8 @@ void change_authnick(char *nuh, char *newnuh)
 }
 
 LS User *au_user;
-LS char *au_userhost;
-LS char *au_channel;
+LS const char *au_userhost;
+LS const char *au_channel;
 LS int au_access;
 
 void aucheck(User *user)
@@ -282,7 +282,7 @@ void aucheck(User *user)
 	{
 		for(ump=user->chan;ump;ump=ump->next)
 		{
-			if (*ump->p == '*' || !Strcasecmp(au_channel,ump->p))
+			if (*ump->p == '*' || !stringcasecmp(au_channel,ump->p))
 				break;
 		}
 		if (!ump)
@@ -303,7 +303,7 @@ void aucheck(User *user)
 	}
 }
 
-User *get_authuser(char *userhost, char *channel)
+User *get_authuser(const char *userhost, const char *channel)
 {
 	User	*user;
 	Auth	*auth;
@@ -320,7 +320,7 @@ User *get_authuser(char *userhost, char *channel)
 	{
 		if (au_access < auth->user->x.x.access)
 		{
-			if (!Strcasecmp(userhost,auth->nuh))
+			if (!stringcasecmp(userhost,auth->nuh))
 			{
 				aucheck(auth->user);
 			}
@@ -341,7 +341,7 @@ User *get_authuser(char *userhost, char *channel)
 	return(au_user);
 }
 
-int get_authaccess(char *userhost, char *channel)
+int get_authaccess(const char *userhost, const char *channel)
 {
 	User	*user;
 	Strp	*ump;
@@ -355,7 +355,7 @@ int get_authaccess(char *userhost, char *channel)
 			return(user->x.x.access);
 		for(ump=user->chan;ump;ump=ump->next)
 		{
-			if (*ump->p == '*' || !Strcasecmp(ump->p,channel))
+			if (*ump->p == '*' || !stringcasecmp(ump->p,channel))
 				return(user->x.x.access);
 		}
 		return(0);
@@ -375,7 +375,7 @@ int make_auth(const char *userhost, const User *user)
 
 	for(auth=current->authlist;auth;auth=auth->next)
 	{
-		if ((auth->user == user) && !Strcasecmp(auth->nuh,userhost))
+		if ((auth->user == user) && !stringcasecmp(auth->nuh,userhost))
 			return(TRUE);
 	}
 
@@ -389,7 +389,7 @@ int make_auth(const char *userhost, const User *user)
 	auth = (Auth*)Calloc(sizeof(Auth) + strlen(userhost));
 	auth->user = (User*)user;
 	auth->active = now;
-	Strcpy(auth->nuh,userhost);
+	stringcpy(auth->nuh,userhost);
 
 	auth->next = current->authlist;
 	current->authlist = auth;

@@ -1,7 +1,7 @@
 /*
 
     EnergyMech, IRC bot software
-    Copyright (c) 2001-2018 proton
+    Copyright (c) 2018 proton
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -26,24 +26,8 @@
 #include "structs.h"
 #include "global.h"
 #include "h.h"
-#include "text.h"
-#include "mcmd.h"
 
 #include <sys/utsname.h>
-
-/*---Help:HOSTINFO:(no arguments)
-
-Equivalent to ``uname -orm''
-
-See also: meminfo, cpuinfo
-*/
-void do_hostinfo(COMMAND_ARGS)
-{
-	struct utsname un;
-
-	if (uname(&un) == 0)
-		to_user_q(from,"%s %s %s",un.sysname,un.release,un.machine);
-}
 
 char	vmpeak[32];
 char	vmsize[32];
@@ -102,7 +86,54 @@ int parse_proc_status(char *line)
 	return(FALSE);
 }
 
-/*---Help:MEMINFO:(no arguments)
+char *cpufrom,cpuline[MSGLEN];
+int sentmodel;
+int cpus;
+int cores;
+
+/*
+proton@endemic:~/energymech/src> cat /proc/loadavg
+0.00 0.00 0.00 1/178 6759
+processor       : 0
+vendor_id       : GenuineIntel
+cpu family      : 6
+model           : 23
+model name      : Intel(R) Core(TM)2 Quad  CPU   Q8200  @ 2.33GHz
+stepping        : 7
+microcode       : 0x705
+cpu MHz         : 2024.267
+cache size      : 2048 KB
+physical id     : 0
+siblings        : 4
+core id         : 0
+cpu cores       : 4
+*/
+
+int parse_proc_cpuinfo(char *line)
+{
+	char	*src,*dst;
+
+	if (strncmp(line,"model name\t:",12) == 0)
+		;
+}
+
+/*
+help:HOSTINFO:(no arguments)
+
+Equivalent to ``uname -orm''
+
+See also: meminfo, cpuinfo
+*/
+void do_hostinfo(COMMAND_ARGS)
+{
+	struct utsname un;
+
+	if (uname(&un) == 0)
+		to_user_q(from,"%s %s %s",un.sysname,un.release,un.machine);
+}
+
+/*
+help:MEMINFO:(no arguments)
 
 Will display memory usage of the energymech process.
 
@@ -134,38 +165,8 @@ void do_meminfo(COMMAND_ARGS)
 		vmsize,vmpeak,vmrss,vmexe,vmdata,vmlib,vmstk);
 }
 
-char *cpufrom,cpuline[MSGLEN];
-int sentmodel;
-int cpus;
-int cores;
-
-int parse_proc_cpuinfo(char *line)
-{
-	char	*src,*dst;
-
-	if (strncmp(line,"model name\t:",12) == 0)
-		;
-}
-
 /*
-proton@endemic:~/energymech/src> cat /proc/loadavg
-0.00 0.00 0.00 1/178 6759
-processor       : 0
-vendor_id       : GenuineIntel
-cpu family      : 6
-model           : 23
-model name      : Intel(R) Core(TM)2 Quad  CPU   Q8200  @ 2.33GHz
-stepping        : 7
-microcode       : 0x705
-cpu MHz         : 2024.267
-cache size      : 2048 KB
-physical id     : 0
-siblings        : 4
-core id         : 0
-cpu cores       : 4
-*/
-
-/*---Help:CPUINFO:(no arguments)
+help:CPUINFO:(no arguments)
 
 See also: hostinfo, meminfo
 */

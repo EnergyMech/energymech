@@ -72,9 +72,9 @@ char *webread(int s, char *rest, char *line)
 			if (np)
 				*np = 0;
 			*pt = 0;
-			Strcpy(line,rest);
+			stringcpy(line,rest);
 			pt++;
-			Strcpy(rest,pt);
+			stringcpy(rest,pt);
 #ifdef DEBUG
 			debug("[WoR] {%i} `%s'\n",s,line);
 #endif /* DEBUG */
@@ -104,9 +104,9 @@ char *webread(int s, char *rest, char *line)
 			if (np)
 				*np = 0;
 			*tp = *pt = 0;
-			Strcpy(line,rest);
+			stringcpy(line,rest);
 			pt++;
-			Strcpy(rest,pt);
+			stringcpy(rest,pt);
 #ifdef DEBUG
 			debug("[WoR] {%i} `%s'\n",s,line);
 #endif /* DEBUG */
@@ -250,7 +250,7 @@ void web_raw(WebSock *client, char *url)
 		goto error;
 	ino = s.st_ino;
 
-	dest = Strcpy(path,WEBROOT);
+	dest = stringcpy(path,WEBROOT);
 	src = url;
 	if (*src == '/')
 		src++;
@@ -401,7 +401,7 @@ void parse(WebSock *client, char *rest)
 		method = chop(&rest);
 		url = chop(&rest);
 		proto = chop(&rest);
-		if (!method || !proto || Strcasecmp(method,"GET"))
+		if (!method || !proto || stringcasecmp(method,"GET"))
 		{
 			client->status = WEB_DEAD;
 			return;
@@ -409,13 +409,13 @@ void parse(WebSock *client, char *rest)
 		client->docptr = &docraw;
 		for(i=0;doclist[i].proc;i++)
 		{
-			if (!Strcasecmp(doclist[i].url,url))
+			if (!stringcasecmp(doclist[i].url,url))
 			{
 				client->docptr = &doclist[i];
 				break;
 			}
 		}
-		client->url = Strdup(url);
+		client->url = stringdup(url);
 		client->status = WEB_WAITCR;
 		break;
 	case WEB_WAITCR:

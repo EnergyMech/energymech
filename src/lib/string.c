@@ -20,27 +20,11 @@
 */
 #define STRING_C
 #include "config.h"
+
 #include "defines.h"
 #include "structs.h"
 #include "global.h"
 #include "h.h"
-
-/*
- *  callers responsibility to make sure text is not NULL
- */
-int stringiscaps(const char *text)
-{
-	int	n,upper;
-
-	n = upper = 0;
-	while(text[n])
-	{
-		if ((text[n] >= 'A' && text[n] <= 'Z') || (text[n] == '!'))
-			upper += 2;
-		n++;
-	}
-	return(upper >= n);
-}
 
 /*
  *  returns NULL or non-zero length string

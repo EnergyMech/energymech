@@ -12,6 +12,7 @@ trivia/*.index
 energymech
 src/energymech
 src/*.o
+src/lib/*.o
 src/gencmd
 src/aliastest
 src/safepathtest

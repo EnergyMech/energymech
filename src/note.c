@@ -47,12 +47,12 @@ int catch_note(char *from, char *to, char *rest)
 #ifdef DEBUG
 		debug("(catch_note) n->from = %s, n->to = %s\n",n->from,n->to);
 #endif /* DEBUG */
-		if (!Strcasecmp(from,n->from) && !Strcasecmp(to,n->to))
+		if (!stringcasecmp(from,n->from) && !stringcasecmp(to,n->to))
 		{
 #ifdef DEBUG
 			debug("(catch_note) note to user = %s\n",n->user);
 #endif /* DEBUG */
-			if (!Strcasecmp(rest,"."))
+			if (rest[0] == '.' && rest[1] == 0)
 			{
 				to_user(from,"Note for %s has been saved",n->user);
 				*pp = n->next;
@@ -105,12 +105,9 @@ void do_note(COMMAND_ARGS)
 	n->next = notelist;
 	notelist = n;
 
-	/*
-	 *  custom Strcat makes it sooooo easy
-	 */
-	n->to = Strcat(n->from,from) + 1;
-	n->user = Strcat(n->to,to) + 1;
-	Strcpy(n->user,rest);
+	n->to = stringcat(n->from,from) + 1;
+	n->user = stringcat(n->to,to) + 1;
+	stringcpy(n->user,rest);
 
 	/*
 	 *  add a note header
@@ -143,7 +140,7 @@ void do_read(COMMAND_ARGS)
 
 	if (rest && (opt = chop(&rest)))
 	{
-		which = a2i(opt);
+		which = asc2int(opt);
 		if (errno || !which)
 			goto read_usage;
 

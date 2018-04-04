@@ -71,7 +71,7 @@ Chan *find_channel(const char *name, int anychannel)
 			continue;
 		if (ni != tolowertab[(uchar)(chan->name[1])])
 			continue;
-		if (!Strcasecmp(name,chan->name))
+		if (!stringcasecmp(name,chan->name))
 			return(chan);
 	}
 	return(NULL);
@@ -123,11 +123,11 @@ void join_channel(char *name, char *key)
 		set_mallocdoer(join_channel);
 		chan = (Chan*)Calloc(sizeof(Chan));
 		set_mallocdoer(join_channel);
-		chan->name = Strdup(name);
+		chan->name = stringdup(name);
 		if (key)
 		{
 			set_mallocdoer(join_channel);
-			chan->key = Strdup(key);
+			chan->key = stringdup(key);
 		}
 		copy_vars(chan->setting,current->setting);
 		chan->next = current->chanlist;
@@ -151,7 +151,7 @@ void join_channel(char *name, char *key)
 	{
 		Free(&chan->key);
 		set_mallocdoer(join_channel);
-		chan->key = Strdup(key);
+		chan->key = stringdup(key);
 	}
 	if (chan->active)
 	{
@@ -175,14 +175,14 @@ void reverse_topic(Chan *chan, char *from, char *topic)
 	if ((chan->setting[TOG_TOP].int_var) &&
 		(get_useraccess(from,chan->name) < ASSTLEVEL))
 	{
-		if (chan->topic && Strcasecmp(chan->topic,topic))
+		if (chan->topic && stringcasecmp(chan->topic,topic))
 			to_server("TOPIC %s :%s\n",chan->name,chan->topic);
 		return;
 	}
 
 	Free((char**)&chan->topic);
 	set_mallocdoer(reverse_topic);
-	chan->topic = Strdup(topic);
+	chan->topic = stringdup(topic);
 }
 
 void cycle_channel(Chan *chan)
@@ -228,7 +228,7 @@ int reverse_mode(char *from, Chan *chan, int m, int s)
 		{
 			buffer[0] = mode;
 			buffer[1] = 0;
-			Strcat(buffer,ptr);
+			stringcat(buffer,ptr);
 		}
 		set_str_varc(chan,STR_ENFMODES,buffer);
 		return(FALSE);
@@ -263,8 +263,8 @@ void chan_modestr(Chan *chan, char *dest)
 	}
 	if (chan->keymode)
 	{
-		Strcat(dest," ");
-		Strcat(dest,(chan->key) ? chan->key : "???");
+		stringcat(dest," ");
+		stringcat(dest,(chan->key) ? chan->key : "???");
 	}
 }
 
@@ -288,7 +288,7 @@ Ban *make_ban(Ban **banlist, char *from, char *banmask, time_t when)
 
 	for(new=*banlist;new;new=new->next)
 	{
-		if (!Strcasecmp(new->banstring,banmask))
+		if (!stringcasecmp(new->banstring,banmask))
 			return(NULL);
 	}
 
@@ -297,8 +297,8 @@ Ban *make_ban(Ban **banlist, char *from, char *banmask, time_t when)
 	set_mallocdoer(make_ban);
 	new = (Ban*)Calloc(sz);
 
-	new->bannedby = Strcpy(new->banstring,banmask) + 1;
-			Strcpy(new->bannedby,from);
+	new->bannedby = stringcpy(new->banstring,banmask) + 1;
+	stringcpy(new->bannedby,from);
 
 	new->time = when;
 	new->next = *banlist;
@@ -314,7 +314,7 @@ void delete_ban(Chan *chan, char *banmask)
 	while(*pp)
 	{
 		ban = *pp;
-		if (!Strcasecmp(ban->banstring,banmask))
+		if (!stringcasecmp(ban->banstring,banmask))
 		{
 			*pp = ban->next;
 			Free((char**)&ban);
@@ -337,7 +337,7 @@ void delete_modemask(Chan *chan, char *mask, int mode)
 		if ((mode == 'I' && ban->imode == TRUE) ||
 		    (mode == 'e' && ban->emode == TRUE))
 		{
-			if (!Strcasecmp(ban->banstring,mask))
+			if (!stringcasecmp(ban->banstring,mask))
 			{
 				*pp = ban->next;
 				Free((char**)&ban);
@@ -364,7 +364,7 @@ void purge_banlist(Chan *chan)
 	chan->banlist = NULL;
 }
 
-void channel_massmode(Chan *chan, char *pattern, int filtmode, char mode, char typechar)
+void channel_massmode(const Chan *chan, char *pattern, int filtmode, char mode, char typechar)
 {
 	ChanUser *cu;
 	char	*pat,*uh,burst[MSGLEN],deopstring[MSGLEN];
@@ -458,8 +458,8 @@ void channel_massmode(Chan *chan, char *pattern, int filtmode, char mode, char t
 #endif /* DEBUG */
 			if (willdo && ((cu->flags & CU_MASSTMP) == 0))
 			{
-				Strcat(deopstring," ");
-				Strcat(deopstring,cu->nick);
+				stringcat(deopstring," ");
+				stringcat(deopstring,cu->nick);
 				cu->flags |= CU_MASSTMP;
 				i++;
 			}
@@ -482,8 +482,8 @@ void channel_massmode(Chan *chan, char *pattern, int filtmode, char mode, char t
 #endif /* DEBUG */
 				*burst = 0;
 			}
-			Strcat(burst,deopstring);
-			Strcat(burst,"\n");
+			stringcat(burst,deopstring);
+			stringcat(burst,"\n");
 		}
 	}
 
@@ -580,7 +580,7 @@ void remove_chanuser(Chan *chan, char *nick)
 	uchar	ni;
 
 	/*
-	 *  avoid calling Strcasecmp if first char doesnt match
+	 *  avoid calling stringcasecmp if first char doesnt match
 	 */
 	ni = nickcmptab[(uchar)(*nick)];
 	nick++;
@@ -635,13 +635,13 @@ void make_chanuser(char *nick, char *userhost)
 	new->idletime = now;
 	new->next = CurrentChan->users;
 	CurrentChan->users = new;
-	Strcpy(new->userhost,userhost);
+	stringcpy(new->userhost,userhost);
 
 	/*
 	 *  nick can change without anything else changing with it
 	 */
 	set_mallocdoer(make_chanuser);
-	new->nick = Strdup(nick);
+	new->nick = stringdup(nick);
 }
 
 void purge_chanusers(Chan *chan)
@@ -789,9 +789,9 @@ void do_channels(COMMAND_ARGS)
 	table_buffer("\037channel\037\t \037@\037\t\037users\037\t\037ops\037\t\037voiced\037\t\037modes\037");
 	for(chan=current->chanlist;chan;chan=chan->next)
 	{
-		p = Strcpy(text,chan->name);
+		p = stringcpy(text,chan->name);
 		if (chan == current->activechan)
-			p = Strcat(p," (current)");
+			p = stringcat(p," (current)");
 		if (chan->active)
 		{
 			u = o = v = 0;
@@ -902,17 +902,17 @@ void do_names(COMMAND_ARGS)
 {
 	ChanUser *cu;
 	Chan	*chan;
-	char	names[MSGLEN];
-	char	*p;
+	char	*p,names[MSGLEN];
+	const char *tochan;
 
-	p = get_channel(to,&rest);
-	if ((chan = find_channel_ny(p)) == NULL)
+	tochan = get_channel(to,&rest);
+	if ((chan = find_channel_ny(tochan)) == NULL)
 	{
-		to_user(from,ERR_CHAN,p);
+		to_user(from,ERR_CHAN,tochan);
 		return;
 	}
 
-	to_user(from,"Names on %s%s:",p,(chan->active) ? "" : " (from memory)");
+	to_user(from,"Names on %s%s:",tochan,(chan->active) ? "" : " (from memory)");
 	for(cu=chan->users;cu;)
 	{
 		p = names;
@@ -928,7 +928,7 @@ void do_names(COMMAND_ARGS)
 			if ((cu->flags) & CU_VOICE)
 				*(p++) = '+';
 
-			p = Strcpy(p,cu->nick);
+			p = stringcpy(p,cu->nick);
 			cu = cu->next;
 		}
 
@@ -1067,10 +1067,10 @@ void do_who(COMMAND_ARGS)
 
 		if (nuh)
 		{
-			if (!Strcasecmp(nuh,"-ops"))
+			if (!stringcasecmp(nuh,"-ops"))
 				flags = 1;
 			else
-			if (!Strcasecmp(nuh,"-nonops"))
+			if (!stringcasecmp(nuh,"-nonops"))
 				flags = 2;
 			else
 			{
@@ -1166,7 +1166,7 @@ void do_showidle(COMMAND_ARGS)
 	n = 10;
 	if (*rest)
 	{
-		n = a2i(chop(&rest));
+		n = asc2int(chop(&rest));
 		if (errno)
 		{
 			usage(from);	/* usage for CurrentCmd->name */

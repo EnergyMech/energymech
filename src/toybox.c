@@ -58,7 +58,7 @@ int read_bigcharset_callback(char *rest)
 	opt = chop(&rest);
 	n = NULL;
 
-	if (!Strcasecmp(opt,"chars") && charheight)
+	if (!stringcasecmp(opt,"chars") && charheight)
 	{
 		charlines = charheight;
 
@@ -71,28 +71,28 @@ int read_bigcharset_callback(char *rest)
 		*/
 		newchar->next = fontlist;
 		fontlist = newchar;
-		Strcpy(newchar->chars,opt);
+		stringcpy(newchar->chars,opt);
 	}
 	else
-	if (!Strcasecmp(opt,"spacewidth"))
+	if (!stringcasecmp(opt,"spacewidth"))
 	{
 		n = &spacewidth;
 	}
 	else
-	if (!Strcasecmp(opt,"charheight"))
+	if (!stringcasecmp(opt,"charheight"))
 	{
 		n = &charheight;
 	}
 	else
-	if (!Strcasecmp(opt,"kerning"))
+	if (!stringcasecmp(opt,"kerning"))
 	{
 		n = &kerning;
 	}
 	else
-	if (!Strcasecmp(opt,"fontname"))
+	if (!stringcasecmp(opt,"fontname"))
 	{
 		opt = chop(&rest);
-		if (fontname && !Strcasecmp(fontname,opt))
+		if (fontname && !stringcasecmp(fontname,opt))
 		{
 			fontlist   = orig_fontlist;
 			charlines  = orig_charlines;
@@ -104,12 +104,12 @@ int read_bigcharset_callback(char *rest)
 		}
 		Free((char**)&fontname);
 		set_mallocdoer(read_bigcharset_callback);
-		fontname = Strdup(opt);
+		fontname = stringdup(opt);
 	}
 
 	if (n)
 	{
-		*n = a2i(rest);
+		*n = asc2int(rest);
 		if (errno) *n = 0;
 	}
 
@@ -124,7 +124,7 @@ int read_bigcharset(char *fname)
 
 	if ((fd = open(fname,O_RDONLY)) < 0)
 	{
-		Strcat(fname,FONT_EXTENSION);
+		stringcat(fname,FONT_EXTENSION);
 		if ((fd = open(fname,O_RDONLY)) < 0)
 			return(-1);
 	}
@@ -178,7 +178,7 @@ void do_bigsay(COMMAND_ARGS)
 	debug("(do_bigsay) rest = \"%s\"\n",rest);
 #endif /* DEBUG */
 
-	Strcpy(output,BIGSAY_DEFAULTFONT);
+	stringcpy(output,BIGSAY_DEFAULTFONT);
 
 	if (read_bigcharset(output) < 0)
 	{
@@ -214,7 +214,6 @@ void do_bigsay(COMMAND_ARGS)
 					temp2 = tail;
 					while(*temp && tail < OEND)
 						*(tail++) = *(temp++);
-					//temp = Strcat(tail,sp->p);
 					while(tail < (temp2 + bigc->width) && tail < OEND)
 						*(tail++) = ' ';
 					if (pt[1])
@@ -248,7 +247,8 @@ void do_bigsay(COMMAND_ARGS)
 
 void do_random_msg(COMMAND_ARGS)
 {
-	char	*filename,*message;
+	const char *filename;
+	const char *message;
 
 	filename =  CurrentCmd->cmdarg;
 
@@ -342,7 +342,7 @@ ascii_badfile:
 		to_user_q(from,"%s","Bad filename or file does not exist");
 		return;
 	}
-	Strcat(Strcpy(fname,"ascii/"),rest);
+	stringcat(stringcpy(fname,"ascii/"),rest);
 	debug("(do_ascii) file = \"%s\"\n",fname);
 	if (is_safepath(fname,FILE_MUST_EXIST) != FILE_IS_SAFE)
 	{
@@ -361,7 +361,7 @@ ascii_badfile:
 		to_user_q(from,"%s","Bad filename or file does not exist");
 		return;
 	}
-	Strcat(Strcpy(fname,"ascii/"),rest);
+	stringcat(stringcpy2(fname,"ascii/"),rest);
 	if (is_safepath(fname,FILE_MUST_EXIST) != FILE_IS_SAFE)
 		goto ascii_badfile;
 	if ((fd = open(fname,O_RDONLY)) < 0)

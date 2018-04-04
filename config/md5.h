@@ -1,1 +1,1 @@
-../src/md5/md5.h
+../src/lib/md5.h

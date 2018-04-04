@@ -164,9 +164,9 @@ BotInfo *make_botinfo(int guid, int hops, char *nuh, char *server, char *version
 	new->guid = guid;
 	new->hops = hops;
 
-	new->server = Strcat(new->nuh,nuh) + 1;
-	new->version = Strcat(new->server,server) + 1;
-	Strcpy(new->version,version);
+	new->server = stringcat(new->nuh,nuh) + 1;
+	new->version = stringcat(new->server,server) + 1;
+	stringcpy(new->version,version);
 
 	return(new);
 }
@@ -312,14 +312,14 @@ void basicAuth(BotNet *bn, char *rest)
 
 	if ((pass = chop(&rest)))
 	{
-		if (!Strcmp(pass,"PTA"))
+		if (!stringcmp(pass,"PTA"))
 			authtype = BNAUTH_PLAINTEXT;
 #ifdef SHACRYPT
-		if (!Strcmp(pass,"SHA"))
+		if (!stringcmp(pass,"SHA"))
 			authtype = BNAUTH_SHA;
 #endif /* SHACRYPT */
 #ifdef MD5CRYPT
-		if (!Strcmp(pass,"MD5"))
+		if (!stringcmp(pass,"MD5"))
 			authtype = BNAUTH_MD5;
 #endif /* MD5CRYPT */
 	}
@@ -353,7 +353,7 @@ void basicAuth(BotNet *bn, char *rest)
 #ifdef DEBUG
 		debug(">> plain text given: \"%s\" stored \"%s\"\n",pass,rest);
 #endif /* DEBUG */
-		if (Strcmp(pass,rest))
+		if (stringcmp(pass,rest))
 			goto badpass;
 		break;
 #ifdef SHACRYPT
@@ -371,7 +371,7 @@ void basicAuth(BotNet *bn, char *rest)
 		debug("(basicAuth) their = %s, mypass = %s :: sha = %s\n",
 			pass,linkpass,enc);
 #endif /* DEBUG */
-		if (!Strcmp(enc,rest))
+		if (!stringcmp(enc,rest))
 			break;
 		}
 #endif /* SHACRYPT */
@@ -390,7 +390,7 @@ void basicAuth(BotNet *bn, char *rest)
 		debug("(basicAuth) their = %s, mypass = %s :: md5 = %s\n",
 			pass,linkpass,enc);
 #endif /* DEBUG */
-		if (!Strcmp(enc,rest))
+		if (!stringcmp(enc,rest))
 			break;
 		}
 #endif /* MD5CRYPT */
@@ -448,7 +448,7 @@ void basicBanner(BotNet *bn, char *rest)
 	 *  find out who's calling
 	 */
 	p = chop(&rest);
-	guid = a2i(p);
+	guid = asc2int(p);
 	/*
 	 *  bad guid received
 	 */
@@ -518,7 +518,7 @@ void basicBanner(BotNet *bn, char *rest)
 	 *  get a session number
 	 */
 	p = chop(&rest);
-	bn->rsid = a2i(p);
+	bn->rsid = asc2int(p);
 	if (errno)
 	{
 		botnet_deaduplink(bn);
@@ -530,14 +530,14 @@ void basicBanner(BotNet *bn, char *rest)
 	 */
 	while((p = chop(&rest)))
 	{
-		if (!Strcmp(p,"PTA"))
+		if (!stringcmp(p,"PTA"))
 			bn->opt.pta = TRUE;
 #ifdef SHACRYPT
-		if (!Strcmp(p,"SHA"))
+		if (!stringcmp(p,"SHA"))
 			bn->opt.sha = TRUE;
 #endif /* SHACRYPT */
 #ifdef MD5CRYPT
-		if (!Strcmp(p,"MD5"))
+		if (!stringcmp(p,"MD5"))
 			bn->opt.md5 = TRUE;
 #endif /* MD5CRYPT */
 	}
@@ -693,12 +693,12 @@ void basicLink(BotNet *bn, char *version)
 	 *  BL<guid> <hops> <nick>!<userhost> <server> <version>
 	 */
 	nuh = chop(&version);
-	guid = a2i(nuh);
+	guid = asc2int(nuh);
 	if (errno)
 		return;
 
 	nuh = chop(&version);
-	hops = a2i(nuh);
+	hops = asc2int(nuh);
 	if (errno)
 		return;
 
@@ -747,7 +747,7 @@ void basicQuit(BotNet *bn, char *rest)
 	if (bn->status != BN_LINKED)
 		return;
 
-	guid = a2i(rest);
+	guid = asc2int(rest);
 	if (errno)
 		return;
 
@@ -837,7 +837,7 @@ int commandlocal(int dg, int sg, char *from, char *command)
 		{
 			for(sp=user->mask;sp;sp=sp->next)
 			{
-				if (!Strcmp(sp->p,uh))
+				if (!stringcmp(sp->p,uh))
 					break;
 			}
 		}
@@ -851,13 +851,13 @@ int commandlocal(int dg, int sg, char *from, char *command)
 			redirect.method = R_BOTNET;
 			redirect.guid = sg;
 			set_mallocdoer(commandlocal);
-			redirect.to = Strdup(CurrentNick);
+			redirect.to = stringdup(CurrentNick);
 
 			p1 = tempdata;
-			p2 = Strcpy(p1,from);
+			p2 = stringcpy(p1,from);
 			p2++; /* skip past '0' */
 			*p2 = current->setting[CHR_CMDCHAR].char_var;
-			Strcpy((*p2 == *command) ? p2 : p2+1,command);
+			stringcpy((*p2 == *command) ? p2 : p2+1,command);
 
 			on_msg(p1,current->nick,p2);
 			CurrentDCC = NULL;
@@ -887,11 +887,11 @@ void partyCommand(BotNet *bn, char *rest)
 	if ((userhost = chop(&rest)) == NULL || *rest == 0)
 		return;
 
-	isguid = a2i(sguid);
+	isguid = asc2int(sguid);
 	if (errno)
 		return;
 
-	idguid = a2i(dguid);
+	idguid = asc2int(dguid);
 	if (errno)	/* == "*" */
 	{
 		commandlocal(-1,isguid,userhost,rest);
@@ -935,10 +935,10 @@ void partyMessage(BotNet *bn, char *rest)
 	if ((src = chop(&rest)) == NULL || *rest == 0)
 		return;
 
-	guid = a2i(dst);
+	guid = asc2int(dst);
 	if (errno)	/* == "*" */
 	{
-		Strncpy(CurrentNick,src,NUHLEN-1);
+		stringcpy_n(CurrentNick,src,NUHLEN-1);
 		/*
 		 *  partyline_broadcast() uses CurrentNick for the first %s in the format
 		 */
@@ -989,7 +989,7 @@ void ushareUser(BotNet *bn, char *rest)
 	int	i,tick,modcount,uaccess;
 
 	c = *(rest++);
-	tick = a2i(chop(&rest));
+	tick = asc2int(chop(&rest));
 	if (errno)
 		return;
 	if ((c != '-' && bn->tick >= tick) && (c != '+' && bn->tick != tick))
@@ -1007,15 +1007,15 @@ void ushareUser(BotNet *bn, char *rest)
 		/* `UU+tick modcount access handle chan pass' */
 		/*  UU+0 4 100 proton * $1$3484$AxMkHvZijkeqb8hA6h9AB/ */
 		i = 0;
-		modcount = a2i(chop(&rest));
+		modcount = asc2int(chop(&rest));
 		i += errno;
-		uaccess = a2i(chop(&rest));
+		uaccess = asc2int(chop(&rest));
 		i += errno;
 		handle = chop(&rest);
 		pass = chop(&rest);
 		if (i == 0 && handle && pass && *pass)
 		{
-			if (!Strcmp(pass,"none"))
+			if (!stringcmp(pass,"none"))
 				pass = NULL;
 			i = 0;
 			bn->addsession = (rand() | 1);
@@ -1129,7 +1129,7 @@ void ushareTick(BotNet *bn, char *rest)
 	User	*user,*senduser;
 	int	i;
 
-	i = a2i(rest);
+	i = asc2int(rest);
 	if (errno)
 		return;
 #ifdef DEBUG
@@ -1195,7 +1195,7 @@ void ushareDelete(BotNet *bn, char *rest)
 	int	modcount;
 
 	orig = rest;
-	modcount = a2i(chop(&rest));
+	modcount = asc2int(chop(&rest));
 	if (errno)
 		return;
 	for(current=botlist;current;current=current->next)
@@ -1225,7 +1225,7 @@ void botnet_parse(BotNet *bn, char *rest)
 #ifdef TELNET
 	if (bn->status == BN_UNKNOWN)
 	{
-		if (!Strcmp(rest,telnetprompt))
+		if (!stringcmp(rest,telnetprompt))
 			return;
 		if (*rest != 'B')
 		{
@@ -1535,7 +1535,7 @@ void do_link(COMMAND_ARGS)
 	else
 		mode = 0;
 
-	iguid = a2i(guid);
+	iguid = asc2int(guid);
 	if (errno)
 	{
 usage:
@@ -1562,7 +1562,7 @@ usage:
 		host = chop(&rest);
 		port = chop(&rest);
 
-		iport = a2i(port);
+		iport = asc2int(port);
 		if (!pass || (host && !port) || (port && (errno || iport < 1 || iport > 65535)))
 			goto usage;
 
@@ -1571,10 +1571,10 @@ usage:
 
 		cfg->guid = iguid;
 		cfg->port = iport;
-		cfg->host = Strcat(cfg->pass,pass) + 1;
+		cfg->host = stringcat(cfg->pass,pass) + 1;
 
 		if (host)
-			Strcpy(cfg->host,host);
+			stringcpy(cfg->host,host);
 		else
 			cfg->host = NULL;
 
@@ -1627,7 +1627,7 @@ void do_cmd(COMMAND_ARGS)
 	int	guid;
 
 	target = chop(&rest);
-	guid = a2i(target);
+	guid = asc2int(target);
 	if (errno)
 	{
 		unchop(orig,rest);

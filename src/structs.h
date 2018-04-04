@@ -49,7 +49,7 @@ typedef union usercombo
 typedef struct OnMsg
 {
 	const char	*name;
-	void		(*func)(char *, char *, char *, int);
+	void		(*func)(char *, const char *, char *, const int);
 	ulong		defaultaccess:8,	/* defaultaccess */
 			dcc:1,
 			cc:1,
@@ -64,7 +64,7 @@ typedef struct OnMsg
 			cbang:1,
 			acchan:1,
 			supres:1; // -- 21 bits
-	char		*cmdarg;
+	const char	*cmdarg;
 
 } OnMsg;
 
@@ -419,7 +419,7 @@ typedef struct ChanStats
 typedef struct ShortChan
 {
 	struct		ShortChan *next;
-	char		*name;
+	const char	*name;
 
 } ShortChan;
 

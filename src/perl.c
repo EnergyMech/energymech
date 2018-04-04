@@ -107,8 +107,8 @@ XS(XS_perl_parse_hook)
 	hook->next = hooklist;
 	hooklist = hook;
 
-	hook->type.command = Strcpy(hook->self,sub) + 1;
-	Strcpy(hook->type.command,name);
+	hook->type.command = stringcpy(hook->self,sub) + 1;
+	stringcpy(hook->type.command,name);
 
 	/*
 	 *  return successful status to script

@@ -18,7 +18,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
-#define COMBOT_C
+#define CORE_C
 #include "config.h"
 
 #include "defines.h"
@@ -66,7 +66,7 @@ void readcfgfile(void)
 	in = -1;
 
 #ifdef SESSION
-	if (!Strcmp(CFGFILE,configfile))
+	if (!stringcmp(CFGFILE,configfile))
 	{
 		if ((in = open(SESSIONFILE,O_RDONLY)) >= 0)
 		{
@@ -193,7 +193,7 @@ int write_session(void)
 #endif /* WEB */
 
 #ifdef UPTIME
-	if (uptimehost && Strcasecmp(uptimehost,defaultuptimehost))
+	if (uptimehost && stringcasecmp(uptimehost,defaultuptimehost))
 		to_file(sf,"set uphost %s\n",uptimehost);
 	if (uptimeport)
 		to_file(sf,"set upport %i\n",uptimeport);
@@ -325,12 +325,12 @@ void setbotnick(Mech *bot, char *nick)
 	/*
 	 *  if its exactly the same we dont need to change it
 	 */
-	if (!Strcmp(bot->nick,nick))
+	if (!stringcmp(bot->nick,nick))
 		return;
 
 	Free((char**)&bot->nick);
 	set_mallocdoer(setbotnick);
-	bot->nick = Strdup(nick);
+	bot->nick = stringdup(nick);
 #ifdef BOTNET
 	botnet_refreshbotinfo();
 #endif /* BOTNET */
@@ -346,9 +346,9 @@ Mech *add_bot(int guid, char *nick)
 	bot->sock = -1;
 	bot->guid = guid;
 	set_mallocdoer(add_bot);
-	bot->nick = Strdup(nick);
+	bot->nick = stringdup(nick);
 	set_mallocdoer(add_bot);
-	bot->wantnick = Strdup(nick);
+	bot->wantnick = stringdup(nick);
 	set_binarydefault(bot->setting);
 	bot->next = botlist;
 	botlist = bot;
@@ -511,16 +511,16 @@ Server *add_server(char *host, int port, char *pass)
 	while(*pp)
 	{
 		sp = *pp;
-		if ((!port || sp->port == port) && (!Strcasecmp(host,sp->name) || !Strcasecmp(host,sp->realname)))
+		if ((!port || sp->port == port) && (!stringcasecmp(host,sp->name) || !stringcasecmp(host,sp->realname)))
 			return(sp);
 		pp = &sp->next;
 	}
 	set_mallocdoer(add_server);
 	*pp = sp = (Server*)Calloc(sizeof(Server));
 	sp->ident = serverident++;
-	Strncpy(sp->name,host,NAMELEN);
+	stringcpy_n(sp->name,host,NAMELEN);
 	if (pass && *pass)
-		Strncpy(sp->pass,pass,PASSLEN);
+		stringcpy_n(sp->pass,pass,PASSLEN);
 	sp->port = (port) ? port : DEFAULT_IRC_PORT;
 	if (currentservergroup)
 		sp->servergroup = currentservergroup->servergroup;
@@ -533,7 +533,7 @@ ServerGroup *getservergroup(const char *name)
 
 	for(sg=servergrouplist;sg;sg=sg->next)
 	{
-		if (!strcasecmp(sg->name,name))
+		if (!stringcasecmp(sg->name,name))
 			return(sg);
 	}
 	return(NULL);
@@ -584,7 +584,7 @@ int try_server(Server *sp, char *hostname)
 #ifdef DEBUG
 		debug("(try_server) rawdns: %s ==> %s\n",sp->name,host);
 #endif /* DEBUG */
-		Strcpy(temphost,host);
+		stringcpy(temphost,host);
 		hostname = temphost;
 	}
 	else
@@ -794,8 +794,8 @@ int sub_compile_timer(int limit, ulong *flags1, ulong *flags2, char *args)
 				if (!*dash)
 					return -1;
 
-				lo = a2i(s);
-				hi = a2i(dash);
+				lo = asc2int(s);
+				hi = asc2int(dash);
 
 				if (lo < 0 || lo > limit || hi < 0 || hi > limit)
 					return -1;
@@ -817,7 +817,7 @@ int sub_compile_timer(int limit, ulong *flags1, ulong *flags2, char *args)
 			}
 			else
 			{
-				n = a2i(s);
+				n = asc2int(s);
 				if (n < 0 || n > limit)
 					return -1;
 				if (n >= 30)
@@ -910,7 +910,7 @@ int compile_timer(HookTimer *timer, char *rest)
 	char	backup[strlen(rest)+1];
 	char	*sec,*min,*hour,*day;
 
-	Strcpy(backup,rest);
+	stringcpy(backup,rest);
 	rest = backup;
 #ifdef DEBUG
 	debug("(compile_timer) rest = %s\n",nullstr(rest));
@@ -1020,7 +1020,7 @@ void update(SequenceTime *this)
 		if ((now - current->lastreset) > RESETINTERVAL)
 		{
 			current->lastreset = now;
-			if (Strcmp(current->nick,current->wantnick))
+			if (stringcmp(current->nick,current->wantnick))
 				to_server("NICK %s\n",current->wantnick);
 			check_idlekick();
 			if ((x = current->setting[INT_AAWAY].int_var) && current->away == FALSE)
@@ -1244,7 +1244,7 @@ void do_core(COMMAND_ARGS)
 			bu++;
 	}
 
-	i = Strcmp(current->nick,current->wantnick);
+	i = stringcmp(current->nick,current->wantnick);
 	if (i)
 		table_buffer(TEXT_CURRNICKWANT,current->nick,current->wantnick,current->guid);
 	else
@@ -1266,12 +1266,12 @@ void do_core(COMMAND_ARGS)
 		if (chan == current->activechan)
 		{
 			*(pt++) = '\037';
-			pt = Strcpy(pt,chan->name);
+			pt = stringcpy(pt,chan->name);
 			*(pt++) = '\037';
 		}
 		else
 		{
-			pt = Strcpy(pt,chan->name);
+			pt = stringcpy(pt,chan->name);
 		}
 		if (chan->next)
 			*(pt++) = ' ';
@@ -1341,9 +1341,9 @@ void do_die(COMMAND_ARGS)
 	}
 
 	set_mallocdoer(do_die);
-	current->signoff = Strdup(reason);
+	current->signoff = stringdup(reason);
 	set_mallocdoer(do_die);
-	current->from = Strdup(from);
+	current->from = stringdup(from);
 
 	current->connect = CN_BOTDIE;
 }
@@ -1394,7 +1394,7 @@ void do_servergroup(COMMAND_ARGS)
 		new = (ServerGroup*)Calloc(sizeof(ServerGroup) + strlen(name));
 		servergroupid++;
 		new->servergroup = servergroupid;
-		strcpy(new->name,name);
+		stringcpy(new->name,name);
 		sgp = &servergrouplist;
 		while(*sgp)
 			sgp = &(*sgp)->next;
@@ -1437,7 +1437,7 @@ void do_server(COMMAND_ARGS)
 	 */
 	if (!server)
 	{
-		if (dcc_only_command(from))
+		if (partyline_only_command(from))
 			return;
 		if (servergrouplist->next)
 			table_buffer(str_underline("server") "\t" str_underline("last connect") "\t" str_underline("group"));
@@ -1515,7 +1515,7 @@ void do_server(COMMAND_ARGS)
 
 	aport = chop(&rest);
 	pass = chop(&rest);
-	iport = a2i(aport);
+	iport = asc2int(aport);
 
 	if (aport && *aport == COMMENT_CHAR)
 	{
@@ -1548,7 +1548,7 @@ void do_server(COMMAND_ARGS)
 		dp = NULL;
 		for(sp=serverlist;sp;sp=sp->next)
 		{
-			if ((!Strcasecmp(server,sp->name)) || (!Strcasecmp(server,sp->realname)))
+			if ((!stringcasecmp(server,sp->name)) || (!stringcasecmp(server,sp->realname)))
 			{
 				if (!iport || (iport && sp->port == iport))
 				{
@@ -1653,7 +1653,7 @@ void do_nick(COMMAND_ARGS)
 		usage(from);	/* usage for CurrentCmd->name */
 		return;
 	}
-	guid = a2i(nick);
+	guid = asc2int(nick);
 	backup = current;
 	if (!errno)
 	{
@@ -1689,12 +1689,12 @@ void do_nick(COMMAND_ARGS)
 		{
 			Free((char**)&current->nick);
 			set_mallocdoer(do_nick);
-			current->nick = Strdup(nick);
+			current->nick = stringdup(nick);
 			current->guid = guid;
 		}
 		Free((char**)&current->wantnick);
 		set_mallocdoer(do_nick);
-		current->wantnick = Strdup(nick);
+		current->wantnick = stringdup(nick);
 		to_server("NICK %s\n",current->wantnick);
 	}
 	current = backup;

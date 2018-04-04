@@ -171,7 +171,7 @@ Strp *make_strp(Strp **pp, const char *string)
 {
 	set_mallocdoer(make_strp);
 	*pp = (Strp*)Calloc(sizeof(Strp) + strlen(string));
-	Strcpy((*pp)->p,string);
+	stringcpy((*pp)->p,string);
 	return(*pp);
 }
 
@@ -193,6 +193,9 @@ Strp *prepend_strp(Strp **pp, const char *string)
 	return(sp);
 }
 
+/*
+ *  Free() a chain of Strp's
+ */
 void purge_strplist(Strp *sp)
 {
 	Strp	*nxt;
@@ -218,54 +221,94 @@ void dupe_strp(Strp *sp, Strp **pp)
 	}
 }
 
-const int StrlenX(const char *first, ...)
+Strp *e_table = NULL;
+
+void table_buffer(const char *format, ...)
 {
-	const char *s,*o;
-	int n;
-	va_list vlist;
+	Strp	**sp;
+	va_list	msg;
+	int	sz;
 
-	va_start(vlist,first);
+	va_start(msg,format);
+	sz = sizeof(Strp) + vsprintf(gsockdata,format,msg);
+	va_end(msg);
 
-	n = 0;
-	o = s = first;
-	do
+	for(sp=&e_table;*sp;sp=&(*sp)->next)
+		;
+
+	set_mallocdoer(table_buffer);
+	*sp = (Strp*)Calloc(sz);
+	/* Calloc sets to zero (*sp)->next = NULL; */
+	stringcpy((*sp)->p,gsockdata);
+}
+
+void table_send(const char *from, const int space)
+{
+	char	message[MAXLEN];
+	Strp	*sp,*next;
+	char	*src,*o,*end;
+	int	i,u,g,x,z[6];
+
+	z[0] = z[1] = z[2] = z[3] = z[4] = z[5] = 0;
+	for(sp=e_table;sp;sp=sp->next)
 	{
-		while(*s)
-			s++;
-		n += (s - o);
-		s = o = va_arg(vlist,const char *);
+		u = i = 0;
+		src = o = sp->p;
+		while(*src)
+		{
+			if (*src == '\037' || *src == '\002')
+				u++;
+			if (*src == '\t' || *src == '\r')
+			{
+				x = (src - o) - u;
+				if (x > z[i])
+					z[i] = x;
+				i++;
+				o = src+1;
+				u = 0;
+			}
+			src++;
+		}
 	}
-	while(s);
 
-	va_end(vlist);
-	return(n);
-}
+	for(sp=e_table;sp;sp=next)
+	{
+		next = sp->next;
 
-const int Strlen2(const char *one, const char *two)
-{
-	const char *s1,*s2;
+		o = message;
+		src = sp->p;
+		g = x = i = 0;
+		while(*src)
+		{
+			if (g)
+			{
+				end = src;
+				while(*end && *end != '\t' && *end != '\r')
+					end++;
+				g -= (end - src);
+				while(g-- > 0)
+					*(o++) = ' ';
+			}
+			if (*src == '\037' || *src == '\002')
+				x++;
+			if (*src == '\t' || *src == '\r')
+			{
+				if (*src == '\r')
+					g = z[i+1];
+				src++;
+				x += (z[i++] + space);
+				while(o < (message + x))
+					*(o++) = ' ';
+			}
+			else
+				*(o++) = *(src++);
+		}
+		*o = 0;
+		to_user(from,FMT_PLAIN,message);
 
-	if (one)
-		for(s1=one;*s1;s1++);
-	if (two)
-		for(s2=two;*s2;s2++);
-
-	return((s1 - one) + (s2 - two));
-}
-
-char *nickcpy(char *dest, const char *nuh)
-{
-	char	*ret;
-
-	if (!dest)
-		dest = nick_buf;
-	ret = dest;
-
-	while(*nuh && (*nuh != '!'))
-		*(dest++) = *(nuh++);
-	*dest = 0;
-
-	return(ret);
+		Free((char**)&sp);
+	}
+	e_table = NULL;
 }
 
 char *getuh(char *nuh)
@@ -451,9 +494,9 @@ char *idle2str(time_t when, int small)
 	return(idlestr);
 }
 
-char *get_channel(char *to, char **rest)
+const char *get_channel(const char *to, char **rest)
 {
-	char	*channel;
+	const char *channel;
 
 	if (*rest && ischannel(*rest))
 	{
@@ -469,9 +512,9 @@ char *get_channel(char *to, char **rest)
 	return(channel);
 }
 
-char *get_channel2(char *to, char **rest)
+const char *get_channel2(const char *to, char **rest)
 {
-	char	*channel;
+	const char *channel;
 
 	if (*rest && (**rest == '*' || ischannel(*rest)))
 	{
@@ -528,7 +571,7 @@ char *cluster(char *hostname)
 			}
 			*(p++) = *(host++);
 		}
-		Strcpy(p,".*.*");
+		stringcpy(p,".*.*");
 	}
 	else
 	{
@@ -546,9 +589,9 @@ char *cluster(char *hostname)
 				break;
 			host++;
 		}
-		Strcpy(p,host);
+		stringcpy(p,host);
 	}
-	Strcpy(hostname,mask);
+	stringcpy(hostname,mask);
 	return(hostname);
 }
 
@@ -566,7 +609,7 @@ char *format_uh(char *userhost, int type)
 	if (STRCHR(userhost,'*'))
 		return(userhost);
 
-	Strcpy(tmpmask,userhost);
+	stringcpy(tmpmask,userhost);
 
 	h = tmpmask;
 	    get_token(&h,"!");	/* discard nickname */
@@ -594,7 +637,7 @@ char *nick2uh(char *from, char *userhost)
 {
 	if (STRCHR(userhost,'!') && STRCHR(userhost,'@'))
 	{
-		Strcpy(nuh_buf,userhost);
+		stringcpy(nuh_buf,userhost);
 	}
 	else
 	if (!STRCHR(userhost,'!') && !STRCHR(userhost,'@'))
@@ -609,10 +652,10 @@ char *nick2uh(char *from, char *userhost)
 	}
 	else
 	{
-		Strcpy(nuh_buf,"*!");
+		stringcpy(nuh_buf,"*!");
 		if (!STRCHR(userhost,'@'))
-			Strcat(nuh_buf,"*@");
-		Strcat(nuh_buf,userhost);
+			stringcat(nuh_buf,"*@");
+		stringcat(nuh_buf,userhost);
 	}
 	return(nuh_buf);
 }
@@ -684,26 +727,7 @@ int is_nick(const char *nick)
 	return(TRUE);
 }
 
-int capslevel(char *text)
-{
-	int	sz,upper;
-
-	if (!*text)
-		return(0);
-
-	sz = upper = 0;
-	while(*text)
-	{
-		if ((*text >= 'A' && *text <= 'Z') || (*text == '!'))
-			upper++;
-		sz++;
-		text++;
-	}
-	sz = sz / 2;
-	return(upper >= sz);
-}
-
-int a2i(char *anum)
+int asc2int(const char *anum)
 {
 	int	res = 0,neg;
 
@@ -760,146 +784,7 @@ void fix_config_line(char *text)
 		*space = 0;
 }
 
-/*
- *  returns NULL or non-zero length string
- */
-char *chop(char **src)
-{
-	char	*tok,*cut = *src;
-
-	while(*cut && *cut == ' ')
-		cut++;
-
-	if (*cut)
-	{
-		tok = cut;
-		while(*cut && *cut != ' ')
-			cut++;
-		*src = cut;
-		while(*cut && *cut == ' ')
-			cut++;
-		**src = 0;
-		*src = cut;
-	}
-	else
-	{
-		tok = NULL;
-	}
-	return(tok);
-}
-
-/*
- *  remove all '\0' in an array bounded by two pointers
- */
-void unchop(char *orig, char *rest)
-{
-	for(;orig<rest;orig++)
-	{
-		if (*orig == 0)
-			*orig = ' ';
-	}
-}
-
-int Strcasecmp(const char *p1, const char *p2)
-{
-	int	ret;
-
-	if (p1 != p2)
-	{
-		while(!(ret = tolowertab[(uchar)*(p1++)] - tolowertab[(uchar)*p2]) && *(p2++))
-			;
-		return(ret);
-	}
-	return(0);
-}
-
-int Strcmp(const char *p1, const char *p2)
-{
-	int	ret;
-
-	if (p1 != p2)
-	{
-		while(!(ret = *(p1++) - *p2) && *(p2++))
-			;
-		return(ret);
-	}
-	return(0);
-}
-
-int nickcmp(const char *p1, const char *p2)
-{
-	int	ret;
-	int	c;
-
-	if (p1 != p2)
-	{
-		while(!(ret = nickcmptab[(uchar)*(p1++)] - (c = nickcmptab[(uchar)*(p2++)])) && c)
-			;
-		return(ret);
-	}
-	return(0);
-}
-
-void Strncpy(char *dst, const char *src, int sz)
-{
-	char	*stop = dst + sz - 1;
-
-	while(*src)
-	{
-		*(dst++) = *(src++);
-		if (dst == stop)
-			break;
-	}
-	*dst = 0;
-}
-
-char *Strcpy(char *dst, const char *src)
-{
-	while(*src)
-		*(dst++) = *(src++);
-	*dst = 0;
-	return(dst);
-}
-
-char *Strchr(const char *t, int c)
-{
-	char	ch = c;
-
-	while(*t != ch && *t)
-		t++;
-	return((*t == ch) ? (char*)t : NULL);
-}
-
-char *Strdup(const char *src)
-{
-	char	*dest;
-
-	dest = (char*)Calloc(strlen(src)+1);
-	Strcpy(dest,src);
-	return(dest);
-}
-
-char *tolowercat(char *dest, const char *src)
-{
-	dest = STREND(dest);
-	while(*src)
-		*(dest++) = (char)tolowertab[(uchar)*(src++)];
-	return(dest);
-}
-
-/*
- *  This code might look odd but its optimized for size,
- *  so dont change it!
- */
-char *Strcat(char *dst, const char *src)
-{
-	while(*(dst++))
-		;
-	--dst;
-	while((*(dst++) = *(src++)) != 0)
-		;
-	return(dst-1);
-}
+#endif /* ifndef TEST */
 
 /*
  *  mask matching
@@ -998,140 +883,6 @@ int num_matches(const char *mask, const char *text)
 	return(n);
 }
 
-Strp *e_table = NULL;
-
-void table_buffer(const char *format, ...)
-{
-	Strp	**sp;
-	va_list	msg;
-	int	sz;
-
-	va_start(msg,format);
-	sz = sizeof(Strp) + vsprintf(gsockdata,format,msg);
-	va_end(msg);
-
-	for(sp=&e_table;*sp;sp=&(*sp)->next)
-		;
-
-	set_mallocdoer(table_buffer);
-	*sp = (Strp*)Calloc(sz);
-	/* Calloc sets to zero (*sp)->next = NULL; */
-	Strcpy((*sp)->p,gsockdata);
-}
-
-void table_send(const char *from, const int space)
-{
-	char	message[MAXLEN];
-	Strp	*sp,*next;
-	char	*src,*o,*end;
-	int	i,u,g,x,z[6];
-
-	z[0] = z[1] = z[2] = z[3] = z[4] = z[5] = 0;
-	for(sp=e_table;sp;sp=sp->next)
-	{
-		u = i = 0;
-		src = o = sp->p;
-		while(*src)
-		{
-			if (*src == '\037' || *src == '\002')
-				u++;
-			if (*src == '\t' || *src == '\r')
-			{
-				x = (src - o) - u;
-				if (x > z[i])
-					z[i] = x;
-				i++;
-				o = src+1;
-				u = 0;
-			}
-			src++;
-		}
-	}
-
-	for(sp=e_table;sp;sp=next)
-	{
-		next = sp->next;
-
-		o = message;
-		src = sp->p;
-		g = x = i = 0;
-		while(*src)
-		{
-			if (g)
-			{
-				end = src;
-				while(*end && *end != '\t' && *end != '\r')
-					end++;
-				g -= (end - src);
-				while(g-- > 0)
-					*(o++) = ' ';
-			}
-			if (*src == '\037' || *src == '\002')
-				x++;
-			if (*src == '\t' || *src == '\r')
-			{
-				if (*src == '\r')
-					g = z[i+1];
-				src++;
-				x += (z[i++] + space);
-				while(o < (message + x))
-					*(o++) = ' ';
-			}
-			else
-				*(o++) = *(src++);
-		}
-		*o = 0;
-		to_user(from,FMT_PLAIN,message);
-
-		Free((char**)&sp);
-	}
-	e_table = NULL;
-}
-
-#ifdef OLDCODE
-
-int is_safepath(const char *path)
-{
-	struct stat st;
-	ino_t	ino;
-	char	tmp[PATH_MAX];
-	const char *src;
-	char	*dst;
-
-	int path_token_check(void)
-	{
-		*dst = 0;
-		lstat(tmp,&st);
-		if (!(S_ISREG(st.st_mode) || S_ISDIR(st.st_mode)))
-			return(FALSE);
-		if (st.st_ino == parent_inode)
-			return(FALSE);
-		return(S_ISDIR(st.st_mode) ? 2 : 1);
-	}
-
-	if (*(src = path) == '/')
-		return(FALSE);
-
-	dst = tmp;
-	while(*src)
-	{
-		if (*src == '/' && !path_token_check())
-			return(FALSE);
-		if (dst == tmp + PATH_MAX-1)
-			return(FALSE);
-		*dst++ = *src++;
-	}
-	return(path_token_check() == 1 ? TRUE : FALSE);
-}
-
-#endif
-
-#endif /* ifndef TEST at the beginning of file */
-
-#define FILE_MUST_EXIST         1
-#define FILE_MAY_EXIST          2
-#define FILE_MUST_NOTEXIST      3
-
 int is_safepath(const char *path, int filemustexist)
 {
 	struct stat st;
@@ -1210,6 +961,31 @@ void testcase(const char *str, int expected, int filemustexist)
 	}
 }
 
+const char teststr[] = "dingchat";
+
+void teststring(void)
+{
+	char	str[100];
+
+	stringcpy(str,teststr);
+	if (stringcmp(str,teststr))
+		debug("teststring FAIL: stringcpy(str,%s) != %s (%s)\n",teststr,teststr,str);
+	else
+		debug("teststring SUCCESS: stringcpy(str,%s) == %s\n",teststr,teststr);
+
+	stringcpy_n(str+4,"xoom",2);
+	if (stringcmp(str,"dingxo"))
+		debug("teststring FAIL: stringcpy_n(str+4,%s,2) != %s (%s)\n","xoom","dingxo",str);
+	else
+		debug("teststring SUCCESS: stringcpy_n(str+4,%s,2) == %s\n","xoom","dingxo");
+
+	stringcat(str,"free");
+	if (stringcmp(str,"dingxofree"))
+		debug("teststring FAIL: stringcat(str,%s) != %s (%s)\n","free","dingxofree",str);
+	else
+		debug("teststring SUCCESS: stringcat(str,%s) == %s\n","free","dingxofree");
+}
+
 int main(int argc, char **argv)
 {
 	struct stat st;
@@ -1235,6 +1011,7 @@ int main(int argc, char **argv)
 		testcase("./nosuchfile",1,FILE_MUST_NOTEXIST);
 		testcase("../../nosuchfile",-5,FILE_MUST_NOTEXIST);
 		testcase(P2,-6,FILE_MAY_EXIST);
+		teststring();
 		exit(0);
 	}
 

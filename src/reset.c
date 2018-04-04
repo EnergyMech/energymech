@@ -98,7 +98,7 @@ char *recover_client(char *env)
 		{
 			for(user=current->userlist;user;user=user->next)
 			{
-				if (!Strcasecmp(user->name,handle))
+				if (!stringcasecmp(user->name,handle))
 					goto found_user;
 			}
 			break;
@@ -133,7 +133,7 @@ found_user:
 	if (user->x.x.access == OWNERLEVEL)
 	{
 		CurrentDCC = client;
-		Strcpy(client->sockdata,"status");
+		stringcpy(client->sockdata,"status");
 		do_spy(user->name,current->wantnick,client->sockdata,0);
 		*client->sockdata = 0;
 		CurrentDCC = NULL;
@@ -371,7 +371,7 @@ void do_reset(COMMAND_ARGS)
 #endif /* NOTIFY */
 
 	*env = 0;
-	p = Strcat(env,STR_MECHRESET);
+	p = stringcat(env,STR_MECHRESET);
 	n = 0;
 #ifdef DEBUG
 	/*

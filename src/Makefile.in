@@ -42,23 +42,20 @@ MV =		mv -f
 RM =		rm -f
 CHMOD =		chmod
 
-INCS =		config.h defines.h global.h h.h mcmd.h structs.h text.h usercombo.h
+BASEINCLUDES =	config.h defines.h structs.h global.h h.h
+INCS =		$(BASEINCLUDES) mcmd.h text.h usercombo.h
 
 TESTFILES =	aliastest safepathtest
 
-OFILES =	alias.o auth.o bounce.o chanban.o channel.o core.o \
-		ctcp.o debug.o dns.o dynamode.o function.o greet.o help.o hostinfo.o irc.o \
-		kicksay.o main.o net.o net_chan.o note.o notify.o ons.o parse.o \
-		perl.o prot.o python.o redirect.o reset.o seen.o shit.o socket.o \
-		spy.o stats.o tcl.o telnet.o toybox.o trivia.o uptime.o urlcap.o \
-		user.o vars.o web.o @MD5_O@ @SHA_O@
+OFILES =	alias.o auth.o bounce.o chanban.o channel.o core.o ctcp.o debug.o dns.o function.o greet.o \
+		help.o hostinfo.o irc.o kicksay.o main.o net.o net_chan.o note.o notify.o ons.o parse.o partyline.o \
+		perl.o prot.o python.o redirect.o reset.o seen.o shit.o socket.o spy.o stats.o tcl.o toybox.o \
+		trivia.o uptime.o urlcap.o user.o vars.o web.o lib/string.o @MD5_O@ @SHA_O@
 
-SRCFILES =	alias.c auth.c bounce.c chanban.c channel.c core.c \
-		ctcp.c debug.c dns.c dynamode.c function.c greet.c help.c hostinfo.c irc.c \
-		kicksay.c main.c net.c net_chan.c note.c notify.c ons.c parse.c \
-		perl.c prot.c python.c redirect.c reset.c seen.c shit.c socket.c \
-		spy.c stats.c tcl.c telnet.c toybox.c trivia.c uptime.c urlcap.c \
-		user.c vars.c web.c
+SRCFILES =	alias.c auth.c bounce.c chanban.c channel.c core.c ctcp.c debug.c dns.c function.c greet.c \
+		help.c hostinfo.c irc.c kicksay.c main.c net.c net_chan.c note.c notify.c ons.c parse.c partyline.c \
+		perl.c prot.c python.c redirect.c reset.c seen.c shit.c socket.c spy.c stats.c tcl.c toybox.c \
+		trivia.c uptime.c urlcap.c user.c vars.c web.c lib/string.c @MD5_C@ @SHA_C@
 
 .PHONY:		all clean mega-install mega mega-static test commands
 
@@ -137,6 +134,15 @@ commands:
 #
 #
 
+lib/md5.o:	lib/md5.c $(INCS)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< -o $@ -Ilib $(CPROF)
+
+lib/sha1.o:	lib/sha1.c $(INCS)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< -o $@ -Ilib $(CPROF)
+
+lib/string.o:	lib/string.c $(BASEINCLUDES)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< -o $@ -I. $(CPROF)
+
 alias.o:	alias.c $(INCS)
 		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
@@ -162,9 +168,6 @@ debug.o:	debug.c $(INCS) settings.h
 		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF) $(PYINCLUDE)
 
 dns.o:		dns.c $(INCS)
-		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
-
-dynamode.o:	dynamode.c $(INCS)
 		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
 function.o:	function.c $(INCS)
@@ -206,8 +209,11 @@ ons.o:		ons.c $(INCS)
 parse.o:	parse.c $(INCS)
 		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
+partyline.o:	partyline.c $(INCS)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
+
 perl.o:		perl.c $(INCS)
-		$(CROSS_COMPILE)$(CC) $(CFLAGS) $(I_PERL) -c $< $(CPROF)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF) $(I_PERL)
 
 prot.o:		prot.c $(INCS)
 		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
@@ -239,9 +245,6 @@ stats.o:	stats.c $(INCS)
 tcl.o:		tcl.c $(INCS)
 		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF) $(TCLINCLUDE)
 
-telnet.o:	telnet.c $(INCS)
-		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
-
 toybox.o:	toybox.c $(INCS)
 		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
@@ -262,10 +265,4 @@ vars.o:		vars.c $(INCS) settings.h
 
 web.o:		web.c $(INCS)
 		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
-
-md5/md5.o:	md5/md5.c $(INCS)
-		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< -o $@ -Imd5 $(CPROF)
-
-sha/sha1.o:	sha/sha1.c $(INCS)
-		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< -o $@ -Isha1 $(CPROF)
 

@@ -195,7 +195,7 @@ void catch_ison(char *rest)
 				{
 					if (*whoismsg) *(dst++) = ',';
 					*dst = 0;
-					dst = Strcat(dst,nf->nick);
+					dst = stringcat(dst,nf->nick);
 					nf->status = NF_WHOIS;
 				}
 			}
@@ -248,8 +248,8 @@ void catch_whois(char *nick, char *userhost, char *realname)
 			nlog->signon = now;
 			nlog->next = nf->log;
 			nf->log = nlog;
-			nlog->realname = Strcat(nlog->userhost,userhost) + 1;
-			Strcpy(nlog->realname,realname);
+			nlog->realname = stringcat(nlog->userhost,userhost) + 1;
+			stringcpy(nlog->realname,realname);
 			/*
 			 *  if there is a mask, we need a match to announce the online status
 			 */
@@ -279,11 +279,11 @@ int notifylog_callback(char *rest)
 
 	nick = chop(&rest);
 
-	on = a2i(chop(&rest));
+	on = asc2int(chop(&rest));
 	if (errno)
 		return(FALSE);
 
-	off = a2i(chop(&rest));
+	off = asc2int(chop(&rest));
 	if (errno)
 		return(FALSE);
 
@@ -311,8 +311,8 @@ int notifylog_callback(char *rest)
 			nlog->signoff = off;
 			nlog->next = *pp;
 			*pp = nlog;
-			nlog->realname = Strcat(nlog->userhost,userhost) + 1;
-			Strcpy(nlog->realname,rest);
+			nlog->realname = stringcat(nlog->userhost,userhost) + 1;
+			stringcpy(nlog->realname,rest);
 			break;
 		}
 	}
@@ -381,7 +381,6 @@ void write_notifylog(void)
 #endif /* DEBUG */
 }
 
-
 int notify_callback(char *rest)
 {
 	Notify	*nf;
@@ -443,18 +442,18 @@ int notify_callback(char *rest)
 	 */
 	set_mallocdoer(notify_callback);
 	nf = (Notify*)Calloc(sizeof(Notify) + StrlenX(nick,rest,src,NULL));
-	dst = Strcat(nf->nick,nick);
+	dst = stringcat(nf->nick,nick);
 	if (*rest)
 	{
 		nf->mask = dst + 1;
-		dst = Strcat(nf->mask,rest);
+		dst = stringcat(nf->mask,rest);
 		if (STRCHR(nf->mask,' '))
 			nf->endofmask = dst;
 	}
 	if (src)
 	{
 		nf->info = dst + 1;
-		Strcpy(nf->info,src);
+		stringcpy(nf->info,src);
 	}
 	/* put it at the end of notifylist */
 	*endoflist = nf;
@@ -577,11 +576,11 @@ void nfshow_full(Notify *nf)
 			if (s[1] == ':')
 				*(opt++) = ' ';
 			*opt = 0;
-			opt = Strcat(opt,s);
+			opt = stringcat(opt,s);
 			while(opt < (mem+18))
 				*(opt++) = ' ';
 			*opt = 0;
-			opt = Strcat(opt," -- ");
+			opt = stringcat(opt," -- ");
 			if (nlog->signoff)
 			{
 				s = time2away(nlog->signoff);
@@ -593,7 +592,7 @@ void nfshow_full(Notify *nf)
 			{
 				s = "   online now";
 			}
-			opt = Strcat(opt,s);
+			opt = stringcat(opt,s);
 			while(opt < (mem+41))
 				*(opt++) = ' ';
 			*opt = 0;
@@ -654,7 +653,7 @@ void do_notify(COMMAND_ARGS)
 	{
 		while((opt = chop(&rest)))
 		{
-			if (!Strcmp(opt,"+"))
+			if (!stringcmp(opt,"+"))
 			{
 				endoflist = &current->notifylist;
 				while(*endoflist)
@@ -662,14 +661,14 @@ void do_notify(COMMAND_ARGS)
 				notify_callback(rest);
 				return;
 			}
-			if (!Strcmp(opt,"-"))
+			if (!stringcmp(opt,"-"))
 			{
 				sub_notifynick(from,rest);
 				return;
 			}
 			for(n=0;n<NF_OPTIONS;n++)
 			{
-				if (!Strcasecmp(notify_opt[n],opt))
+				if (!stringcasecmp(notify_opt[n],opt))
 				{
 					flags |= (1 << n);
 					break;
@@ -691,8 +690,8 @@ void do_notify(COMMAND_ARGS)
 				if (!nf)
 				{
 					if (*message)
-						Strcat(message,", ");
-					Strcat(message,opt);
+						stringcat(message,", ");
+					stringcat(message,opt);
 				}
 				nf_header++;
 			}

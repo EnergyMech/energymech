@@ -1,1 +1,1 @@
-../src/sha/sha1.c
+../src/lib/sha1.c
