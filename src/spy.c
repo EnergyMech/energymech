@@ -65,7 +65,7 @@ void send_spy(const char *src, const char *format, ...)
 	{
 		if ((*src == '#' || *src == '*') && spy->t_src == SPY_CHANNEL)
 		{
-			if ((*src != '*') && Strcasecmp(spy->src,src))
+			if ((*src != '*') && stringcasecmp(spy->src,src))
 				continue;
 			if ((chan = find_channel_ac(spy->src)) == NULL)
 				continue;
@@ -187,7 +187,7 @@ int spy_source(char *from, int *t_src, const char **src)
 
 	for(i=0;spy_source_list[i].idstring;i++)
 	{
-		if (!Strcasecmp(*src,spy_source_list[i].idstring))
+		if (!stringcasecmp(*src,spy_source_list[i].idstring))
 		{
 			*src = spy_source_list[i].idstring;
 			*t_src = spy_source_list[i].typenum;
@@ -251,7 +251,7 @@ void do_spy(COMMAND_ARGS)
 			return;
 		}
 
-		if (dcc_only_command(from))
+		if (partyline_only_command(from))
 			return;
 		table_buffer("\037source\037\t\037target\037");
 		for(spy=current->spylist;spy;spy=spy->next)
@@ -393,7 +393,7 @@ spy_dest_ok:
 	for(spy=current->spylist;spy;spy=spy->next)
 	{
 		if ((spy->t_src == t_src) && (spy->t_dest == t_dest) &&
-			!Strcasecmp(spy->src,src) && !Strcasecmp(spy->dest,dest))
+			!stringcasecmp(spy->src,src) && !stringcasecmp(spy->dest,dest))
 		{
 			to_user(from,"Requested spy channel is already active");
 			return;
@@ -415,7 +415,7 @@ spy_dest_ok:
 	if (t_dest != SPY_DCC)
 	{
 		spy->dest = spy->p;
-		spy->src = Strcat(spy->p,dest) + 1;
+		spy->src = stringcat(spy->p,dest) + 1;
 	}
 	else
 	{
@@ -426,7 +426,7 @@ spy_dest_ok:
 
 	if (t_src == SPY_CHANNEL)
 	{
-		Strcpy((char*)spy->src,src);
+		stringcpy((char*)spy->src,src);
 	}
 	else
 	{
@@ -537,12 +537,12 @@ rspy_dest_ok:
 	 */
 	for(spy=current->spylist;spy;spy=spy->next)
 	{
-		if ((spy->t_src == t_src) && (spy->t_dest == t_dest) && (!Strcasecmp(spy->src,src)))
+		if ((spy->t_src == t_src) && (spy->t_dest == t_dest) && (!stringcasecmp(spy->src,src)))
 		{
 			if ((t_dest == SPY_DCC) && (!nickcmp(spy->dest,dest)))
 				break;
 			else
-			if (!Strcasecmp(spy->dest,dest))
+			if (!stringcasecmp(spy->dest,dest))
 				break;
 		}
 	}

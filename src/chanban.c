@@ -117,7 +117,7 @@ void chanban_action(char *nick, char *channel, Shit *shit)
 	// check all current channels
 	for(CurrentChan=current->chanlist;CurrentChan;CurrentChan=CurrentChan->next)
 	{
-		if (!Strcasecmp(channel,CurrentChan->name)) // if the bot is on the channel, skip it
+		if (!stringcasecmp(channel,CurrentChan->name)) // if the bot is on the channel, skip it
 		{
 #ifdef DEBUG
 			debug("(chanban_action) skipping %s: bot is on channel\n",channel);
@@ -125,7 +125,7 @@ void chanban_action(char *nick, char *channel, Shit *shit)
 			return;
 		}
 		// is the shit for this channel?
-		if (!Strcasecmp(shit->chan,CurrentChan->name))
+		if (!stringcasecmp(shit->chan,CurrentChan->name))
 		{
 			// if chanban is turned on && if bot is op (pretty pointless otherwise)
 			if (CurrentChan->setting[TOG_CHANBAN].int_var && CurrentChan->bot_is_op)

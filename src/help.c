@@ -68,7 +68,7 @@ void do_help(COMMAND_ARGS)
 	int	cur,nxt,count,ci,tl;
 	int	in;
 
-	if (dcc_only_command(from))
+	if (partyline_only_command(from))
 		return;
 
 	axs = get_maxaccess(from);
@@ -104,11 +104,11 @@ help_loop:
 			if (tl != cur)
 				continue;
 			if (ci != count)
-				Strcat(line,", ");
+				stringcat(line,", ");
 			print_help(from,line,strlen(mcmd[i].name));
 			if (*line == 0)
-				Strcpy(line,"           ");
-			Strcat(line,(char*)mcmd[i].name);
+				stringcpy(line,"           ");
+			stringcat(line,(char*)mcmd[i].name);
 			count--;
 		}
 		print_help(from,line,500);
@@ -119,7 +119,7 @@ help_loop:
 		goto help_loop;
 	}
 
-	level = a2i(rest);
+	level = asc2int(rest);
 	if (!errno)
 	{
 		if ((level > axs) || (level < 0))
@@ -132,10 +132,10 @@ help_loop:
 			if (acmd[i] <= level)
 			{
 				if (ci != 0)
-					Strcat(line,", ");
+					stringcat(line,", ");
 				ci++;
 				print_help(from,line,strlen(mcmd[i].name));
-				Strcat(line,(char*)mcmd[i].name);
+				stringcat(line,(char*)mcmd[i].name);
 			}
 		}
 		if (ci)
@@ -155,10 +155,10 @@ help_loop:
 			if ((!matches(rest,(char*)mcmd[i].name)) && (acmd[i] <= axs))
 			{
 				if (ci != 0)
-					Strcat(line,", ");
+					stringcat(line,", ");
 				ci++;
 				print_help(from,line,strlen(mcmd[i].name));
-				Strcat(line,(char*)mcmd[i].name);
+				stringcat(line,(char*)mcmd[i].name);
 			}
 		}
 		if (ci)
@@ -168,7 +168,7 @@ help_loop:
 		return;
 	}
 
-	pt = Strcpy(line,HELPDIR);
+	pt = stringcpy(line,HELPDIR);
 	for(i=0;(rest[i]);i++)
 	{
 		if (rest[i] >= 'a' && rest[i] <= 'z')
@@ -213,7 +213,7 @@ help_loop:
 		table_buffer("Level needed: %i",level);
 	for(i=0;ulist[i].command;i++)
 	{
-		if (!Strcasecmp(rest,ulist[i].command))
+		if (!stringcasecmp(rest,ulist[i].command))
 		{
 			pt = (ulist[i].usage) ? ulist[i].usage : "";
 			table_buffer("Usage: %s %s",ulist[i].command,pt);
@@ -231,7 +231,7 @@ void usage_command(char *to, const char *arg)
 
 	for(i=0;ulist[i].command;i++)
 	{
-		if (!Strcasecmp(arg,ulist[i].command))
+		if (!stringcasecmp(arg,ulist[i].command))
 		{
 			pt = ulist[i].usage;
 			to_user_q(to,(pt) ? "Usage: %s %s" : "Usage: %s",ulist[i].command,pt);
@@ -258,7 +258,7 @@ void do_usage(COMMAND_ARGS)
 	cmd = chop(&rest);
 	for(i=0;mcmd[i].name;i++)
 	{
-		if (!Strcasecmp(cmd,mcmd[i].name))
+		if (!stringcasecmp(cmd,mcmd[i].name))
 		{
 			usage_command(from,mcmd[i].name);
 			return;

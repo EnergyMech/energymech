@@ -37,7 +37,7 @@ KickSay *find_kicksay(char *text, char *channel)
 	best = 0;
 	for(kick=current->kicklist;kick;kick=kick->next)
 	{
-		if (!channel || *kick->chan == '*' || !Strcasecmp(channel,kick->chan))
+		if (!channel || *kick->chan == '*' || !stringcasecmp(channel,kick->chan))
 		{
 			num = num_matches(kick->mask,text);
 			if (num > best)
@@ -60,7 +60,7 @@ void check_kicksay(Chan *chan, ChanUser *doer, char *text)
 	action = -1;
 	for(kick=current->kicklist;kick;kick=kick->next)
 	{
-		if (*kick->chan == '*' || !Strcasecmp(chan->name,kick->chan))
+		if (*kick->chan == '*' || !stringcasecmp(chan->name,kick->chan))
 		{
 			if (!matches(kick->mask,text))
 			{
@@ -158,7 +158,7 @@ void do_kicksay(COMMAND_ARGS)
 			return;
 		}
 
-		if (dcc_only_command(from))
+		if (partyline_only_command(from))
 			return;
 
 		table_buffer("\037channel\037\t\037action\037\t\037string\037\t\037kick reason\037");
@@ -179,7 +179,7 @@ void do_kicksay(COMMAND_ARGS)
 		inum = DEFAULT_KS_LEVEL;
 		if (*rest != '"')
 		{
-			inum = a2i(chop(&rest));
+			inum = asc2int(chop(&rest));
 			if (errno || inum < 0 || inum > MAX_KS_LEVEL)
 				return;
 		}
@@ -217,15 +217,15 @@ void do_kicksay(COMMAND_ARGS)
 		kick->action = inum;
 
 		if (!matches("\\*?*\\*",mask))
-			kick->chan = Strcpy(kick->mask,mask) + 1;
+			kick->chan = stringcpy(kick->mask,mask) + 1;
 		else
 		{
 			kick->mask[0] = '*';
-			Strcpy(kick->mask+1,mask);
-			kick->chan = Strcat(kick->mask,MATCH_ALL) + 1;
+			stringcpy(kick->mask+1,mask);
+			kick->chan = stringcat(kick->mask,MATCH_ALL) + 1;
 		}
-		kick->reason = Strcpy(kick->chan,channel) + 1;
-				Strcpy(kick->reason,rest);
+		kick->reason = stringcpy(kick->chan,channel) + 1;
+		stringcpy(kick->reason,rest);
 
 		to_user(from,"Now kicking on \"%s\" on %s",mask,channel);
 		current->ul_save++;

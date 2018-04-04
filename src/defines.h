@@ -82,6 +82,9 @@
 #define MAXSHITLEVELSTRING	"4"
 #define MAXSHITLEVELCHAR	'4'
 
+#define __STR_ON		"on"
+#define __STR_OFF		"off"
+
 /*
  *  channel modequeues
  */

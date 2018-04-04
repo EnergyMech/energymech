@@ -111,13 +111,13 @@ void do_info(COMMAND_ARGS)
 	for(chan=current->chanlist;chan;chan=chan->next)
 	{
 		*(p = text) = 0;
-		p = Strcat(p,chan->name);
+		p = stringcat(p,chan->name);
 		if (chan == current->activechan)
-			p = Strcat(p," (current)");
+			p = stringcat(p," (current)");
 		if ((stats = chan->stats))
 		{
 			if (stats && stats->flags == CSTAT_PARTIAL)
-				p = Strcat(p," (partial)");
+				p = stringcat(p," (partial)");
 			while(p < text+35)
 				*(p++) = ' ';
 			if (stats->LHuserseconds > 0)
@@ -135,7 +135,7 @@ void do_info(COMMAND_ARGS)
 		}
 		else
 		{
-			Strcpy(p," (no current data)");
+			stringcpy(p," (no current data)");
 		}
 		to_user(from,FMT_PLAIN,text);
 	}

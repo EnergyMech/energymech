@@ -193,6 +193,7 @@ struct
 	 *  Level 80 == ASSTLEVEL
 	 */
 	{ 0, "AWAY",		"do_away",		80	| CCPW	| GAXS				},
+	{ 0, "BOOT",		"do_boot",		80	| CCPW	| GAXS | CARGS			},
 #if defined(BOTNET) && defined(REDIRECT)
 	{ 0, "CMD",		"do_cmd",		80	| CCPW	| CARGS				},
 #endif /* BOTNET && REDIRECT */

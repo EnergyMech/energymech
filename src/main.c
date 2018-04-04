@@ -98,13 +98,13 @@ int randstring_getline(char *line)
 {
 	if (--r_ct == 0)
 	{
-		Strcpy(r_str,line);
+		stringcpy(r_str,line);
 		return(TRUE);
 	}
 	return(FALSE);
 }
 
-char *randstring(char *file)
+char *randstring(const char *file)
 {
 	int	in;
 
@@ -549,7 +549,7 @@ mainloop:
 #ifdef DEBUG
 						debug("(doit) rawdns: %s ==> %s\n",sp->name,host);
 #endif /* DEBUG */
-						Strcpy(hosttemp,host);
+						stringcpy(hosttemp,host);
 						host = hosttemp;
 						try_server(sp,host);
 					}
@@ -838,10 +838,10 @@ int main(int argc, char **argv, char **envp)
 	/*
 	 *   Code to detect and recover after a RESET
 	 */
-/*
-execve( ./energymech, argv = { ./energymech <NULL> <NULL> <NULL> <NULL> }, envp = { MECHRESET=d3 f1881:2:X12 } )
-(recover_debug) debug fd recovered
-*/
+	/*
+	execve( ./energymech, argv = { ./energymech <NULL> <NULL> <NULL> <NULL> },
+		envp = { MECHRESET=d3 f1881:2:X12 } )
+	*/
 	while(*envp)
 	{
 		char	*p1;
@@ -881,7 +881,7 @@ execve( ./energymech, argv = { ./energymech <NULL> <NULL> <NULL> <NULL> }, envp 
 	if ((opt = STRCHR(*argv,' ')) != NULL)
 	{
 		*(opt++) = 0;
-		respawn = a2i(opt);
+		respawn = asc2int(opt);
 		if (errno)
 		{
 			to_file(1,bad_exe);

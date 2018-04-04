@@ -36,7 +36,7 @@ void set_str_varc(Chan *channel, int which, char *value)
 	if (value && *value)
 	{
 		set_mallocdoer(set_str_varc);
-		temp = Strdup(value);
+		temp = stringdup(value);
 	}
 	else
 		temp = NULL;
@@ -49,13 +49,13 @@ void set_str_varc(Chan *channel, int which, char *value)
 /*
  *  The rest
  */
-int find_setting(char *name)
+int find_setting(const char *name)
 {
 	int	i;
 
 	for(i=0;VarName[i].name;i++)
 	{
-		if (!Strcasecmp(name,VarName[i].name))
+		if (!stringcasecmp(name,VarName[i].name))
 			return(i);
 	}
 	return(-1);
@@ -72,7 +72,7 @@ void copy_vars(UniVar *dst, UniVar *src)
 			if (src[i].str_var)
 			{
 				set_mallocdoer(copy_vars);
-				dst[i].str_var = Strdup(src[i].str_var);
+				dst[i].str_var = stringdup(src[i].str_var);
 			}
 		}
 		else
@@ -125,7 +125,7 @@ void nobo_strcpy(const char *src)
 	*ec_dest = 0;
 }
 
-void ec_access(char *from, char *to)
+void ec_access(char *from, const char *to)
 {
 	char	num[20];
 
@@ -133,17 +133,17 @@ void ec_access(char *from, char *to)
 	nobo_strcpy(num);
 }
 
-void ec_capabilities(char *from, char *to)
+void ec_capabilities(char *from, const char *to)
 {
 	nobo_strcpy(__mx_opts);
 }
 
-void ec_cc(char *from, char *to)
+void ec_cc(char *from, const char *to)
 {
 	nobo_strcpy((current->activechan) ? current->activechan->name : TEXT_NONE);
 }
 
-void ec_channels(char *from, char *to)
+void ec_channels(char *from, const char *to)
 {
 	Chan	*chan;
 	int	n;
@@ -166,12 +166,12 @@ void ec_channels(char *from, char *to)
 	}
 }
 
-void ec_time(char *from, char *to)
+void ec_time(char *from, const char *to)
 {
 	nobo_strcpy(time2away(now));
 }
 
-void ec_set(char *from, char *to)
+void ec_set(char *from, const char *to)
 {
 	Chan	*chan;
 	UniVar	*varval;
@@ -225,7 +225,7 @@ void ec_set(char *from, char *to)
 		else
 		if (IsTog(which))
 		{
-			nobo_strcpy((varval->int_var) ? "on" : "off");
+			nobo_strcpy((varval->int_var) ? __STR_ON : __STR_OFF);
 		}
 		else
 		if (IsStr(which))
@@ -240,12 +240,12 @@ void ec_set(char *from, char *to)
 	ec_src = src;
 }
 
-void ec_on(char *from, char *to)
+void ec_on(char *from, const char *to)
 {
 	nobo_strcpy(idle2str(now - current->ontime,FALSE));
 }
 
-void ec_server(char *from, char *to)
+void ec_server(char *from, const char *to)
 {
 	Server	*sv;
 	char	*s;
@@ -257,12 +257,12 @@ void ec_server(char *from, char *to)
 	nobo_strcpy(s);
 }
 
-void ec_up(char *from, char *to)
+void ec_up(char *from, const char *to)
 {
 	nobo_strcpy(idle2str(now - uptime,FALSE));
 }
 
-void ec_ver(char *from, char *to)
+void ec_ver(char *from, const char *to)
 {
 	nobo_strcpy(BOTCLASS);
 	nobo_strcpy(" ");
@@ -271,7 +271,7 @@ void ec_ver(char *from, char *to)
 
 LS const struct
 {
-	void	(*func)(char *, char *);
+	void	(*func)(char *, const char *);
 	char	name[12];
 	char	len;
 
@@ -326,7 +326,7 @@ void do_esay(COMMAND_ARGS)
 				c = *chp;
 				*chp = 0;
 			}
-			n = Strcasecmp(ecmd[i].name,ec_src);
+			n = stringcasecmp(ecmd[i].name,ec_src);
 			if (c)
 			{
 				*chp = c;
@@ -356,7 +356,8 @@ void do_set(COMMAND_ARGS)
 	Chan	*chan;
 	UniVar	*univar,*varval;
 	char	tmp[MSGLEN];
-	char	*pp,*channel,*name;
+	char	*pp,*name;
+	const char *channel;
 	int	n,which,i,sz,limit,uaccess;
 
 	/*
@@ -421,7 +422,7 @@ second_pass:
 			else
 			if (IsTog(i))
 			{
-				pp = Strcat(tmp,(varval->int_var) ? "+" : "-");
+				pp = stringcat(tmp,(varval->int_var) ? "+" : "-");
 				pp = tolowercat(pp,VarName[i].name);
 				pp[0] = ' ';
 				pp[1] = 0;
@@ -492,19 +493,19 @@ set_usage:
 	{
 		if (IsTog(which))
 		{
-			if (!Strcasecmp(rest,"ON"))
+			if (!stringcasecmp(rest,__STR_ON))
 			{
 				n = 1;
 				goto num_data_ok;
 			}
 			else
-			if (!Strcasecmp(rest,"OFF"))
+			if (!stringcasecmp(rest,__STR_OFF))
 			{
 				/* n is 0 by default */
 				goto num_data_ok;
 			}
 		}
-		n = a2i((rest = chop(&rest)));
+		n = asc2int((rest = chop(&rest)));
 		if (errno || n < VarName[which].min || n > VarName[which].max)
 		{
 			to_user(from,"Possible values are %i through %i",VarName[which].min,VarName[which].max);
@@ -530,7 +531,7 @@ num_data_ok:
 				if (*rest)
 				{
 					set_mallocdoer(do_set);
-					chan->setting[which].str_var = Strdup(rest);
+					chan->setting[which].str_var = stringdup(rest);
 				}
 			}
 		}
@@ -553,7 +554,7 @@ num_data_ok:
 			if (*rest)
 			{
 				set_mallocdoer(do_set);
-				varval->str_var = Strdup(rest);
+				varval->str_var = stringdup(rest);
 			}
 		}
 	}

@@ -100,7 +100,7 @@ void check_botjoin(Chan *chan, ChanUser *cu)
 		for(binfo=bn->botinfo;binfo;binfo=binfo->next)
 		{
 			if (!nickcmp(cu->nick,binfo->nuh) &&
-				!Strcasecmp(cu->userhost,getuh(binfo->nuh)))
+				!stringcasecmp(cu->userhost,getuh(binfo->nuh)))
 			{
 				if ((cu = find_chanbot(chan,binfo->nuh)) == NULL)
 					return;
@@ -129,11 +129,11 @@ void check_botinfo(BotInfo *binfo, const char *channel)
 	{
 		for(chan=current->chanlist;chan;chan=chan->next)
 		{
-			if (channel && Strcasecmp(channel,chan->name))
+			if (channel && stringcasecmp(channel,chan->name))
 				continue;
 			if ((cu = find_chanbot(chan,binfo->nuh)) == NULL)
 				continue;
-			if (!Strcasecmp(cu->userhost,userhost))
+			if (!stringcasecmp(cu->userhost,userhost))
 			{
 				cu->flags |= CU_NEEDOP;
 				send_mode(chan,50,QM_CHANUSER,'+','o',(void*)cu);
@@ -156,7 +156,7 @@ void netchanNeedop(BotNet *source, char *rest)
 	char	*channel;
 	int	guid;
 
-	guid = a2i(chop(&rest));
+	guid = asc2int(chop(&rest));
 	channel = chop(&rest);
 	if (errno || guid < 1 || !channel)
 		return;
@@ -190,7 +190,7 @@ void netchanSuppress(BotNet *source, char *rest)
 	// convert command to const command
 	for(i=0;mcmd[i].name;i++)
 	{
-		j = Strcasecmp(mcmd[i].name,cmd);
+		j = stringcasecmp(mcmd[i].name,cmd);
 		if (j < 0)
 			continue;
 		if (j > 0)
@@ -202,7 +202,7 @@ void netchanSuppress(BotNet *source, char *rest)
 	if (mcmd[i].name == NULL)
 		return;
 
-	crc = a2i(rest);
+	crc = asc2int(rest);
 
 	// to all local bots
 	for(backup=botlist;backup;backup=backup->next)

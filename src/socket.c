@@ -353,7 +353,7 @@ void to_user_q(const char *target, const char *format, ...)
 	vsprintf(message,format,args);
 	va_end(args);
 
-	Strcat(message,"\n");
+	stringcat(message,"\n");
 
 	fmt = "NOTICE %s :%s";
 	if (CurrentChan)
@@ -434,12 +434,12 @@ void to_user(const char *target, const char *format, ...)
 #endif /* DEBUG */
 			return;
 		}
-		s = Strcpy(message,"NOTICE ");
+		s = stringcpy(message,"NOTICE ");
 		if (ischannel(target))
-			Strcat(message,target);
+			stringcat(message,target);
 		else
 			nickcpy(s,target);
-		s = Strcat(message," :");
+		s = stringcat(message," :");
 	}
 
 	va_start(args,format);
@@ -457,7 +457,7 @@ void to_user(const char *target, const char *format, ...)
 	/*
 	 *  tag on a newline for DCC or server
 	 */
-	s = Strcat(message,"\n");
+	s = stringcat(message,"\n");
 
 #ifdef DEBUG
 	*s = 0;

@@ -19,27 +19,24 @@ A million repetitions of "a"
 
 #include <stdio.h>
 #include <string.h>
-
 /* for uint32_t */
 #include <stdint.h>
-
+#include <unistd.h>
 #include "sha1.h"
-
 
 #define rol(value, bits) (((value) << (bits)) | ((value) >> (32 - (bits))))
 
 /* blk0() and blk() perform the initial expand. */
 /* I got the idea of expanding during the round function from SSLeay */
 #if BYTE_ORDER == LITTLE_ENDIAN
-#define blk0(i) (block->l[i] = (rol(block->l[i],24)&0xFF00FF00) \
-    |(rol(block->l[i],8)&0x00FF00FF))
+#define blk0(i)		(block->l[i] = (rol(block->l[i],24)&0xFF00FF00)|(rol(block->l[i],8)&0x00FF00FF))
 #elif BYTE_ORDER == BIG_ENDIAN
-#define blk0(i) block->l[i]
+#define blk0(i)		block->l[i]
 #else
 #error "Endianness not defined!"
 #endif
-#define blk(i) (block->l[i&15] = rol(block->l[(i+13)&15]^block->l[(i+8)&15] \
-    ^block->l[(i+2)&15]^block->l[i&15],1))
+
+#define blk(i)		(block->l[i&15] = rol(block->l[(i+13)&15]^block->l[(i+8)&15]^block->l[(i+2)&15]^block->l[i&15],1))
 
 /* (R0+R1), R2, R3, R4 are the different operations used in SHA1 */
 #define R0(v,w,x,y,z,i) z+=((w&(x^y))^y)+blk0(i)+0x5A827999+rol(v,5);w=rol(w,30);
@@ -51,10 +48,7 @@ A million repetitions of "a"
 
 /* Hash a single 512-bit block. This is the core of the algorithm. */
 
-void SHA1Transform(
-    uint32_t state[5],
-    const unsigned char buffer[64]
-)
+void SHA1Transform(uint32_t state[5], const unsigned char buffer[64])
 {
     uint32_t a, b, c, d, e;
 
@@ -176,12 +170,8 @@ void SHA1Transform(
 #endif
 }
 
-
 /* SHA1Init - Initialize new context */
-
-void SHA1Init(
-    SHA1_CTX * context
-)
+void SHA1Init(SHA1_CTX *context)
 {
     /* SHA1 initialization constants */
     context->state[0] = 0x67452301;
@@ -192,14 +182,8 @@ void SHA1Init(
     context->count[0] = context->count[1] = 0;
 }
 
-
 /* Run your data through this. */
-
-void SHA1Update(
-    SHA1_CTX * context,
-    const unsigned char *data,
-    uint32_t len
-)
+void SHA1Update(SHA1_CTX * context, const unsigned char *data, uint32_t len)
 {
     uint32_t i;
 
@@ -225,13 +209,8 @@ void SHA1Update(
     memcpy(&context->buffer[j], &data[i], len - i);
 }
 
-
 /* Add padding and return the message digest. */
-
-void SHA1Final(
-    unsigned char digest[20],
-    SHA1_CTX * context
-)
+void SHA1Final(unsigned char digest[20], SHA1_CTX *context)
 {
     unsigned i;
 
@@ -279,10 +258,7 @@ void SHA1Final(
     memset(&finalcount, '\0', sizeof(finalcount));
 }
 
-void SHA1(
-    char *hash_out,
-    const char *str,
-    int len)
+void SHA1(char *hash_out, const char *str, int len)
 {
     SHA1_CTX ctx;
     unsigned int ii;
@@ -294,3 +270,28 @@ void SHA1(
     hash_out[20] = '\0';
 }
 
+#ifdef TEST
+
+int main(int argc, char **argv)
+{
+	SHA1_CTX sha;
+	uint8_t results[20];
+	char *buf;
+	int n;
+
+	buf = "abc";
+	n = strlen(buf);
+	SHA1Init(&sha);
+	SHA1Update(&sha, (uint8_t *)buf, n);
+	SHA1Final(results, &sha);
+
+	/* Print the digest as one long hex value */
+	printf("a9993e364706816aba3e25717850c26c9cd0d89d <-- expected result\n");
+	for (n = 0; n < 20; n++)
+		printf("%02x", results[n]);
+
+	putchar('\n');
+	return(0);
+}
+
+#endif TEST

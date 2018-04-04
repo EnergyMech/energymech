@@ -57,7 +57,7 @@ void on_kick(char *from, char *rest)
 #endif /* DEBUG */
 		Free(&chan->kickedby);
 		set_mallocdoer(on_kick);
-		chan->kickedby = Strdup(from);
+		chan->kickedby = stringdup(from);
 		chan->active = FALSE;
 		chan->sync = TRUE;
 		chan->bot_is_op = FALSE;
@@ -296,13 +296,13 @@ void on_nick(char *from, char *newnick)
 		 */
 		if (strlen(cu->nick) >= strlen(newnick))
 		{
-			Strcpy(cu->nick,newnick);
+			stringcpy(cu->nick,newnick);
 		}
 		else
 		{
 			Free((char**)&cu->nick);
 			set_mallocdoer(on_nick);
-			cu->nick = Strdup(newnick);
+			cu->nick = stringdup(newnick);
 		}
 
 		/*
@@ -447,7 +447,7 @@ recheck_alias:
 #ifdef ALIAS
 	for(alias=aliaslist;alias;alias=alias->next)
 	{
-		if (!Strcasecmp(alias->alias,command))
+		if (!stringcasecmp(alias->alias,command))
 		{
 			unchop(command,rest);
 			afmt(amem,alias->format,command);
@@ -456,7 +456,7 @@ recheck_alias:
 #endif /* DEBUG */
 			rest = amem;
 			pt = chop(&rest);
-			i = Strcasecmp(pt,command);
+			i = stringcasecmp(pt,command);
 			command = pt;
 			arec++;
 			if ((arec < MAXALIASRECURSE) && (i != 0))
@@ -481,7 +481,7 @@ recheck_alias:
 		/*
 		 *  does the hook match?
 		 */
-		if (hook->flags == HOOK_COMMAND && !Strcasecmp(command,hook->type.command))
+		if (hook->flags == HOOK_COMMAND && !stringcasecmp(command,hook->type.command))
 		{
 			if (hook->func(from,rest,hook))
 				/* if the hook returns non-zero, the input should not be parsed internally */
@@ -500,7 +500,7 @@ recheck_alias:
 			continue;
 		if (uaccess < acmd[i])
 			continue;
-		j = Strcasecmp(mcmd[i].name,command);
+		j = stringcasecmp(mcmd[i].name,command);
 		if (j < 0)
 			continue;
 		if (j > 0)
@@ -550,7 +550,7 @@ recheck_alias:
 		/*
 		 *  convert the command to uppercase
 		 */
-		Strcpy(command,mcmd[i].name);
+		stringcpy(command,mcmd[i].name);
 
 		/*
 		 *  send statmsg with info on the command executed
@@ -593,7 +593,7 @@ recheck_alias:
 		if (mcmd[i].caxs)
 		{
 			/* get channel name; 1: msg, 2: to, 3: active channel */
-			to = get_channel(to,&rest);
+			to = (char*)get_channel(to,&rest);
 			if (!ischannel(to))
 				return;
 			uaccess = get_authaccess(from,to);
@@ -634,7 +634,7 @@ recheck_alias:
 		{
 			if (mcmd[i].lbuf && ischannel(orig_to))
 			{
-				redirect.to = Strdup(to);
+				redirect.to = stringdup(to);
 				redirect.method = R_PRIVMSG;
 			}
 			else
@@ -643,7 +643,7 @@ recheck_alias:
 		}
 #endif /* REDIRECT */
 
-		if (mcmd[i].dcc && dcc_only_command(from))
+		if (mcmd[i].dcc && partyline_only_command(from))
 			return;
 
 		mcmd[i].func(from,to,rest,acmd[i]);
@@ -958,7 +958,7 @@ modeloop:
 			}
 			Free(&chan->key);
 			set_mallocdoer(on_mode);
-			chan->key = Strdup((parm) ? parm : "???");
+			chan->key = stringdup((parm) ? parm : "???");
 		}
 		else
 		{
@@ -974,7 +974,7 @@ modeloop:
 		if (sign == '+')
 		{
 			parm = chop(&rest);
-			chan->limit = a2i(parm);
+			chan->limit = asc2int(parm);
 			if (errno)
 				chan->limit = 0;
 			chan->limitmode = TRUE;
@@ -1007,6 +1007,7 @@ modeloop:
 void common_public(Chan *chan, char *from, char *spyformat, char *rest)
 {
 	ChanUser *doer;
+	int	n,upper;
 
 	if (current->spy & SPYF_CHANNEL)
 		send_spy(chan->name,spyformat,CurrentNick,rest);
@@ -1016,7 +1017,17 @@ void common_public(Chan *chan, char *from, char *spyformat, char *rest)
 
 	doer = find_chanuser(chan,from);
 
-	if (capslevel(rest))
+	// check if more than half of rest is caps
+	n = upper = 0;
+	while(rest[n])
+	{
+		if ((rest[n] >= 'A' && rest[n] <= 'Z') || (rest[n] == '!'))
+			upper += 2;
+		n++;
+	}
+
+	// trigger caps flood action
+	if (upper >= n)
 	{
 		if (check_mass(chan,doer,INT_CKL))
 			send_kick(chan,CurrentNick,KICK_CAPS);
@@ -1082,10 +1093,10 @@ void do_chaccess(COMMAND_ARGS)
 	}
 
 	dis = FALSE;
-	newaccess = a2i(axs);
+	newaccess = asc2int(axs);
 	if (axs)
 	{
-		if (!Strcasecmp(axs,"disable"))
+		if (!stringcasecmp(axs,"disable"))
 		{
 			dis = TRUE;
 			newaccess = 100;
@@ -1114,7 +1125,7 @@ void do_chaccess(COMMAND_ARGS)
 
 	for(i=0;mcmd[i].name;i++)
 	{
-		if (!Strcasecmp(mcmd[i].name,name))
+		if (!stringcasecmp(mcmd[i].name,name))
 		{
 			oldaccess = acmd[i];
 			if (dis || oldaccess > 200)
@@ -1153,7 +1164,7 @@ int access_needed(char *name)
 
 	for(i=0;mcmd[i].name;i++)
 	{
-		if (!Strcasecmp(mcmd[i].name,name))
+		if (!stringcasecmp(mcmd[i].name,name))
 		{
 			return(acmd[i]);
 		}
@@ -1171,7 +1182,7 @@ void do_last(COMMAND_ARGS)
 	else
 	{
 		thenum = chop(&rest);
-		num = a2i(thenum);
+		num = asc2int(thenum);
 	}
 	if ((num < 1) || (num > LASTCMDSIZE))
 		usage(from);	/* usage for CurrentCmd->name */

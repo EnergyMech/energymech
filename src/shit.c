@@ -98,7 +98,7 @@ void remove_shit(Shit *shit)
 	Shit	**pp;
 
 #ifdef DEBUG
-	debug("(remove_shit) removing shit %s on channel %s (Level 4)\n",shit->mask,shit->chan,shit->action);
+	debug("(remove_shit) removing shit %s on channel %s (Level %i)\n",shit->mask,shit->chan,shit->action);
 #endif /* DEBUG */
 	pp = &current->shitlist;
 	while(*pp)
@@ -145,10 +145,10 @@ Shit *add_shit(char *from, char *chan, char *mask, char *reason, int axs, int ex
 	shit->next = current->shitlist;
 	current->shitlist = shit;
 
-	shit->chan   = Strcpy(shit->mask,mask) + 1;
-	shit->from   = Strcpy(shit->chan,chan) + 1;
-	shit->reason = Strcpy(shit->from,from) + 1;
-	Strcpy(shit->reason,reason);
+	shit->chan   = stringcpy(shit->mask,mask) + 1;
+	shit->from   = stringcpy(shit->chan,chan) + 1;
+	shit->reason = stringcpy(shit->from,from) + 1;
+	stringcpy(shit->reason,reason);
 
 	current->ul_save++;
 	return(shit);
@@ -165,7 +165,7 @@ Shit *find_shit(const char *userhost, const char *channel)
 	best = 0;
 	for(shit=current->shitlist;shit;shit=shit->next)
 	{
-		if (!channel || !Strcasecmp(channel,shit->chan) ||
+		if (!channel || !stringcasecmp(channel,shit->chan) ||
 		    (*shit->chan == '*') || (*channel == '*'))
 		{
 			num = num_matches(shit->mask,userhost);
@@ -240,7 +240,7 @@ void do_shit(COMMAND_ARGS)
 	 *  on_msg checks CARGS
 	 */
 	char	*channel,*nick,*nuh;
-	int	shitlevel,days,uaccess,shitaccess; 
+	int	shitlevel,days,uaccess,shitaccess;
 
 	if (CurrentCmd->name == C_QSHIT)
 	{
@@ -272,7 +272,7 @@ void do_shit(COMMAND_ARGS)
 	}
 	else
 	{
-		shitlevel = a2i(chop(&rest));
+		shitlevel = asc2int(chop(&rest));
 		if (errno)
 			goto usage;
 
@@ -288,7 +288,7 @@ void do_shit(COMMAND_ARGS)
 		days = 86400 * 30;
 		if (*rest >= '1' && *rest <= '9')
 		{
-			days = 86400 * a2i(chop(&rest));
+			days = 86400 * asc2int(chop(&rest));
 			if (errno)
 				goto usage;
 		}

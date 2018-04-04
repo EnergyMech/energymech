@@ -58,7 +58,7 @@ int begin_redirect(char *from, char *args)
 			{
 				if (find_channel_ac(nick))
 				{
-					redirect.to = Strdup(nick);
+					redirect.to = stringdup(nick);
 					redirect.method = R_PRIVMSG;
 					return(0);
 				}
@@ -83,13 +83,13 @@ int begin_redirect(char *from, char *args)
 					to_user(from,"Bad filename.");
 					return(-1);
 				}
-				redirect.to = Strdup(nick);
+				redirect.to = stringdup(nick);
 				redirect.method = R_FILE;
 				return(0);
 			}
 			if ((pt = find_nuh(nick)))
 			{
-				redirect.to = Strdup(nick);
+				redirect.to = stringdup(nick);
 				redirect.method = R_NOTICE;
 				return(0);
 			}
@@ -122,7 +122,7 @@ void send_redirect(char *message)
 	case R_FILE:
 		if ((fd = open(redirect.to,O_WRONLY|O_CREAT|O_APPEND,NEWFILEMODE)) < 0)
 			return;
-		fmt = Strcat(message,"\n");
+		fmt = stringcat(message,"\n");
 		write(fd,message,(fmt-message));
 		close(fd);
 		return;

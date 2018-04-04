@@ -1,7 +1,7 @@
 /*
 
     EnergyMech, IRC bot software
-    Parts Copyright (c) 1997-2004 proton
+    Parts Copyright (c) 1997-2018 proton
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -28,19 +28,6 @@
 #include "text.h"
 #include "mcmd.h"
 
-int dcc_only_command(char *from)
-{
-#ifdef REDIRECT
-	if (!redirect.to)
-#endif /* REDIRECT */
-	if (!CurrentDCC)
-	{
-		to_user(from,TEXT_DCC_ONLY,CurrentCmd->name);
-		return(TRUE);
-	}
-	return(FALSE);
-}
-
 Client *find_client(const char *nick)
 {
 	Client	*client;
@@ -50,7 +37,7 @@ Client *find_client(const char *nick)
 
 	for(client=current->clientlist;client;client=client->next)
 	{
-		if (((client->flags & DCC_SEND) == 0) && !Strcasecmp(nick,client->user->name))
+		if (((client->flags & DCC_SEND) == 0) && !stringcasecmp(nick,client->user->name))
 			return(client);
 	}
 	return(NULL);
@@ -106,49 +93,6 @@ void delete_client(Client *client)
 	Free((char **)&client);
 }
 
-void partyline_broadcast(Client *from, char *format, char *rest)
-{
-	Client	*client;
-	Mech	*bot;
-
-	for(bot=botlist;bot;bot=bot->next)
-	{
-		for(client=bot->clientlist;client;client=client->next)
-		{
-			if (0 == (client->flags & (DCC_ACTIVE|DCC_TELNET)))
-				continue;
-			if (client == from && client->user->x.x.echo == FALSE)
-				continue;
-			to_file(client->sock,format,CurrentNick,rest);
-		}
-	}
-}
-
-void dcc_banner(Client *client)
-{
-	char	tmp[MSGLEN];
-
-	client->flags = DCC_ACTIVE;
-	client->lasttime = now;
-
-	sprintf(tmp,"[%s] %s[%i] has connected",
-		current->nick,client->user->name,(int)client->user->x.x.access);
-
-	if ((to_file(client->sock,"[%s] %s\n",time2medium(now),tmp)) < 0)
-	{
-		client->flags = DCC_DELETE;
-		return;
-	}
-	send_global(SPYSTR_STATUS,tmp);
-	if (client->user->x.x.access == OWNERLEVEL)
-	{
-		CurrentDCC = client;
-		Strcpy(tmp,SPYSTR_STATUS);
-		do_spy(client->user->name,current->nick,tmp,0);
-		CurrentDCC = NULL;
-	}
-}
-
 #ifdef DCC_FILE
 
 int dcc_sendfile(char *target, char *filename)
@@ -158,8 +102,8 @@ int dcc_sendfile(char *target, char *filename)
 	int	s,f,sz;
 	char	tempfile[strlen(filename)+strlen(DCC_PUBLICFILES)+2]; // strlen(DCC_PUBLICFILES) evaluates at compile time to a constant.
 
-	Strcpy(tempfile,DCC_PUBLICFILES);
-	Strcat(tempfile,filename);
+	stringcpy(tempfile,DCC_PUBLICFILES);
+	stringcat(tempfile,filename);
 
 #ifdef DEBUG
 	debug("(dcc_sendfile) opening %s for transfer\n",tempfile);
@@ -184,8 +128,8 @@ int dcc_sendfile(char *target, char *filename)
 	client->user = NULL;
 	client->flags = DCC_WAIT|DCC_ASYNC|DCC_SEND;
 	client->lasttime = now;
-	client->whom = Strcpy(client->filename,filename) + 1;
-	Strcpy(client->whom,target);
+	client->whom = stringcpy(client->filename,filename) + 1;
+	stringcpy(client->whom,target);
 
 	client->next = current->clientlist;
 	current->clientlist = client;
@@ -265,7 +209,7 @@ void parse_dcc(Client *client)
 			/*
 			 *  tell them how much we love them
 			 */
-			dcc_banner(client);
+			partyline_banner(client);
 		}
 #ifdef DCC_FILE
 		else
@@ -392,7 +336,7 @@ void parse_dcc(Client *client)
 		client->lasttime = now;
 		CurrentDCC  = client;
 		CurrentUser = client->user;
-		Strcpy(CurrentNick,CurrentUser->name);
+		stringcpy(CurrentNick,CurrentUser->name);
 
 		if (*ptr == 1)
 		{
@@ -438,7 +382,7 @@ void process_dcc(void)
 #ifdef DEBUG
 			debug("(process_dcc) chat connected [ASYNC]\n");
 #endif /* DEBUG */
-			dcc_banner(client);
+			partyline_banner(client);
 		}
 		else
 		if ((client->flags & DCC_WAIT) && ((now - client->lasttime) >= WAITTIMEOUT))
@@ -471,51 +415,6 @@ void process_dcc(void)
 	}
 }
 
-void dcc_chat(char *from)
-{
-	struct	sockaddr_in sai;
-	Client	*client;
-	User	*user;
-	int	sock,sz;
-
-	if ((user = get_authuser(from,NULL)) == NULL)
-		return;
-	if (find_client(user->name))
-		return;
-
-	if ((sock = SockListener(0)) < 0)
-		return;
-
-	sz = sizeof(sai);
-	if (getsockname(sock,(struct sockaddr *)&sai,&sz) < 0)
-	{
-		close(sock);
-		return;
-	}
-
-	set_mallocdoer(dcc_chat);
-	client = (Client*)Calloc(sizeof(Client));
-#ifdef DCC_FILE
-	client->fileno = -1;
-#endif /* DCC_FILE */
-	client->user = user;
-	client->sock = sock;
-	client->flags = DCC_WAIT;
-	client->lasttime = now;
-
-	client->next = current->clientlist;
-	current->clientlist = client;
-
-	to_server("PRIVMSG %s :\001DCC CHAT CHAT %u %u\001\n",
-		CurrentNick,htonl(current->ip.s_addr),ntohs(sai.sin_port));
-}
-
-/*
- *
- *  CTCP things...
- *
- */
-
 void ctcp_dcc(char *from, char *to, char *rest)
 {
 	struct	in_addr ia;
@@ -545,7 +444,7 @@ void ctcp_dcc(char *from, char *to, char *rest)
 	send_spy(SPYSTR_STATUS,"[DCC] :%s[%i]: Requested DCC %s [%s]",CurrentNick,x,port,nullstr(rest));
 
 #ifdef DCC_FILE
-	if (!Strcasecmp(port,"SEND"))
+	if (!stringcasecmp(port,"SEND"))
 	{
 #ifdef DEBUG
 		debug("(ctcp_dcc) rest: `%s'\n",nullstr(rest));
@@ -566,7 +465,7 @@ void ctcp_dcc(char *from, char *to, char *rest)
 		{
 			char	tempmask[strlen(addr)+1];
 
-			Strcpy(tempmask,addr);
+			stringcpy(tempmask,addr);
 			do
 			{
 				port = chop(&addr);
@@ -591,9 +490,9 @@ void ctcp_dcc(char *from, char *to, char *rest)
 
 		addr = chop(&rest);
 		port = chop(&rest);
-		portnum = a2i(port);
+		portnum = asc2int(port);
 		x = errno;
-		filesz = a2i(rest);
+		filesz = asc2int(rest);
 		if (errno || x || portnum < 1024 || portnum > 63353 || filesz <= 0)
 			return;
 
@@ -604,13 +503,13 @@ void ctcp_dcc(char *from, char *to, char *rest)
 			addr++;
 		}
 		ia.s_addr = ntohl(longip);
-		Strcpy(ip_addr,inet_ntoa(ia));
+		stringcpy(ip_addr,inet_ntoa(ia));
 
 		if (1)
 		{
 			char tempname[strlen(filename)+strlen(DCC_PUBLICINCOMING)+1]; // strlen(DCC_PUBLICINCOMING) evaluates to a constant during compile.
 
-			Strcpy(Strcpy(tempname,DCC_PUBLICINCOMING),filename);
+			stringcpy(stringcpy(tempname,DCC_PUBLICINCOMING),filename);
 
 			if ((f = open(tempname,O_RDWR|O_CREAT|O_EXCL,S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH)) < 0)
 				return;
@@ -626,8 +525,8 @@ void ctcp_dcc(char *from, char *to, char *rest)
 			client->sock = s;
 			client->flags = DCC_WAIT|DCC_SEND|DCC_RECV;
 			client->lasttime = client->start = now;
-			client->whom = Strcpy(client->filename,filename) + 1;
-			Strcpy(client->whom,from);
+			client->whom = stringcpy(client->filename,filename) + 1;
+			stringcpy(client->whom,from);
 
 			client->next = current->clientlist;
 			current->clientlist = client;
@@ -635,7 +534,7 @@ void ctcp_dcc(char *from, char *to, char *rest)
 	}
 	else
 #endif /* DCC_FILE */
-	if (x && (x < BOTLEVEL) && !Strcasecmp(port,"CHAT"))
+	if (x && (x < BOTLEVEL) && !stringcasecmp(port,"CHAT"))
 	{
 		if ((user = get_authuser(from,NULL)) == NULL)
 		{
@@ -652,7 +551,7 @@ void ctcp_dcc(char *from, char *to, char *rest)
 		if (!port || !*port)
 			return;
 
-		x = a2i(port);
+		x = asc2int(port);
 		if (errno || (x < 1024) || (x > 65535))
 			return;
 
@@ -667,7 +566,7 @@ void ctcp_dcc(char *from, char *to, char *rest)
 			addr++;
 		}
 		ia.s_addr = ntohl(longip);
-		Strcpy(ip_addr,inet_ntoa(ia));
+		stringcpy(ip_addr,inet_ntoa(ia));
 
 #ifdef DEBUG
 		debug("(ctcp_dcc) %s [%s,%s]\n",from,ip_addr,port);
@@ -821,7 +720,7 @@ void on_ctcp(char *from, char *to, char *rest)
 	}
 	for(i=0;ctcp_commands[i].name;i++)
 	{
-		if (!Strcasecmp(ctcp_commands[i].name,command))
+		if (!stringcasecmp(ctcp_commands[i].name,command))
 		{
 #ifdef CTCP
 			if (ctcp_commands[i].need_slot)
@@ -861,21 +760,6 @@ void on_ctcp(char *from, char *to, char *rest)
  *
  */
 
-void do_chat(COMMAND_ARGS)
-{
-	User	*user;
-
-	user = get_authuser(from,NULL);
-	if (!user)
-		return;
-	if (find_client(user->name))
-	{
-		to_user(from,"You are already DCC chatting me");
-		return;
-	}
-	dcc_chat(from);
-}
-
 #ifdef CTCP
 
 void do_ping_ctcp(COMMAND_ARGS)
@@ -887,7 +771,7 @@ void do_ping_ctcp(COMMAND_ARGS)
 
 	if ((target = chop(&rest)))
 	{
-		if (CurrentCmd->name == C_PING || !Strcasecmp(rest,"PING"))
+		if (CurrentCmd->name == C_PING || !stringcasecmp(rest,"PING"))
 		{
 			to_server("PRIVMSG %s :\001PING %lu\001\n",target,now);
 			return;
@@ -902,97 +786,6 @@ void do_ping_ctcp(COMMAND_ARGS)
 }
 
 #endif /* CTCP */
-
-#ifdef BOTNET
-
-void whom_printbot(char *from, BotInfo *binfo, char *stt)
-{
-	char	*us;
-	int	uaccess;
-
-	us = "";
-	if (binfo->nuh)
-	{
-		uaccess = get_maxaccess(binfo->nuh);
-		if (uaccess == BOTLEVEL)
-			us = "b200";
-		else
-		if (uaccess)
-			sprintf((us = stt),"u%i",uaccess);
-	}
-	uaccess = get_authaccess(from,MATCH_ALL);
-	table_buffer((uaccess >= ASSTLEVEL) ? TEXT_WHOMBOTGUID : TEXT_WHOMBOTLINE,(binfo->nuh) ? nickcpy(NULL,binfo->nuh) : "???",us,
-		(binfo->server) ? binfo->server : "???",(binfo->version) ? binfo->version : "???",binfo->guid);
-}
-
-#endif /* BOTNET */
-
-void do_whom(COMMAND_ARGS)
-{
-#ifdef BOTNET
-	BotNet	*bn;
-	BotInfo	*binfo;
-#endif /* BOTNET */
-	Server	*sp;
-	char	stt[NUHLEN];
-	Client	*client;
-	Mech	*bot;
-	int	m,s;
-
-	if (dcc_only_command(from))
-		return;
-
-	for(bot=botlist;bot;bot=bot->next)
-	{
-		if (bot->connect == CN_ONLINE)
-		{
-			sp = find_server(bot->server);
-			if (sp)
-			{
-				sprintf(stt,"%s:%i",(*sp->realname) ? sp->realname : sp->name,sp->port);
-			}
-			else
-			{
-				Strcpy(stt,TEXT_NOTINSERVLIST);
-			}
-		}
-		else
-		{
-			Strcpy(stt,TEXT_NOTCONNECTED);
-		}
-		table_buffer(TEXT_WHOMSELFLINE,bot->nick,(bot == current) ? "(me)" : "b200",stt);
-		for(client=bot->clientlist;client;client=client->next)
-		{
-			m = (now - client->lasttime) / 60;
-			s = (now - client->lasttime) % 60;
-			table_buffer(TEXT_WHOMUSERLINE,
-#ifdef TELNET
-				client->user->name,client->user->x.x.access,(client->flags & DCC_TELNET) ? "telnet" : "DCC",m,s);
-#else
-				client->user->name,client->user->x.x.access,"DCC",m,s);
-#endif /* TELNET */
-		}
-	}
-#ifdef BOTNET
-	for(bn=botnetlist;bn;bn=bn->next)
-	{
-		if (bn->status != BN_LINKED)
-			continue;
-		for(binfo=bn->botinfo;binfo;binfo=binfo->next)
-			whom_printbot(from,binfo,stt);
-	}
-#endif /* BOTNET */
-	table_send(from,3);
-}
-
-void do_bye(COMMAND_ARGS)
-{
-	if (CurrentDCC)
-	{
-		to_user(from,TEXT_DCC_GOODBYE);
-		CurrentDCC->flags = DCC_DELETE;
-	}
-}
 
 #ifdef DCC_FILE
 

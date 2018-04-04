@@ -29,6 +29,35 @@
 #include "h.h"
 #include "text.h"
 
+char *urlhost(const char *url)
+{
+	char	copy[strlen(url)];
+	const char *end,*beg,*dst;
+	int	n = 0;
+
+	beg = end = url;
+	while(*end)
+	{
+		if (*end == '@')
+			beg = end+1;
+		else
+		if (*end == '/')
+		{
+			if (n == 1)
+				beg = end+1;
+			else
+			if (n == 2)
+				break;
+			n++;
+		}
+		end++;
+	}
+	stringcpy_n(copy,beg,(end-beg));
+#ifdef DEBUG
+	debug("(urlhost) host = %s\n",copy);
+#endif
+}
+
 void urlcapture(const char *rest)
 {
 	Strp	*sp,*nx;
@@ -43,6 +72,7 @@ void urlcapture(const char *rest)
 #ifdef DEBUG
 	debug("(urlcapture) URL = \"%s\"\n",url);
 #endif /* ifdef DEBUG */
+	urlhost(url);
 
 	send_spy(SPYSTR_URL,"%s",url);
 
@@ -92,7 +122,7 @@ void do_urlhist(COMMAND_ARGS)
 	else
 	{
 		thenum = chop(&rest);
-		maxnum = a2i(thenum);
+		maxnum = asc2int(thenum);
 	}
 	if ((maxnum < 1) || (maxnum > urlhistmax))
 		usage(from);    /* usage for CurrentCmd->name */

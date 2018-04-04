@@ -144,7 +144,7 @@ void hint_two(void)
 	dst = STREND(triv_str);
 	src = triv_answers->p;
 
-	n = a2i(src);
+	n = asc2int(src);
 	if (!errno)
 	{
 		if (n >   99 && *src) *(dst++) = *(src++);
@@ -181,7 +181,7 @@ void hint_three(void)
 	dst = STREND(triv_str);
 	src = triv_answers->p;
 
-	n = a2i(src);
+	n = asc2int(src);
 	if (!errno)
 	{
 		if (n >   9 && *src) *(dst++) = *(src++);
@@ -238,7 +238,7 @@ void trivia_check(Chan *chan, char *rest)
 
 	for(ans=triv_answers;ans;ans=ans->next)
 	{
-		if (!Strcasecmp(ans->p,rest))
+		if (!stringcasecmp(ans->p,rest))
 			goto have_answer;
 	}
 	return;
@@ -275,7 +275,7 @@ have_answer:
 		su->score_wk = su->score_mo = triv_score;
 		su->week_nr = week;
 		/* su->month_nr = 0; * fix this */
-		Strcpy(su->nick,CurrentNick);
+		stringcpy(su->nick,CurrentNick);
 	}
 
 	to_server("PRIVMSG %s :Yes, %s! got the answer -> %s <- in %i seconds, and gets %i points!\n",
@@ -339,7 +339,7 @@ char *random_question(char *triv_rand)
 	if (STRCHR(triv_qfile,'/') || strlen(triv_qfile) > 100) // really bad filenames...
 		return(NULL);
 
-	Strcat(Strcpy(tmpname,"trivia/"),triv_qfile);
+	stringcat(stringcpy(tmpname,"trivia/"),triv_qfile);
 
 	if ((fd = open(tmpname,O_RDONLY)) < 0)
 #ifdef DEBUG
@@ -351,10 +351,10 @@ char *random_question(char *triv_rand)
 		return(NULL);
 #endif /* DEBUG */
 
-	Strcpy(triv_rand,tmpname);
+	stringcpy(triv_rand,tmpname);
 	if ((p = STRCHR(triv_rand,'.')) == NULL)
 		p = STREND(triv_rand);
-	Strcpy(p,".index");
+	stringcpy(p,".index");
 
 	if ((ifd = open(triv_rand,O_RDONLY)) < 0)
 		return(NULL);
@@ -508,17 +508,17 @@ int trivia_score_callback(char *rest)
 
 		if (mnr)
 		{
-			score_wk = a2i(wk);
+			score_wk = asc2int(wk);
 			err  = errno;
-			score_mo = a2i(mo);
+			score_mo = asc2int(mo);
 			err += errno;
-			score_last_wk = a2i(lwk);
+			score_last_wk = asc2int(lwk);
 			err += errno;
-			score_last_mo = a2i(lmo);
+			score_last_mo = asc2int(lmo);
 			err += errno;
-			week_nr = a2i(wnr);
+			week_nr = asc2int(wnr);
 			err += errno;
-			month_nr = a2i(mnr);
+			month_nr = asc2int(mnr);
 			err += errno;
 
 			if (!err)
@@ -533,7 +533,7 @@ int trivia_score_callback(char *rest)
 				su->score_last_mo = score_last_mo;
 				su->week_nr = week_nr;
 				su->month_nr = month_nr;
-				Strcpy(su->nick,nick);
+				stringcpy(su->nick,nick);
 			}
 		}
 	}
@@ -580,7 +580,7 @@ void do_trivia(COMMAND_ARGS)
 		return;
 	}
 
-	if (!Strcasecmp(rest,"start"))
+	if (!stringcasecmp(rest,"start"))
 	{
 		if (triv_chan)
 		{
@@ -606,7 +606,7 @@ void do_trivia(COMMAND_ARGS)
 		}
 	}
 	else
-	if (!Strcasecmp(rest,"stop"))
+	if (!stringcasecmp(rest,"stop"))
 	{
 		if (chan == triv_chan)
 		{
@@ -616,7 +616,7 @@ void do_trivia(COMMAND_ARGS)
 		}
 	}
 	else
-	if (!Strcasecmp(rest,"top10"))
+	if (!stringcasecmp(rest,"top10"))
 	{
 		int	n;
 

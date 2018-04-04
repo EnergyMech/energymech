@@ -31,7 +31,7 @@
 /*
  *  nick can be NULL
  */
-void make_ireq(int t, char *from, char *nick)
+void make_ireq(int t, const char *from, const char *nick)
 {
 	IReq	*ir;
 	char	*pt;
@@ -42,11 +42,11 @@ void make_ireq(int t, char *from, char *nick)
 	ir->t = t;
 	ir->when = now;
 
-	pt = Strcat(ir->from,from) + 1;
+	pt = stringcat(ir->from,from) + 1;
 	if (nick)
 	{
 		ir->nick = pt;
-		Strcpy(ir->nick,nick);
+		stringcpy(ir->nick,nick);
 	}
 
 	ir->next = current->parselist;
@@ -67,7 +67,7 @@ void send_pa(int type, const char *nick, const char *format, ...)
 	for(pp=&current->parselist;(ir = *pp);)
 	{
 #ifdef RAWDNS
-		if (ir->t == PA_DNS && !Strcasecmp(nick,ir->nick))
+		if (ir->t == PA_DNS && !stringcasecmp(nick,ir->nick))
 		{
 #ifdef DEBUG
 			debug("(send_pa) PA_DNS %s\n",ir->nick);

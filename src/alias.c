@@ -231,7 +231,7 @@ void do_alias(COMMAND_ARGS)
 			to_user(from,TEXT_NOALIASES);
 		else
 		{
-			if (dcc_only_command(from))
+			if (partyline_only_command(from))
 				return;
 			to_user(from,"\037Alias\037              \037Format\037");
 			for(alias=aliaslist;alias;alias=alias->next)
@@ -250,11 +250,11 @@ void do_alias(COMMAND_ARGS)
 	}
 	for(alias=aliaslist;alias;alias=alias->next)
 	{
-		if (!Strcasecmp(alias->alias,cmd))
+		if (!stringcasecmp(alias->alias,cmd))
 		{
 			Free(&alias->format);
 			set_mallocdoer(do_alias);
-			alias->format = Strdup(rest);
+			alias->format = stringdup(rest);
 			to_user(from,"Replaced alias: %s --> %s",cmd,rest);
 #ifdef DEBUG
 			debug("(do_alias) Replaced alias: %s --> %s\n",cmd,rest);
@@ -264,9 +264,9 @@ void do_alias(COMMAND_ARGS)
 	}
 	set_mallocdoer(do_alias);
 	alias = (Alias*)Calloc(sizeof(Alias)+strlen(cmd));
-	Strcpy(alias->alias,cmd);
+	stringcpy(alias->alias,cmd);
 	set_mallocdoer(do_alias);
-	alias->format = Strdup(rest);
+	alias->format = stringdup(rest);
 	alias->next = aliaslist;
 	aliaslist = alias;
 	to_user(from,"Added alias: %s --> %s",cmd,rest);
@@ -295,7 +295,7 @@ void do_unalias(COMMAND_ARGS)
 
 	for(ap=&aliaslist;*ap;ap=&(*ap)->next)
 	{
-		if (!Strcasecmp(rest,(*ap)->alias))
+		if (!stringcasecmp(rest,(*ap)->alias))
 		{
 			alias = *ap;
 			*ap = alias->next;

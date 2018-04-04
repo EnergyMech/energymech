@@ -103,6 +103,7 @@ do
           hostinfo )	ft_hostinfo=$yesno ;;
           idwrap )	ft_idwrap=$yesno ;;
           ircd_ext )	ft_ircd_ext=$yesno ;;
+	  libmusl )	try_libmusl=$yesno ;;
           md5 )		ft_md5=$yesno ;;
           newbie )	ft_newbie=$yesno ;;
           note )	ft_note=$yesno ;;
@@ -205,6 +206,8 @@ do
         idwrap_no )			ft_idwrap=no ;;
         ircd_ext_yes | ircd_ext_ )	ft_ircd_ext=yes ;;
         ircd_ext_no )			ft_ircd_ext=no ;;
+	libmusl_yes | libmusl_ )	try_libmusl=/usr/local/musl/bin/musl-gcc ;;
+	libmusl_no )			try_libmusl=no ;;
         md5_yes | md5_ )		ft_md5=yes ;;
         md5_no )			ft_md5=no ;;
         newbie_yes | newbie_ )		ft_newbie=yes ;;
@@ -225,7 +228,7 @@ do
         seen_no )			ft_seen=no ;;
         session_yes | session_ )	ft_session=yes ;;
         session_no )			ft_session=no ;;
-        sha_yes | sha_ )		ft_seen=yes ;;
+        sha_yes | sha_ )		ft_sha=yes ;;
         sha_no )			ft_sha=no ;;
         stats_yes | stats_ )		ft_stats=yes ;;
         stats_no )			ft_stats=no ;;
@@ -256,7 +259,7 @@ do
         alias )        ft_alias=no ;;
         botnet )       ft_botnet=no ;;
         bounce )       ft_bounce=no ;;
-	chanban )      ft_chanban=yes ;;
+	chanban )      ft_chanban=no ;;
         ctcp )         ft_ctcp=no ;;
         dccfile )      ft_dccfile=no ;;
         debug )        ft_debug=no ;;
@@ -266,6 +269,7 @@ do
         hostinfo )     ft_hostinfo=no ;;
         idwrap )       ft_idwrap=no ;;
         ircd_ext )     ft_ircd_ext=no ;;
+	libmusl )	try_libmusl=no ;;
         md5 )          ft_md5=no ;;
         newbie )       ft_newbie=no ;;
         note )         ft_note=no ;;
@@ -277,7 +281,7 @@ do
         redirect )     ft_redirect=no ;;
         seen )         ft_seen=no ;;
         session )      ft_session=no ;;
-        sha )          ft_sha=yes ;;
+        sha )          ft_sha=no ;;
         stats )        ft_stats=no ;;
 	suppress )     ft_suppress=no ;;
         tcl )          ft_tcl=no ;;
@@ -292,7 +296,6 @@ do
     ;;
     --compile)		compile=yes ;;
     --install)		install=yes ;;
-    --with-libmusl)	try_libmusl=/usr/local/musl/bin/musl-gcc ;;
     --silence=options)	silentopt=yes ;;
     --md5=internal)	ft_md5=internal ;;
     --sha=internal)	ft_sha=internal ;;
@@ -1039,14 +1042,18 @@ fi
 objcomment=
 [ "$OBJCOPY" = "not found" ] && objcomment='#'
 
+MD5_C=
 MD5_O=
 if [ "$ft_md5" = internal ]; then
-  MD5_O=md5/md5.o
+  MD5_C=lib/md5.c
+  MD5_O=lib/md5.o
 fi
 
+SHA_C=
 SHA_O=
 if [ "$ft_sha" = internal ]; then
-  SHA_O=sha/sha.o
+  SHA_C=lib/sha1.c
+  SHA_O=lib/sha.o
 fi
 
 out=echo

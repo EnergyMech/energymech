@@ -43,7 +43,7 @@ void cfg_user(char *rest)
 {
 	set_mallocdoer(cfg_user);
 	cfgUser = Calloc(sizeof(User) + strlen(rest));
-	Strcpy(cfgUser->name,rest);
+	stringcpy(cfgUser->name,rest);
 }
 
 #ifdef BOTNET
@@ -52,7 +52,7 @@ void cfg_modcount(char *rest)
 {
 	int	i;
 
-	i = a2i(rest);
+	i = asc2int(rest);
 	if (errno || i < 1)
 		return;
 	cfgUser->modcount = i;
@@ -64,7 +64,7 @@ void cfg_pass(char *rest)
 {
 	Free((char**)&cfgUser->pass);
 	set_mallocdoer(cfg_pass);
-	cfgUser->pass = Strdup(rest);
+	cfgUser->pass = stringdup(rest);
 }
 
 void cfg_mask(char *rest)
@@ -118,7 +118,7 @@ void cfg_opt(char *rest)
 			cfgUser->x.x.prot = rest[1] - '0';
 		if (*rest == 'u')
 		{
-			cfgUser->x.x.access = a2i(rest+1);
+			cfgUser->x.x.access = asc2int(rest+1);
 			return;
 		}
 		rest++;
@@ -147,14 +147,14 @@ void cfg_shit(char *rest)
 	/*
 	 *  convert the expiry time
 	 */
-	expire = a2i(chop(&rest));	/* a2i() can handle NULLs */
+	expire = asc2int(chop(&rest));	/* asc2int() can handle NULLs */
 	if (errno || expire < now)
 		return;
 
 	/*
 	 *  convert time when the shit was added
 	 */
-	when = a2i(chop(&rest));
+	when = asc2int(chop(&rest));
 	if (errno || *rest == 0)	/* if *rest == 0, the reason is missing */
 		return;
 
@@ -183,7 +183,7 @@ void cfg_greet(char *rest)
 {
 	Free((char**)&cfgUser->greet);
 	set_mallocdoer(cfg_greet);
-	cfgUser->greet = Strdup(rest);
+	cfgUser->greet = stringdup(rest);
 }
 
 #endif /* GREET */
@@ -199,7 +199,7 @@ void cfg_note(char *rest)
 		np = &(*np)->next;
 	*np = sp = Calloc(sizeof(Strp) + strlen(rest));
 	/* Calloc sets to zero sp->next = NULL; */
-	Strcpy(sp->p,rest);
+	stringcpy(sp->p,rest);
 }
 
 #endif /* NOTE */
@@ -264,7 +264,7 @@ int read_userlist_callback(char *line)
 	command = chop(&line);
 	for(i=0;userlist_cmds[i].name;i++)
 	{
-		if (!Strcasecmp(command,userlist_cmds[i].name))
+		if (!stringcasecmp(command,userlist_cmds[i].name))
 			break;
 	}
 	if (userlist_cmds[i].name)
@@ -526,14 +526,14 @@ void addtouser(Strp **pp, const char *string, int rehash)
 	while(*pp)
 	{
 		um = *pp;
-		if (!Strcasecmp(um->p,string))
+		if (!stringcasecmp(um->p,string))
 			return;
 		pp = &um->next;
 	}
 
 	set_mallocdoer(addtouser);
 	*pp = um = (Strp*)Calloc(sizeof(Strp) + strlen(string));
-	Strcpy(um->p,string);
+	stringcpy(um->p,string);
 	if (rehash)
 		rehash_chanusers();
 }
@@ -545,7 +545,7 @@ int remfromuser(Strp **pp, const char *string)
 	while(*pp)
 	{
 		um = *pp;
-		if (!Strcasecmp(um->p,string))
+		if (!stringcasecmp(um->p,string))
 		{
 			*pp = um->next;
 			Free((char**)&um);
@@ -578,7 +578,7 @@ void mirror_user(User *user)
 			continue;
 		for(olduser=anybot->userlist;olduser;olduser=olduser->next)
 		{
-			if (!Strcasecmp(user->name,olduser->name))
+			if (!stringcasecmp(user->name,olduser->name))
 			{
 #ifdef BOTNET
 				/* dont overwrite "better" users */
@@ -780,11 +780,11 @@ User *add_user(char *handle, char *pass, int axs)
 	/*
 	 *  "name\0pass\0"
 	 */
-	p = Strcpy(user->name,handle) + 1;
+	p = stringcpy(user->name,handle) + 1;
 	if (pass)
 	{
 		user->pass = p;
-		Strcpy(user->pass,pass);
+		stringcpy(user->pass,pass);
 	}
 	current->ul_save++;
 	return(user);
@@ -799,7 +799,7 @@ User *find_handle(const char *handle)
 
 	for(user=current->userlist;user;user=user->next)
 	{
-		if (!Strcasecmp(handle,user->name))
+		if (!stringcasecmp(handle,user->name))
 			return(user);
 	}
 	return(NULL);
@@ -813,7 +813,7 @@ int userhaschannel(const User *user, const char *channel)
 		return(TRUE);
 	for(ump=user->chan;ump;ump=ump->next)
 	{
-		if (*ump->p == '*' || !Strcasecmp(ump->p,channel))
+		if (*ump->p == '*' || !stringcasecmp(ump->p,channel))
 			return(TRUE);
 	}
 	return(FALSE);
@@ -963,7 +963,7 @@ int usercanmodify(const char *from, const User *user)
 				return(TRUE);
 			for(ump=user->chan;ump;ump=ump->next)
 			{
-				if (!Strcasecmp(ump->p,fmp->p))
+				if (!stringcasecmp(ump->p,fmp->p))
 				{
 					if (u->x.x.access >= ua)
 						return(TRUE);
@@ -982,7 +982,8 @@ int usercanmodify(const char *from, const User *user)
 
 void do_access(COMMAND_ARGS)
 {
-	char	*chan,*nuh;
+	const char *chan;
+	char	*nuh;
 	int	level;
 
 	chan = get_channel(to,&rest);
@@ -1053,12 +1054,12 @@ void do_userlist(COMMAND_ARGS)
 	{
 		if (*rest == '+' && rest[1] >= '0' && rest[1] <= '9')
 		{
-			minlevel = a2i(rest+1);
+			minlevel = asc2int(rest+1);
 		}
 		else
 		if (*rest == '-' && rest[1] >= '0' && rest[1] <= '9')
 		{
-			maxlevel = a2i(rest+1);
+			maxlevel = asc2int(rest+1);
 		}
 		else
 		if (*rest == '-' && (*rest|32) == 'b')
@@ -1150,7 +1151,7 @@ void do_userlist(COMMAND_ARGS)
 		if (user->greet)
 		{
 			table_buffer("Greet\t: %s%s",user->greet,
-				(user->x.x.greetfile) ? " (greetfile)" : 
+				(user->x.x.greetfile) ? " (greetfile)" :
 				((user->x.x.randline) ? " (random line from file)" : ""));
 		}
 #endif /* GREET */
@@ -1165,7 +1166,7 @@ void do_userlist(COMMAND_ARGS)
 				else
 					sz += strlen(ump->p);
 			}
-			table_buffer(from,"Message\t: %i message%s (%i bytes)",n,(n == 1) ? "" : "s",sz);
+			table_buffer("Message\t: %i message%s (%i bytes)",n,(n == 1) ? "" : "s",sz);
 		}
 #endif /* NOTE */
 		table_buffer(" ");
@@ -1237,7 +1238,7 @@ void do_user(COMMAND_ARGS)
 		anum = chop(&rest);
 		pass = chop(&rest);
 
-		newaccess = a2i(anum);
+		newaccess = asc2int(anum);
 		if (errno)
 			goto usage;
 
@@ -1267,7 +1268,7 @@ void do_user(COMMAND_ARGS)
 		 */
 		if ((mask = nick2uh(from,nick)) == NULL) // nick2uh uses nuh_buf
 			return;
-		Strcpy(tmpmask,mask);
+		stringcpy(tmpmask,mask);
 #ifdef DEBUG
 		debug("(do_user) nick2uh(from \"%s\", nick \"%s\") = mask \"%s\"\n",from,nick,tmpmask);
 #endif /* DEBUG */
@@ -1381,28 +1382,28 @@ void do_user(COMMAND_ARGS)
 		}
 
 #ifdef BOTNET
-		if (!Strcasecmp(pt,"NS"))
+		if (!stringcasecmp(pt,"NS"))
 			combo.x.noshare = mode;
 		else
-		if (!Strcasecmp(pt,"RO"))
+		if (!stringcasecmp(pt,"RO"))
 			combo.x.readonly = mode;
 		else
 #endif /* BOTNET */
 #ifdef BOUNCE
-		if (!Strcasecmp(pt,"BNC"))
+		if (!stringcasecmp(pt,"BNC"))
 			combo.x.bounce = mode;
 		else
 #endif /* BOUNCE */
-		if (!Strcasecmp(pt,"AV"))
+		if (!stringcasecmp(pt,"AV"))
 			combo.x.avoice = mode;
 		else
-		if (!Strcasecmp(pt,"AO"))
+		if (!stringcasecmp(pt,"AO"))
 			combo.x.aop = mode;
 		else
-		if (!Strcasecmp(pt,"ECHO"))
+		if (!stringcasecmp(pt,"ECHO"))
 			combo.x.echo = mode;
 		else
-		if (!Strcasecmp(pt,"CHAN"))
+		if (!stringcasecmp(pt,"CHAN"))
 		{
 			ch = (mode) ? _ADD : _SUB;
 			mask = chop(&rest);
@@ -1410,7 +1411,7 @@ void do_user(COMMAND_ARGS)
 				goto usage;
 		}
 		else
-		if (!Strcasecmp(pt,"HOST"))
+		if (!stringcasecmp(pt,"HOST"))
 		{
 			ho = (mode) ? _ADD : _SUB;
 			mask = chop(&rest);
@@ -1434,7 +1435,7 @@ void do_user(COMMAND_ARGS)
 				goto usage;
 		}
 		else
-		if ((uaccess = a2i(pt)) >= 0 && uaccess <= BOTLEVEL && errno == 0)
+		if ((uaccess = asc2int(pt)) >= 0 && uaccess <= BOTLEVEL && errno == 0)
 		{
 			combo.x.access = uaccess;
 		}
@@ -1463,7 +1464,7 @@ usage:
 	{
 		for(ump=user->chan;ump;ump=ump->next)
 		{
-			if (!Strcasecmp(ump->p,mask))
+			if (!stringcasecmp(ump->p,mask))
 			{
 				to_user(from,"Channel %s already exists for %s",mask,user->name);
 				return;
@@ -1489,7 +1490,7 @@ usage:
 	{
 		for(ump=user->mask;ump;ump=ump->next)
 		{
-			if (!Strcasecmp(ump->p,mask))
+			if (!stringcasecmp(ump->p,mask))
 			{
 				to_user(from,"Mask %s already exists for %s",mask,user->name);
 				return;
@@ -1544,7 +1545,7 @@ void do_echo(COMMAND_ARGS)
 
 	if ((tmp = chop(&rest)))
 	{
-		if (!Strcasecmp(tmp,"on"))
+		if (!stringcasecmp(tmp,__STR_ON))
 		{
 			if (CurrentUser->x.x.echo == FALSE)
 			{
@@ -1555,7 +1556,7 @@ void do_echo(COMMAND_ARGS)
 			to_user(from,TEXT_PARTYECHOON);
 			return;
 		}
-		if (!Strcasecmp(tmp,"off"))
+		if (!stringcasecmp(tmp,__STR_OFF))
 		{
 			if (CurrentUser->x.x.echo == TRUE)
 			{
@@ -1579,7 +1580,7 @@ void change_pass(User *user, char *pass)
 	enc = makepass(pass);
 	if (strlen(user->pass) <= strlen(enc))
 	{
-		Strcpy(user->pass,enc);
+		stringcpy(user->pass,enc);
 		user->modcount++;
 	}
 	/*
@@ -1688,7 +1689,7 @@ void do_setpass(COMMAND_ARGS)
 		to_user(from,TEXT_USEROWNSYOU,user->name);
 		return;
 	}
-	if (!Strcasecmp(pass,"none"))
+	if (!stringcasecmp(pass,"none"))
 	{
 		user->pass = NULL;
 		to_user(from,"password for %s has been removed",user->name);

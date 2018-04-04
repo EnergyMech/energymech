@@ -54,8 +54,8 @@ void send_kick(Chan *chan, const char *nick, const char *format, ...)
 	*pp = new = (qKick*)Calloc(sizeof(qKick) + Strlen2(nick,gsockdata)); // gsockdata is never NULL
 	/* Calloc sets to zero new->next = NULL; */
 
-	new->reason = Strcpy(new->nick,nick) + 1;
-	Strcpy(new->reason,gsockdata);
+	new->reason = stringcpy(new->nick,nick) + 1;
+	stringcpy(new->reason,gsockdata);
 }
 
 void push_kicks(Chan *chan)
@@ -148,7 +148,7 @@ void send_mode(Chan *chan, int pri, int type, char plusminus, char modeflag, voi
 		if (data)
 		{
 			set_mallocdoer(send_mode);
-			mode->data = (void*)Strdup((char*)data);
+			mode->data = (void*)stringdup((char*)data);
 		}
 		else
 		{
@@ -220,7 +220,7 @@ loop:
 			if (srcparm)
 			{
 				*(dstparm++) = ' ';
-				dstparm = Strcpy(dstparm,srcparm);
+				dstparm = stringcpy(dstparm,srcparm);
 			}
 			maxmodes--;
 		}
@@ -408,6 +408,67 @@ void prot_action(Chan *chan, char *from, ChanUser *doer, char *target, ChanUser 
 	}
 }
 
+#ifdef DYNAMODE
+
+void check_dynamode(Chan *chan)
+{
+	ChanUser *cu;
+	char	tempconf[strlen(chan->setting[STR_DYNLIMIT].str_var)+2];
+	char	ascnum[11];
+	char	*src,*num,*end;
+	int	n = 0,wind,v[3];
+
+	/*
+	 *  parse `delay:window:minwin'
+	 */
+	end = stringcpy(tempconf,chan->setting[STR_DYNLIMIT].str_var);
+	num = src = tempconf;
+	for(;(src<=end) && (n<3);src++)
+	{
+		if (*src == 0 || *src == ':')
+		{
+			*src = 0;
+			v[n] = asc2int(num);
+			if (errno)
+			{
+				v[0] = 90;	/* delay */
+				v[1] = 10;	/* window */
+				v[2] = 4;	/* minwin */
+				break;
+			}
+			num = src+1;
+			n++;
+		}
+	}
+	v[0] = (v[0] < 20) ? 20 : (v[0] > 600) ? 600 : v[0];
+	if ((now - chan->lastlimit) < v[0])
+		return;
+	v[1] = (v[1] < 5) ? 5 : (v[1] > 50) ? 50 : v[1];
+	v[2] = (v[2] < 1) ? 1 : (v[2] > 50) ? 50 : v[2];
+
+	chan->lastlimit = now;
+
+	n = 0;
+	for(cu=chan->users;cu;cu=cu->next)
+		n++;
+
+	wind = n / v[1];
+	if (wind < v[2])
+		wind = v[2];
+
+	wind += n;
+
+	n = wind - chan->limit;
+
+	if (!chan->limitmode || (n < -2) || (n > 1))
+	{
+		sprintf(ascnum,"%i",wind);
+		send_mode(chan,160,QM_RAWMODE,'+','l',ascnum);
+	}
+}
+
+#endif /* DYNAMODE */
+
 /*
  *
  *  mode commands
@@ -437,8 +498,8 @@ void do_opvoice(COMMAND_ARGS)
 	/*
 	 *  on_msg checks CAXS + CARGS
 	 */
-	Chan	*chan;
-	char	*m;
+	const Chan *chan;
+	const char *m;
 
 	if ((chan = CurrentChan) && chan->bot_is_op)
 	{
@@ -598,7 +659,7 @@ void do_banlist(COMMAND_ARGS)
 #else /* IRCD_EXTENSIONS */
 	if (chan->banlist)
 	{
-		table_buffer(str_underline("channel") "\t\037ban mask\037\t\037set by\037");
+		table_buffer(str_underline("channel") "\t" str_underline("ban mask") "\t" str_underline("set by"));
 		for(ban=chan->banlist;ban;ban=ban->next)
 			table_buffer("%s\t%s\t%s",to,ban->banstring,ban->bannedby);
 		table_send(from,2);

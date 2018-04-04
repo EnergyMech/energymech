@@ -1,1 +1,1 @@
-../src/sha/sha1.h
+../src/lib/sha1.h

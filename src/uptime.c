@@ -69,7 +69,7 @@ void init_uptime(void)
 	if (!uptimehost)
 	{
 		set_mallocdoer(init_uptime);
-		uptimehost = Strdup(defaultuptimehost);
+		uptimehost = stringdup(defaultuptimehost);
 	}
 
 	if ((uptimesock = socket(AF_INET,SOCK_DGRAM,0)) < 0)
@@ -116,7 +116,7 @@ void send_uptime(int type)
 			{
 				Free((char**)&uptimehost);
 				set_mallocdoer(send_uptime);
-				uptimehost = Strdup(host);
+				uptimehost = stringdup(host);
 			}
 		}
 		else
@@ -160,7 +160,7 @@ void send_uptime(int type)
 		upPack.sysup = htonl(st.st_ctime);
 	}
 
-	server = "unknown";
+	server = UNKNOWN;
 	nick   = BOTLOGIN;
 
 	/*

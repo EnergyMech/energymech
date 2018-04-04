@@ -65,27 +65,27 @@ void bounce_parse(ircLink *irc, char *message)
 	if (irc->status == BNC_LOGIN)
 	{
 		cmd = chop(&message);
-		if (!Strcasecmp(cmd,"USER"))
+		if (!stringcasecmp(cmd,"USER"))
 		{
 			if (irc->userLine)
 				return;
 			set_mallocdoer(bounce_parse);
-			irc->userLine = Strdup(message);
+			irc->userLine = stringdup(message);
 		}
 		else
-		if (!Strcasecmp(cmd,"NICK"))
+		if (!stringcasecmp(cmd,"NICK"))
 		{
 			if (irc->nickLine)
 				return;
 			set_mallocdoer(bounce_parse);
-			irc->nickLine = Strdup(message);
+			irc->nickLine = stringdup(message);
 			if ((cmd = chop(&message)) == NULL)
 			{
 				irc->status = BNC_DEAD;
 				return;
 			}
 			set_mallocdoer(bounce_parse);
-			irc->nick = Strdup(cmd);
+			irc->nick = stringdup(cmd);
 		}
 		if (irc->userLine && irc->nickLine)
 		{
@@ -103,7 +103,7 @@ void bounce_parse(ircLink *irc, char *message)
 	server = chop(&message);
 	cmd    = chop(&message);
 
-	if (!cmd || Strcasecmp(server,"PRIVMSG") || nickcmp(cmd,INTERNAL_NICK)
+	if (!cmd || stringcasecmp(server,"PRIVMSG") || nickcmp(cmd,INTERNAL_NICK)
 		|| (*message != ':'))
 	{
 		irc->status = BNC_DEAD;
@@ -119,7 +119,7 @@ void bounce_parse(ircLink *irc, char *message)
 			if ((user = find_handle(message)))
 			{
 				set_mallocdoer(bounce_parse);
-				irc->handle = Strdup(user->name);
+				irc->handle = stringdup(user->name);
 				break;
 			}
 		}
@@ -164,7 +164,7 @@ void bounce_parse(ircLink *irc, char *message)
 		iport = 6667;
 		if (aport)
 		{
-			iport = a2i(aport);
+			iport = asc2int(aport);
 			if (errno || (iport < 1) || (iport > 65536))
 				return;
 		}
