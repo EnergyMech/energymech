@@ -38,11 +38,11 @@ typedef struct
 	int	regnr;
 	int	pid;
 	int	type;
-	ulong	cookie;
-	ulong	uptime;
-	ulong	ontime;
-	ulong	now;
-	ulong	sysup;
+	uint32_t cookie;
+	uint32_t uptime;
+	uint32_t ontime;
+	uint32_t now;
+	uint32_t sysup;
 
 } PackStub;
 
@@ -51,11 +51,11 @@ typedef struct
 	int	regnr;
 	int	pid;
 	int	type;
-	ulong	cookie;
-	ulong	uptime;
-	ulong	ontime;
-	ulong	now;
-	ulong	sysup;
+	uint32_t cookie;
+	uint32_t uptime;
+	uint32_t ontime;
+	uint32_t now;
+	uint32_t sysup;
 	char	string[512];
 
 } PackUp;
@@ -225,7 +225,7 @@ void process_uptime(void)
 	struct
 	{
 		int	regnr;
-		ulong	cookie;
+		uint32_t cookie;
 
 	} regPack;
 

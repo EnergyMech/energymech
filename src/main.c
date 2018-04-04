@@ -142,7 +142,7 @@ char *randstring(const char *file)
 
 LS struct
 {
-	ulong	sighup:1,
+	uint32_t sighup:1,
 		sigint:1,
 		sigusr1:1;
 
@@ -985,7 +985,7 @@ int main(int argc, char **argv, char **envp)
 	if (!mechresetenv)
 	{
 		to_file(1,TEXT_HDR_VERS,VERSION,SRCDATE);
-		to_file(1,TEXT_HDR_DATE);
+		to_file(1,"Compiled on " GENDATE "\n");
 		to_file(1,TEXT_HDR_FEAT,__mx_opts);
 	}
 

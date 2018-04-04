@@ -589,10 +589,6 @@ extern char __mx_opts[];
 
 #endif /* MAIN_C */
 
-#ifndef ulong
-#define ulong				unsigned long
-#endif
-
 #ifndef uchar
 #define uchar				unsigned char
 #endif

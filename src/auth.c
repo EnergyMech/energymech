@@ -61,10 +61,10 @@ char	pctab[] =
 char *cipher(char *arg)
 {
 	static	char res[40];
-	ulong	B1a,B2a,B3a,B4a;
-	ulong	B1b,B2b,B3b,B4b;
+	uint32_t B1a,B2a,B3a,B4a;
+	uint32_t B1b,B2b,B3b,B4b;
 	uchar	*ptr;
-	ulong	R1;
+	uint32_t R1;
 	int	i;
 
 	if (!arg || !*arg)

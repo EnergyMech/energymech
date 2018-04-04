@@ -30,22 +30,22 @@
 #include "text.h"
 #include "mcmd.h"
 
-#define unpack_ushort(x)	(((x)[0] << 8) | ((x)[1]))
-#define unpack_ulong(x)		(((x)[0] << 24) | ((x)[1] << 16) | ((x)[2] << 8) | ((x)[3]))
+#define unpack_uint16_t(x)	(((x)[0] << 8) | ((x)[1]))
+#define unpack_uint32_t(x)	(((x)[0] << 24) | ((x)[1] << 16) | ((x)[2] << 8) | ((x)[3]))
 
 typedef struct dnsType
 {
-	ushort		type;
-	ushort		class;
+	uint16_t	type;
+	uint16_t	class;
 
 } dnsType;
 
 typedef struct dnsRType
 {
-	ushort		type;		/* &0 */
-	ushort		class;		/* &2 */
-	ulong		ttl;		/* &4 */
-	ushort		rdlength;	/* &8 */
+	uint16_t	type;		/* &0 */
+	uint16_t	class;		/* &2 */
+	uint32_t	ttl;		/* &4 */
+	uint16_t	rdlength;	/* &8 */
 
 } dnsRType;
 
@@ -112,7 +112,7 @@ struct in_addr dnsroot_lookup(const char *hostname)
 const char *get_dns_token(const char *src, const char *packet, char *dst, int sz)
 {
 	const char *endsrc = NULL;
-	ushort	offptr;
+	uint16_t offptr;
 	int	tsz;
 	int	dot = 0;
 
@@ -268,7 +268,7 @@ void parse_query(int psz, dnsQuery *query)
 	{
 		/* skip QNAME */
 		src = get_dns_token(src,(const char *)query,token,psz);
-		/* skip (ushort)QTYPE and (ushort)QCLASS */
+		/* skip (uint16_t)QTYPE and (uint16_t)QCLASS */
 		src += 4;
 	}
 
@@ -283,8 +283,8 @@ void parse_query(int psz, dnsQuery *query)
 		debug("(parse_query) %i: answer = %s\n",dns->id,token);
 #endif /* DEBUG */
 
-		if ((unpack_ushort(&rtyp[0]) == DNS_TYPE_CNAME) &&
-		    (unpack_ushort(&rtyp[2]) == DNS_CLASS_IN))
+		if ((unpack_uint16_t(&rtyp[0]) == DNS_TYPE_CNAME) &&
+		    (unpack_uint16_t(&rtyp[2]) == DNS_CLASS_IN))
 		{
 			get_dns_token(src,(const char *)query,token2,psz);
 #ifdef DEBUG
@@ -297,9 +297,9 @@ void parse_query(int psz, dnsQuery *query)
 			dns->cname = stringdup(token2);
 		}
 
-		if ((unpack_ushort(&rtyp[0]) == DNS_TYPE_A) &&
-		    (unpack_ushort(&rtyp[2]) == DNS_CLASS_IN) &&
-		    (unpack_ushort(&rtyp[8]) == 4))
+		if ((unpack_uint16_t(&rtyp[0]) == DNS_TYPE_A) &&
+		    (unpack_uint16_t(&rtyp[2]) == DNS_CLASS_IN) &&
+		    (unpack_uint16_t(&rtyp[8]) == 4))
 		{
 			ip = get_stored_ip(src);
 			if (dns->auth && !stringcasecmp(dns->auth->hostname,token))
@@ -331,7 +331,7 @@ void parse_query(int psz, dnsQuery *query)
 				return;
 			}
 		}
-		src += unpack_ushort(&rtyp[8]);
+		src += unpack_uint16_t(&rtyp[8]);
 		n--;
 	}
 
@@ -346,8 +346,8 @@ void parse_query(int psz, dnsQuery *query)
 		src = get_dns_token(src,(const char*)query,token,psz);
 		rtyp = src;
 		src += 10;
-		if ((unpack_ushort(&rtyp[0]) == DNS_TYPE_NS) &&
-		    (unpack_ushort(&rtyp[2]) == DNS_CLASS_IN))
+		if ((unpack_uint16_t(&rtyp[0]) == DNS_TYPE_NS) &&
+		    (unpack_uint16_t(&rtyp[2]) == DNS_CLASS_IN))
 		{
 			dnsAuthority *da;
 
@@ -384,11 +384,11 @@ void parse_query(int psz, dnsQuery *query)
 		else
 		{
 			debug("(parse_query) DNS TYPE %s(%i), CLASS %i, size %i\n",
-				type_textlist[unpack_ushort(&rtyp[0])],unpack_ushort(&rtyp[0]),
-				unpack_ushort(&rtyp[2]),unpack_ushort(&rtyp[8]));
+				type_textlist[unpack_uint16_t(&rtyp[0])],unpack_uint16_t(&rtyp[0]),
+				unpack_uint16_t(&rtyp[2]),unpack_uint16_t(&rtyp[8]));
 		}
 #endif /* DEBUG */
-		src += unpack_ushort(&rtyp[8]);
+		src += unpack_uint16_t(&rtyp[8]);
 		n--;
 	}
 
@@ -402,9 +402,9 @@ void parse_query(int psz, dnsQuery *query)
 		rtyp = src;
 		src += 10;
 
-		if (	(unpack_ushort(&rtyp[0]) == DNS_TYPE_A) &&
-			(unpack_ushort(&rtyp[2]) == DNS_CLASS_IN) &&
-			(unpack_ushort(&rtyp[8]) == 4))
+		if (	(unpack_uint16_t(&rtyp[0]) == DNS_TYPE_A) &&
+			(unpack_uint16_t(&rtyp[2]) == DNS_CLASS_IN) &&
+			(unpack_uint16_t(&rtyp[8]) == 4))
 		{
 			ip = get_stored_ip(src);
 			if (dns->auth && !stringcasecmp(dns->auth->hostname,token))
@@ -415,7 +415,7 @@ void parse_query(int psz, dnsQuery *query)
 			debug("(parse_query) resources: %s = %s\n",token,inet_ntoa(*ip));
 #endif /* DEBUG */
 		}
-		src += unpack_ushort(&rtyp[8]);
+		src += unpack_uint16_t(&rtyp[8]);
 		n--;
 	}
 
@@ -717,9 +717,9 @@ int read_dnsroot(char *line)
 /*
  *  find the IP quickly
  */
-ulong rawdns_get_ip(const char *host)
+uint32_t rawdns_get_ip(const char *host)
 {
-	ulong	ip;
+	uint32_t ip;
 
 	if ((ip = inet_addr(host)) == INADDR_NONE)
 	{
@@ -852,7 +852,7 @@ void do_dns(COMMAND_ARGS)
 	 *  on_msg checks: CARGS and GAXS
 	 */
 	char	*host,*res,*src,*dst,*dot;
-	ulong	ip;
+	uint32_t ip;
 
 	/* to date, all hostnames contain atleast one dot */
 	if ((STRCHR(rest,'.')))

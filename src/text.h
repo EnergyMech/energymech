@@ -25,7 +25,13 @@
  *  These are more or less globally used..
  */
 
+/*
 #define FMT_PLAIN		"%s"
+#define FMT_6XSTRTAB		"%s\t%s\t%s\t%s\t%s\t%s"
+#define FMT_4XSTRTAB		"%s\t%s\t%s\t%s"
+#define FMT_3XSTRTAB		"%s\t%s\t%s"
+*/
+
 #define FMT_PLAINLINE		"%s\n"
 #define MATCH_ALL		"*"
 
@@ -62,7 +68,7 @@
 #define TEXT_NOTCONNECTED	"(not connected)"
 #define TEXT_WHOMUSERLINE	"%s\tu%i\t%s (idle %i min, %i sec)"
 #define TEXT_WHOMSELFLINE	"\037%s\037\t%s\t%s"
-#define TEXT_WHOMBOTLINE	"%s\t%s\t%s"
+#define TEXT_WHOMBOTLINE	FMT_3XSTRTAB
 #define TEXT_WHOMBOTGUID	"%s\t%s\t%s [%s] [%i]"
 
 /*
@@ -142,7 +148,6 @@
 #define TEXT_XSWITCH		" -X            write a debug file before exit\n"
 
 #define TEXT_HDR_VERS		"EnergyMech %s, %s\n"
-#define TEXT_HDR_DATE		"Compiled on " __DATE__ " " __TIME__ "\n"
 #define TEXT_HDR_FEAT		"Features: %s\n"
 
 #define ERR_MISSINGCONF		"init: No configfile specified\n"

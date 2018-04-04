@@ -164,7 +164,7 @@ void do_kicksay(COMMAND_ARGS)
 		table_buffer("\037channel\037\t\037action\037\t\037string\037\t\037kick reason\037");
 		for(kick=current->kicklist;kick;kick=kick->next)
 		{
-			table_buffer("%s\t%s\t%s\t%s",kick->chan,ks_actions[kick->action],kick->mask,kick->reason);
+			table_buffer(FMT_4XSTRTAB,kick->chan,ks_actions[kick->action],kick->mask,kick->reason);
 		}
 		table_send(from,2);
 		return;

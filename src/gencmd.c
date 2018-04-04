@@ -55,7 +55,7 @@ struct
 	int	pass;
 	const char *name;
 	const char *func;
-	ulong	flags;
+	uint32_t flags;
 	char	*cmdarg;
 
 } pre_mcmd[] =
@@ -303,7 +303,7 @@ void make_mcmd(void)
 		}
 		if (pass == __struct_acces)
 		{
-			to_file(fd,"LS OnMsg_access acmd[] = \n{\n");
+			to_file(fd,"LS OnMsg_access acmd[] =\n{\n");
 		}
 		for(i=0;pre_mcmd[i].name;i++)
 		{
@@ -482,6 +482,33 @@ void test_help(void)
 	exit(0);
 }
 
+const char *month[] = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
+int hourampm[24] = { 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
+
+void datestamp(void)
+{
+	char	str[100],*th;
+	struct tm *t;
+	time_t	now;
+
+	time(&now);
+	t = localtime(&now);
+
+	switch(t->tm_mday)
+	{
+	case 31:
+	case 21:
+	case 1:th="st";break;
+	case 22:
+	case 2:th="nd";break;
+	case 23:
+	case 3:th="rd";break;
+	default:th="th";
+	}
+	to_file(1,"\"%s %i%s, %i at %i:%02i%s\"",month[t->tm_mon],t->tm_mday,th,
+		t->tm_year + 1900,hourampm[t->tm_hour],t->tm_min,(t->tm_hour <= 11) ? "am" : "pm");
+}
+
 int main(int argc, char **argv)
 {
 
@@ -493,6 +520,9 @@ int main(int argc, char **argv)
 
 	if (argv[1] && strcmp(argv[1],"testhelp") == 0)
 		test_help();
+
+	if (argv[1] && strcmp(argv[1],"date") == 0)
+		datestamp();
 
 	return(0);
 }

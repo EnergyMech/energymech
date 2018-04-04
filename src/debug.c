@@ -389,10 +389,10 @@ void memreset(void)
 	}
 }
 
-LS void *mem_lowptr;
-LS void *mem_hiptr;
+LS const void *mem_lowptr;
+LS const void *mem_hiptr;
 
-void memtouch(void *addr)
+void memtouch(const void *addr)
 {
 	aMEA	*mp;
 	int	i;
@@ -1245,19 +1245,19 @@ typedef struct
 {
         time_t          last;
         time_t          next;
-        ulong           second1;        //:30;
-        ulong           second2;        //:30;
-        ulong           minute1;        //:30;
-        ulong           minute2;        //:30;
-        ulong           hour;           //:24;
-        ulong           weekday;        //:7;
+        uint32_t        second1;        //:30;
+        uint32_t        second2;        //:30;
+        uint32_t        minute1;        //:30;
+        uint32_t        minute2;        //:30;
+        uint32_t        hour;           //:24;
+        uint32_t        weekday;        //:7;
 
 } HookTimer;
 #endif /* 0 */
 
 char binstr[33];
 
-char *ulong2bin(int limit, ulong x)
+char *uint32tobin(int limit, uint32_t x)
 {
 	char	*dst = binstr;
 	int	n;
@@ -1296,12 +1296,12 @@ void debug_scripthook(void)
 		if (h->flags == HOOK_TIMER)
 		{
 			debug("  ; timer\t\t"mx_pfmt"\n",(mx_ptr)h->type.timer);
-			debug("  ; timer.second1\t%s ( 0..29)\n",ulong2bin(30,h->type.timer->second1));
-			debug("  ; timer.second2\t%s (30..59)\n",ulong2bin(30,h->type.timer->second2));
-			debug("  ; timer.minute1\t%s ( 0..29)\n",ulong2bin(30,h->type.timer->minute1));
-			debug("  ; timer.minute2\t%s (30..59)\n",ulong2bin(30,h->type.timer->minute2));
-			debug("  ; timer.hour\t\t%s (0..23)\n",ulong2bin(24,h->type.timer->hour));
-			debug("  ; timer.weekday\t%s (0..6)\n",ulong2bin(7,h->type.timer->weekday));
+			debug("  ; timer.second1\t%s ( 0..29)\n",uint32tobin(30,h->type.timer->second1));
+			debug("  ; timer.second2\t%s (30..59)\n",uint32tobin(30,h->type.timer->second2));
+			debug("  ; timer.minute1\t%s ( 0..29)\n",uint32tobin(30,h->type.timer->minute1));
+			debug("  ; timer.minute2\t%s (30..59)\n",uint32tobin(30,h->type.timer->minute2));
+			debug("  ; timer.hour\t\t%s (0..23)\n",uint32tobin(24,h->type.timer->hour));
+			debug("  ; timer.weekday\t%s (0..6)\n",uint32tobin(7,h->type.timer->weekday));
 		}
 		debug("  ; self\t\t\"%s\"\n",nullstr(h->self));
 		if (h->next)

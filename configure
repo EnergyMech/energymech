@@ -1247,7 +1247,7 @@ fi
 #
 def_perl='#undef PERL'
 unset ans
-$out $ac_n "[ ALPHA] Perl scripting support? .................... [y/N] "$ac_c
+$out $ac_n "[ ALPHA] Scripting with Perl? ....................... [y/N] "$ac_c
 if [ "$has_perl" = no ]; then
   $out 'no (unsupported)'
 else
@@ -1375,6 +1375,8 @@ s%@gdbflag@%$cc_g_flag%;
 /@L_PERL@/ { s,@L_PERL@,$L_PERL,; };
 /@PYINCLUDE@/ { s,@PYINCLUDE@,$incpython,; };
 /@TCLINCLUDE@/ { s,@TCLINCLUDE@,$inctcl,; };
+s|@MD5_C@|$MD5_C|;
+s|@SHA_C@|$SHA_C|;
 s|@MD5_O@|$MD5_O|;
 s|@SHA_O@|$SHA_O|;
 s%@oc@%$objcomment%;

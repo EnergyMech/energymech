@@ -163,7 +163,7 @@ void spy_typecount(Mech *bot)
 struct
 {
 	const char *idstring;
-	int	typenum;
+	int typenum;
 
 } spy_source_list[] =
 {
@@ -206,7 +206,8 @@ int spy_source(char *from, int *t_src, const char **src)
  *
  */
 
-/*---Help:SPY:[STATUS|MESSAGE|RAWIRC|URL|[guid:|botnick:] [channel|> filename]
+/*
+help:SPY:[STATUS|MESSAGE|RAWIRC|URL|[guid:|botnick:] [channel|> filename]
 
 Spy on a certain source of messages. When you join DCC chat,
 the STATUS source is added by default as a spy source for you.
@@ -253,7 +254,7 @@ void do_spy(COMMAND_ARGS)
 
 		if (partyline_only_command(from))
 			return;
-		table_buffer("\037source\037\t\037target\037");
+		table_buffer(str_underline("source") "\t" str_underline("target"));
 		for(spy=current->spylist;spy;spy=spy->next)
 		{
 			switch(spy->t_src)

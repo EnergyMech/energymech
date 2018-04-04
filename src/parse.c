@@ -243,7 +243,7 @@ void parse_mode(char *from, char *rest)
 void parse_notice(char *from, char *rest)
 {
 	char	*ctcp,*to;
-	ulong	pingtime;
+	uint32_t pingtime;
 
 	to = chop(&rest);
 	if (*rest == ':')
@@ -1375,7 +1375,7 @@ void parse_005(char *from, char *rest)
 
 LS const struct
 {
-	ulong	hash;
+	uint32_t hash;
 	short	flags;
 	void	(*func)(char *, char *);
 
@@ -1448,9 +1448,9 @@ LS const struct
 	{ 0,		0,			NULL		}
 };
 
-ulong stringhash(char *s)
+uint32_t stringhash(char *s)
 {
-	ulong	hash;
+	uint32_t hash;
 	int	i;
 
 	hash = 0;
@@ -1465,7 +1465,7 @@ void parseline(char *rest)
 	Hook	*hook;
 #endif /* SCRIPTING */
 	char	*from,*command;
-	ulong	cmdhash;
+	uint32_t cmdhash;
 	int	i;
 
 	if (current->spy & SPYF_RAWIRC)
