@@ -566,7 +566,7 @@ int try_server(Server *sp, char *hostname)
 #ifdef RAWDNS
 	char	temphost[NAMEBUF];
 	char	*host;
-	ulong	ip;
+	uint32_t ip;
 #endif /* RAWDNS */
 
 	if (!hostname)
@@ -758,10 +758,10 @@ void register_with_server(void)
 
 #ifdef SCRIPTING
 
-int sub_compile_timer(int limit, ulong *flags1, ulong *flags2, char *args)
+int sub_compile_timer(int limit, uint32_t *flags1, uint32_t *flags2, char *args)
 {
 	char	*s,*dash;
-	ulong	f;
+	uint32_t f;
 	int	n,hi,lo;
 
 	*flags1 = 0;
@@ -855,12 +855,12 @@ typedef struct
 {
         time_t  last;
         time_t  next;
-        ulong   second1:30;
-        ulong   second2:30;
-        ulong   minute1:30;
-        ulong   minute2:30;
-        ulong   hour:24;
-        ulong   weekday:7;
+        uint32_t second1:30;
+        uint32_t second2:30;
+        uint32_t minute1:30;
+        uint32_t minute2:30;
+        uint32_t hour:24;
+        uint32_t weekday:7;
 
 } HookTimer;
 

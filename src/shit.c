@@ -37,7 +37,8 @@
 void shit_action(Chan *chan, ChanUser *cu)
 {
 	Shit	*shit;
-	char	*nick,*fromnick;
+	const char *nick;
+	char	*fromnick;
 	char	*userhost;
 
 	if (!chan->setting[TOG_SHIT].int_var || !chan->bot_is_op || cu->user)
@@ -388,7 +389,7 @@ void do_shitlist(COMMAND_ARGS)
 	table_buffer("\037channel\037\t\037mask\037\t\037action\037\t\037set by\037\t\037reason\037\t\037expires\037");
 	for(shit=current->shitlist;shit;shit=shit->next)
 	{
-		table_buffer("%s\t%s\t%s\t%s\t%s\t%s",shit->chan,shit->mask,shit_actions[shit->action],
+		table_buffer(FMT_6XSTRTAB,shit->chan,shit->mask,shit_actions[shit->action],
 			nickcpy(NULL,shit->from),shit->reason,time2away(shit->expire));
 	}
 	table_send(from,2);

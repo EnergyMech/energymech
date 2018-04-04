@@ -69,6 +69,11 @@ BEG const char SPYSTR_URL[]		MDEF("url");
 
 BEG const char STR_MECHRESET[]		MDEF("MECHRESET=");
 
+BEG const char FMT_6XSTRTAB[]		MDEF("%s\t%s\t%s\t%s\t%s\t%s");
+#define FMT_4XSTRTAB			&FMT_6XSTRTAB[6]
+#define FMT_3XSTRTAB			&FMT_6XSTRTAB[9]
+#define FMT_PLAIN			&FMT_6XSTRTAB[15]
+
 BEG Mech	*botlist		MDEF(NULL);
 BEG Mech	*current;
 
@@ -247,9 +252,9 @@ BEG int		uptimeport		MDEF(9969);	/* proc var */
 BEG char	*uptimehost		MDEF(NULL);	/* proc var */
 BEG char	*uptimenick		MDEF(NULL);	/* proc var */
 BEG int		uptimesock;
-BEG ulong	uptimeip		MDEF((ulong)-1);
-BEG ulong	uptimecookie;
-BEG ulong	uptimeregnr		MDEF(0);
+BEG uint32_t	uptimeip		MDEF((uint32_t)-1);
+BEG uint32_t	uptimecookie;
+BEG uint32_t	uptimeregnr		MDEF(0);
 BEG time_t	uptimelast		MDEF(0);
 BEG const char	*defaultuptimehost	MDEF("uptime.energymech.net");
 

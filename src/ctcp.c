@@ -229,7 +229,7 @@ void parse_dcc(Client *client)
 	if (client->flags & DCC_RECV)
 	{
 		char	bigtemp[4096];
-		ulong	where;
+		uint32_t where;
 
 		do
 		{
@@ -259,7 +259,7 @@ void parse_dcc(Client *client)
 	}
 	if (client->flags & DCC_SEND)
 	{
-		ulong	where;
+		uint32_t where;
 
 		client->lasttime = now;
 		s = client->inputcount;
@@ -421,7 +421,7 @@ void ctcp_dcc(char *from, char *to, char *rest)
 	Client	*client;
 	User	*user;
 	char	*addr,*port,ip_addr[20];
-	ulong	longip;
+	uint32_t longip;
 	int	x;
 #ifdef DCC_FILE
 	char	*filename;

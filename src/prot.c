@@ -184,8 +184,9 @@ int mode_effect(Chan *chan, qMode *mode)
 void push_modes(Chan *chan, int lowpri)
 {
 	qMode	*mode;
+	const char *srcparm;
 	char	flaglist[32],parmlist[MSGLEN];
-	char	*dstflag,*dstparm,*srcparm,lastmode;
+	char	*dstflag,*dstparm,lastmode;
 	int	n,maxmodes;
 
 	n = (current->sendq_time - now);
@@ -650,7 +651,7 @@ void do_banlist(COMMAND_ARGS)
 				s = "b";
 #endif /* NEWBIE */
 
-			table_buffer("%s\t%s\t%s\t%s",to,s,ban->banstring,ban->bannedby);
+			table_buffer(FMT_4XSTRTAB,to,s,ban->banstring,ban->bannedby);
 		}
 		table_send(from,2);
 	}
@@ -661,7 +662,7 @@ void do_banlist(COMMAND_ARGS)
 	{
 		table_buffer(str_underline("channel") "\t" str_underline("ban mask") "\t" str_underline("set by"));
 		for(ban=chan->banlist;ban;ban=ban->next)
-			table_buffer("%s\t%s\t%s",to,ban->banstring,ban->bannedby);
+			table_buffer(FMT_3XSTRTAB,to,ban->banstring,ban->bannedby);
 		table_send(from,2);
 	}
 	else

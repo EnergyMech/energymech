@@ -574,7 +574,7 @@ ChanUser *find_chanuser(Chan *chan, const char *nick)
 	return(NULL);
 }
 
-void remove_chanuser(Chan *chan, char *nick)
+void remove_chanuser(Chan *chan, const char *nick)
 {
 	ChanUser *cu,**pp;
 	uchar	ni;
@@ -786,7 +786,7 @@ void do_channels(COMMAND_ARGS)
 		to_user(from,ERR_NOCHANNELS);
 		return;
 	}
-	table_buffer("\037channel\037\t \037@\037\t\037users\037\t\037ops\037\t\037voiced\037\t\037modes\037");
+	table_buffer(str_underline("channel") "\t" str_underline("@") "\t" str_underline("users") "\t" str_underline("ops") "\t" str_underline("voiced") "\t" str_underline("modes"));
 	for(chan=current->chanlist;chan;chan=chan->next)
 	{
 		p = stringcpy(text,chan->name);

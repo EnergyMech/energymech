@@ -32,10 +32,10 @@
 /*
  *  only include this hack if rawdns isnt compiled in
  */
-ulong get_ip(const char *host)
+uint32_t get_ip(const char *host)
 {
 	struct	hostent *he;
-	ulong	ip;
+	uint32_t ip;
 
 	if ((ip = inet_addr(host)) == INADDR_NONE)
 	{
@@ -46,7 +46,7 @@ ulong get_ip(const char *host)
 #endif /* DEBUG */
 			return(-1);
 		}
-		ip = (ulong)((struct in_addr*)he->h_addr)->s_addr;
+		ip = (uint32_t)((struct in_addr*)he->h_addr)->s_addr;
 	}
 #ifdef DEBUG
 	debug("(get_ip) %s -> %s\n",host,inet_ntoa(*((struct in_addr*)&ip)));

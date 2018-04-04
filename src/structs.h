@@ -25,7 +25,7 @@ typedef union usercombo
 {
 	struct
 	{
-		ulong	access:8,		/* access level (0-200)		[0-255]	*/
+		uint32_t access:8,		/* access level (0-200)		[0-255]	*/
 			prot:3,			/* protlevel (0-4) 		[0-7]	*/
 #ifdef BOTNET
 			noshare:1,		/* dont share this user over botnet	*/
@@ -42,7 +42,7 @@ typedef union usercombo
 			aop:1,			/* auto-opping				*/
 			avoice:1;		/* auto-voicing				*/
 	} x;
-	ulong		comboflags;
+	uint32_t	comboflags;
 
 } usercombo;
 
@@ -50,7 +50,7 @@ typedef struct OnMsg
 {
 	const char	*name;
 	void		(*func)(char *, const char *, char *, const int);
-	ulong		defaultaccess:8,	/* defaultaccess */
+	uint32_t	defaultaccess:8,	/* defaultaccess */
 			dcc:1,
 			cc:1,
 			pass:1,
@@ -385,7 +385,7 @@ typedef struct Ban
 
 	time_t		time;
 #ifdef IRCD_EXTENSIONS
-	ulong		imode:1,
+	uint32_t	imode:1,
 			emode:1;
 #endif /* IRCD_EXTENSIONS */
 
@@ -440,8 +440,8 @@ typedef struct Chan
 	ChanUser	*cacheuser;		/* cache for find_chanuser()		*/
 
 	int		limit;			/* channel limit			*/
-	ulong
-			bot_is_op:1,		/* set if the bot is opped		*/
+
+	uint32_t	bot_is_op:1,		/* set if the bot is opped		*/
 			private:1,		/* channel mode: +p			*/
 			secret:1,		/* channel mode: +s			*/
 			moderated:1,		/* channel mode: +m			*/
@@ -545,7 +545,7 @@ typedef struct Mech
 	char		*userhost;
 	int		vhost_type;
 
-	ulong		reset:1,
+	uint32_t	reset:1,
 			rejoin:1,
 			away:1;
 
@@ -684,7 +684,7 @@ typedef struct BotNet
 
 	struct
 	{
-	ulong		pta:1,		/* plain text auth	*/
+	uint32_t	pta:1,		/* plain text auth	*/
 			sha:1,		/* SHA */
 			md5:1;		/* MD5 */
 
@@ -710,9 +710,8 @@ typedef struct NetCfg
 	struct		NetCfg *next;
 
 	int		guid;
-	ushort		port;
-
-	ushort		linked:1;
+	uint16_t	port;
+	uint16_t	linked; //:1;
 
 	char		*host;
 	char		pass[2];
@@ -749,12 +748,12 @@ typedef struct
 {
 	time_t		last;
 	time_t		next;
-	ulong		second1;	//:30;
-	ulong		second2;	//:30;
-	ulong		minute1;	//:30;
-	ulong		minute2;	//:30;
-	ulong		hour;		//:24;
-	ulong		weekday;	//:7;
+	uint32_t	second1;	//:30;
+	uint32_t	second2;	//:30;
+	uint32_t	minute1;	//:30;
+	uint32_t	minute2;	//:30;
+	uint32_t	hour;		//:24;
+	uint32_t	weekday;	//:7;
 
 } HookTimer;
 
@@ -805,7 +804,7 @@ typedef struct dnsList
 	struct		dnsList *next;
 	time_t		when;
 	struct in_addr	ip;
-	ushort		id;
+	uint16_t	id;
 	int		findauth;
 	dnsAuthority	*auth;
 	dnsAuthority	*auth2;
@@ -816,12 +815,12 @@ typedef struct dnsList
 
 typedef struct dnsQuery
 {
-	ushort		qid;		/* query id */
-	ushort		flags;
-	ushort		questions;
-	ushort		answers;
-	ushort		authorities;
-	ushort		resources;
+	uint16_t	qid;		/* query id */
+	uint16_t	flags;
+	uint16_t	questions;
+	uint16_t	answers;
+	uint16_t	authorities;
+	uint16_t	resources;
 
 } dnsQuery;
 

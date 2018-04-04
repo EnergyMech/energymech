@@ -99,7 +99,7 @@ void do_info(COMMAND_ARGS)
 	Chan	*chan;
 	char	*p;
 	char	text[MSGLEN];
-	ulong	avg;
+	uint32_t avg;
 
 	if (current->chanlist == NULL)
 	{

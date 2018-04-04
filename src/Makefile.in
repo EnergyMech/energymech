@@ -84,12 +84,12 @@ clean:
 
 $(INSTALLNAME):	$(OFILES)
 		$(CROSS_COMPILE)$(CC) $(LFLAGS) -o $(INSTALLNAME) $(OFILES) $(LPROF) $(LIBS) $(LDSCRIPT) $(L_PERL)
-@oc@		$(CROSS_COMPILE)objcopy -R .note -R .comment $(INSTALLNAME)
+@oc@		$(CROSS_COMPILE)objcopy -R .note -R .comment -R .got -R .got.plt $(INSTALLNAME)
 @sz@		size $(INSTALLNAME)
 
 $(INSTALLNAME)-static:	$(OFILES)
 		$(CROSS_COMPILE)$(CC) $(LFLAGS) -o $(INSTALLNAME) $(OFILES) $(LPROF) $(LIBS) $(LDSCRIPT) $(L_PERL) -static
-@oc@		$(CROSS_COMPILE)objcopy -R .note -R .comment $(INSTALLNAME)
+@oc@		$(CROSS_COMPILE)objcopy -R .note -R .comment -R .got -R .got.plt $(INSTALLNAME)
 @sz@		size $(INSTALLNAME)
 
 
@@ -104,12 +104,12 @@ mega-install:	mega $(SRCFILES) $(INCS) usage.h
 		$(MV) $(INSTALLNAME) $(INSTALLDIR)
 
 mega:		$(SRCFILES) $(INCS) usage.h
-		$(CROSS_COMPILE)$(CC) $(CFLAGS) -o $(INSTALLNAME) mega.c $(LPROF) $(LIBS) $(LDSCRIPT) $(PYINCLUDE) $(TCLINCLUDE) $(I_PERL) $(L_PERL)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -o $(INSTALLNAME) mega.c -DGENDATE="`./gencmd date`" -I. $(LPROF) $(LIBS) $(LDSCRIPT) $(PYINCLUDE) $(TCLINCLUDE) $(I_PERL) $(L_PERL)
 @oc@		$(CROSS_COMPILE)objcopy -R .note -R .comment $(INSTALLNAME)
 @sz@		size $(INSTALLNAME)
 
 mega-static:	$(SRCFILES) $(INCS) usage.h
-		$(CROSS_COMPILE)$(CC) $(CFLAGS) -o $(INSTALLNAME) mega.c $(LPROF) $(LIBS) $(LDSCRIPT) $(PYINCLUDE) $(TCLINCLUDE) $(I_PERL) $(L_PERL) -static
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -o $(INSTALLNAME) mega.c -DGENDATE="`./gencmd date`" -I. $(LPROF) $(LIBS) $(LDSCRIPT) $(PYINCLUDE) $(TCLINCLUDE) $(I_PERL) $(L_PERL) -static
 @oc@		$(CROSS_COMPILE)objcopy -R .note -R .comment $(INSTALLNAME)
 @sz@		size $(INSTALLNAME)
 
@@ -189,7 +189,7 @@ kicksay.o:	kicksay.c $(INCS)
 		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
 main.o:		main.c $(INCS)
-		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF) $(PYINCLUDE)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< -DGENDATE="`./gencmd date`" $(CPROF) $(PYINCLUDE)
 
 net.o:		net.c $(INCS)
 		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
