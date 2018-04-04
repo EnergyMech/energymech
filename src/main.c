@@ -948,13 +948,13 @@ int main(int argc, char **argv, char **envp)
 			else
 				to_file(1,"error: Missing argument for -p <string>\n");
 			_exit(0);
-		case 't':
-			startup = 666;
-			break;
 		case 'X':
 			debug_on_exit = TRUE;
 			break;
 #endif /* DEBUG */
+		case 't':
+			startup = 666;
+			break;
 		case 'f':
 			if (opt[2] != 0)
 			{

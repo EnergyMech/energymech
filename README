@@ -33,12 +33,16 @@ To compile the source:
 3) ./configure
 -- This script will prompt you for features to include or exclude,
    going with the default is not a bad idea.
-   If you want to cross compile export the prefix of your toolchain:
+-- If you want to cross compile export the prefix of your toolchain:
    export CROSS_COMPILE="armv7a-hardfloat-linux-gnueabi-"
 
-4) make clean install
+4) make install
+-- If you have a modern/more powerful machine you can try to compile
+   the mech with  ``make mega'' or  ``make mega-install''.  This way
+   produces a slightly more compact and efficient executable.
 -- On a modern multi-core cpu, you can run make with the appropriate
-   -j switch to shave off a few seconds of compile time.
+   -j switch to shave off a few seconds of compile time.  (This will
+   not work with ``make mega'' or ``mage mega-install''.
    For example:
      ``make -j4'' for a 4 core cpu system.
 
@@ -93,6 +97,14 @@ to see what's going on with...
 If you get an 'Unknown option -d', you need to answer 'Y' to debug
 support when running ./configure from the compiling section above.
 Or run with ``./configure --with-debug''.
+
+If you are unsure about if you configured everything correctly and
+want to test the configuration, you can run:
+
+  ./energymech -t
+
+This will run the startup sequence in a normal way,  but will quit
+right before the bot enters the main loop.
 
 ---*---
 
