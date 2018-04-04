@@ -98,8 +98,7 @@ int parse_proc_status(char *line)
 
 char *cpufrom;
 int sentmodel;
-int cpus;
-int cores;
+int physid,cpus,cores,addsiblings;
 
 /*
 proton@endemic:~/energymech/src> cat /proc/loadavg
@@ -124,12 +123,10 @@ int parse_proc_cpuinfo(char *line)
 	char	*src,*dst;
 	int	spc;
 
-	if (sentmodel == 0 && strncmp(line,"model name\t:",12) == 0)
+	if (sentmodel == 0 && strncmp(line,"model name\t: ",13) == 0)
 	{
 		spc = 0;
-		src = line+12;
-		while(*src == ' ')
-			src++;
+		src = line+13;
 		dst = omni;
 		while(*src)
 		{
@@ -151,6 +148,24 @@ int parse_proc_cpuinfo(char *line)
 #endif
 		to_user_q(cpufrom,"Cpu: %s\n",omni);
 		sentmodel++;
+	}
+	else
+	if (strncmp(line,"physical id\t: ",14) == 0)
+	{
+		spc = asc2int(line+14);
+		if (errno == 0 && spc != physid)
+		{
+			cpus++;
+			addsiblings = 1;
+			physid = spc;
+		}
+	}
+	else
+	if (addsiblings == 1 && strncmp(line,"siblings\t: ",11) == 0)
+	{
+		spc = asc2int(line+11);
+		addsiblings = 0;
+		cores += spc;
 	}
 }
 
@@ -225,6 +240,8 @@ void do_cpuinfo(COMMAND_ARGS)
 	debug("%s\n",from);
 	cpufrom = from;
 	sentmodel = 0;
+	physid = -1;
+	cpus = cores = addsiblings = 0;
 	readline(fd,&parse_proc_cpuinfo); // readline closes fd
 
 	if ((fd = open("/proc/loadavg",O_RDONLY)) < 0)
@@ -248,7 +265,12 @@ void do_cpuinfo(COMMAND_ARGS)
 	if (!a3 || !*a3)
 		return;
 
-	to_user_q(from,"Load: %s(1m) %s(5m) %s(15m)\n",a1,a2,a3);
+	to_user_q(from,"Load: %s(1m) %s(5m) %s(15m) [%i physical cpu%s, %i core%s]\n",
+		a1,a2,a3,cpus,(cpus == 1) ? "" : "s",cores,(cores == 1) ? "" : "s");
+#ifdef DEBUG
+	debug("(do_cpuinfo) Load: %s(1m) %s(5m) %s(15m) [%i physical cpu%s, %i core%s]\n",
+		a1,a2,a3,cpus,(cpus == 1) ? "" : "s",cores,(cores == 1) ? "" : "s");
+#endif
 }
 
 #endif /* HOSTINFO */
