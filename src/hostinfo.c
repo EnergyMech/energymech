@@ -237,7 +237,6 @@ void do_cpuinfo(COMMAND_ARGS)
 		return;
 #endif
 
-	debug("%s\n",from);
 	cpufrom = from;
 	sentmodel = 0;
 	physid = -1;
