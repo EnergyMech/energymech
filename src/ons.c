@@ -150,7 +150,6 @@ void on_join(Chan *chan, char *from)
 {
 	Ban	*ban;
 	ChanUser *cu;
-	char	*channel;
 	int	vpri;
 
 	/*
@@ -171,7 +170,6 @@ void on_join(Chan *chan, char *from)
 	if (!chan->bot_is_op)
 		return;
 
-	channel = chan->name;
 	cu      = chan->users;
 
 	/*

@@ -41,7 +41,6 @@ int orig_kerning;
 
 int read_bigcharset_callback(char *rest)
 {
-	Strp	*sp,**pp;
 	char	*opt;
 	int	*n,sz;
 
@@ -119,7 +118,6 @@ int read_bigcharset_callback(char *rest)
 int read_bigcharset(char *fname)
 {
 	BigC	*bigc;
-	Strp	*sp;
 	int	fd;
 
 	if ((fd = open(fname,O_RDONLY)) < 0)
@@ -177,7 +175,7 @@ void do_bigsay(COMMAND_ARGS)
 	Strp	*sp;
 	char	output[MSGLEN];
 	char	*pt,*tail,*temp,*temp2;
-	int	i,x,sz;
+	int	i,x;
 
 #ifdef DEBUG
 	debug("(do_bigsay) rest = \"%s\"\n",rest);
@@ -194,7 +192,6 @@ void do_bigsay(COMMAND_ARGS)
 #define OEND	(output + MSGLEN - 1)
 	for(i=0;i<charheight;i++)
 	{
-		sz = 0;
 		*output = 0;
 		tail = output;
 		for(pt=rest;*pt;pt++)

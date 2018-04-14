@@ -886,11 +886,10 @@ int num_matches(const char *mask, const char *text)
 int is_safepath(const char *path, int filemustexist)
 {
 	struct stat st;
-	ino_t	ino;
 	char	tmp[PATH_MAX];
 	const char *src;
 	char	*dst;
-	int	r,mo,dir_r,orr,oerrno;
+	int	mo,dir_r,orr,oerrno;
 
 #ifdef TEST
 	memset(&st,0,sizeof(st));
