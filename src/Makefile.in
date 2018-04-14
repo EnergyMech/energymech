@@ -75,21 +75,24 @@ mcmd.h:		gencmd
 usercombo.h:	gencmd
 		./gencmd usercombo.h
 
+githash.h:	gencmd
+		./gencmd githash.h
+
 install:	$(INSTALLNAME)
 		$(CHMOD) $(INSTALLMODE) $(INSTALLNAME)
 		$(MV) $(INSTALLNAME) $(INSTALLDIR)
 
 clean:
-		$(RM) $(INSTALLNAME) gencmd mcmd.h usercombo.h core $(TESTFILES) $(OFILES)
+		$(RM) $(INSTALLNAME) gencmd mcmd.h usercombo.h githash.h core $(TESTFILES) $(OFILES)
 
 $(INSTALLNAME):	$(OFILES)
 		$(CROSS_COMPILE)$(CC) $(LFLAGS) -o $(INSTALLNAME) $(OFILES) $(LPROF) $(LIBS) $(LDSCRIPT) $(L_PERL)
-@oc@		$(CROSS_COMPILE)objcopy -R .note -R .comment -R .got -R .got.plt $(INSTALLNAME)
+#@oc@		$(CROSS_COMPILE)objcopy -R .note -R .comment -R .got -R .got.plt $(INSTALLNAME)
 @sz@		size $(INSTALLNAME)
 
 $(INSTALLNAME)-static:	$(OFILES)
 		$(CROSS_COMPILE)$(CC) $(LFLAGS) -o $(INSTALLNAME) $(OFILES) $(LPROF) $(LIBS) $(LDSCRIPT) $(L_PERL) -static
-@oc@		$(CROSS_COMPILE)objcopy -R .note -R .comment -R .got -R .got.plt $(INSTALLNAME)
+#@oc@		$(CROSS_COMPILE)objcopy -R .note -R .comment -R .got -R .got.plt $(INSTALLNAME)
 @sz@		size $(INSTALLNAME)
 
 
@@ -105,12 +108,12 @@ mega-install:	mega $(SRCFILES) $(INCS) usage.h
 
 mega:		$(SRCFILES) $(INCS) usage.h
 		$(CROSS_COMPILE)$(CC) $(CFLAGS) -o $(INSTALLNAME) mega.c -DGENDATE="`./gencmd date`" -I. $(LPROF) $(LIBS) $(LDSCRIPT) $(PYINCLUDE) $(TCLINCLUDE) $(I_PERL) $(L_PERL)
-@oc@		$(CROSS_COMPILE)objcopy -R .note -R .comment $(INSTALLNAME)
+#@oc@		$(CROSS_COMPILE)objcopy -R .note -R .comment $(INSTALLNAME)
 @sz@		size $(INSTALLNAME)
 
 mega-static:	$(SRCFILES) $(INCS) usage.h
 		$(CROSS_COMPILE)$(CC) $(CFLAGS) -o $(INSTALLNAME) mega.c -DGENDATE="`./gencmd date`" -I. $(LPROF) $(LIBS) $(LDSCRIPT) $(PYINCLUDE) $(TCLINCLUDE) $(I_PERL) $(L_PERL) -static
-@oc@		$(CROSS_COMPILE)objcopy -R .note -R .comment $(INSTALLNAME)
+#@oc@		$(CROSS_COMPILE)objcopy -R .note -R .comment $(INSTALLNAME)
 @sz@		size $(INSTALLNAME)
 
 #
@@ -185,7 +188,7 @@ irc.o:		irc.c $(INCS)
 kicksay.o:	kicksay.c $(INCS)
 		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
-main.o:		main.c $(INCS)
+main.o:		main.c $(INCS) githash.h
 		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< -DGENDATE="`./gencmd date`" $(CPROF) $(PYINCLUDE)
 
 net.o:		net.c $(INCS)

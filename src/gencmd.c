@@ -510,20 +510,33 @@ void datestamp(void)
 		t->tm_year + 1900,hourampm[t->tm_hour],t->tm_min,(t->tm_hour <= 11) ? "am" : "pm");
 }
 
+void githash(void)
+{
+#ifdef HAVE_GIT
+	system("git log -n 1 | grep commit | sed -r 's/^commit (.{7}).*/#define GITHASH \" (git:\\1)\"/g;' > githash.h");
+#else
+	system("echo '#define GITHASH \"\"' > githash.h");
+#endif
+}
+
 int main(int argc, char **argv)
 {
+	if (argv[1])
+	{
+		if (strcmp(argv[1],"usercombo.h") == 0)
+			make_usercombo();
 
-	if (argv[1] && strcmp(argv[1],"usercombo.h") == 0)
-		make_usercombo();
+		if (strcmp(argv[1],"mcmd.h") == 0)
+			make_mcmd();
 
-	if (argv[1] && strcmp(argv[1],"mcmd.h") == 0)
-		make_mcmd();
+		if (strcmp(argv[1],"testhelp") == 0)
+			test_help();
 
-	if (argv[1] && strcmp(argv[1],"testhelp") == 0)
-		test_help();
+		if (strcmp(argv[1],"date") == 0)
+			datestamp();
 
-	if (argv[1] && strcmp(argv[1],"date") == 0)
-		datestamp();
-
+		if (strcmp(argv[1],"githash.h") == 0)
+			githash();
+	}
 	return(0);
 }
