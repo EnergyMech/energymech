@@ -129,7 +129,7 @@ void purge_kicklist(void)
 }
 
 /*
- * 
+ *
  *  kicksay commands
  *
  */
@@ -262,4 +262,3 @@ void do_rkicksay(COMMAND_ARGS)
 usage:
 	usage(from);	/* usage for CurrentCmd->name */
 }
-

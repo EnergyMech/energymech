@@ -55,9 +55,9 @@ TESTFILES =	config/cc.c config/endian.c config/inet_addr.c config/inet_aton.c co
 
 TRIVFILES =	trivia/mkindex.c
 
-SRCFILES =	src/alias.c src/auth.c src/bounce.c src/chanban.c src/channel.c src/core.c src/ctcp.c src/debug.c src/dns.c \
+SRCFILES =	src/alias.c src/auth.c src/bounce.c src/channel.c src/core.c src/ctcp.c src/debug.c src/dns.c \
 		src/function.c src/gencmd.c src/greet.c src/help.c src/hostinfo.c src/irc.c src/kicksay.c src/main.c src/mega.c \
-		src/net.c src/net_chan.c src/note.c src/notify.c src/ons.c src/parse.c src/partyline.c src/perl.c src/prot.c \
+		src/net.c src/note.c src/notify.c src/ons.c src/parse.c src/partyline.c src/perl.c src/prot.c \
 		src/python.c src/reset.c src/seen.c src/shit.c src/socket.c src/spy.c src/tcl.c \
 		src/toybox.c src/trivia.c src/uptime.c src/user.c src/vars.c src/web.c \
 		src/lib/md5.c src/lib/md5.h src/lib/string.c

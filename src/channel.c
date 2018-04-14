@@ -574,6 +574,29 @@ ChanUser *find_chanuser(Chan *chan, const char *nick)
 	return(NULL);
 }
 
+#ifdef BOTNET
+
+ChanUser *find_chanbot(Chan *chan, const char *nick)
+{
+	ChanUser *cu;
+
+	if (chan->cacheuser && !nickcmp(nick,chan->cacheuser->nick)
+		&& chan->cacheuser->user && chan->cacheuser->user->x.x.access == BOTLEVEL)
+		return(chan->cacheuser);
+
+	for(cu=chan->users;cu;cu=cu->next)
+	{
+		if (cu->user && cu->user->x.x.access == BOTLEVEL)
+		{
+			if (!nickcmp(nick,cu->nick))
+				return(chan->cacheuser = cu);
+		}
+	}
+	return(NULL);
+}
+
+#endif /* BOTNET */
+
 void remove_chanuser(Chan *chan, const char *nick)
 {
 	ChanUser *cu,**pp;
