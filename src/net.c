@@ -295,6 +295,66 @@ int connect_to_bot(NetCfg *cfg)
 	return(0);
 }
 
+void check_botjoin(Chan *chan, ChanUser *cu)
+{
+	BotNet	*bn;
+	BotInfo *binfo;
+
+#ifdef DEBUG
+	debug("(check_botjoin) chan = %s; cu = %s!%s\n",chan->name,cu->nick,cu->userhost);
+#endif /* DEBUG */
+
+	for(bn=botnetlist;bn;bn=bn->next)
+	{
+		if (bn->status != BN_LINKED)
+			continue;
+
+		for(binfo=bn->botinfo;binfo;binfo=binfo->next)
+		{
+			if (!nickcmp(cu->nick,binfo->nuh) &&
+				!stringcasecmp(cu->userhost,getuh(binfo->nuh)))
+			{
+				if ((cu = find_chanbot(chan,binfo->nuh)) == NULL)
+					return;
+				cu->flags |= CU_NEEDOP;
+				send_mode(chan,50,QM_CHANUSER,'+','o',(void*)cu);
+#ifdef DEBUG
+				debug("(check_botjoin) CU_NEEDOP set, mode pushed\n");
+#endif /* DEBUG */
+				return;
+			}
+		}
+	}
+}
+
+void check_botinfo(BotInfo *binfo, const char *channel)
+{
+	Chan	*chan;
+	ChanUser *cu;
+	Mech	*backup;
+	char	*userhost;
+
+	userhost = getuh(binfo->nuh);
+
+	backup = current;
+	for(current=botlist;current;current=current->next)
+	{
+		for(chan=current->chanlist;chan;chan=chan->next)
+		{
+			if (channel && stringcasecmp(channel,chan->name))
+				continue;
+			if ((cu = find_chanbot(chan,binfo->nuh)) == NULL)
+				continue;
+			if (!stringcasecmp(cu->userhost,userhost))
+			{
+				cu->flags |= CU_NEEDOP;
+				send_mode(chan,50,QM_CHANUSER,'+','o',(void*)cu);
+			}
+		}
+	}
+	current = backup;
+}
+
 /*
  *
  *  protocol routines
@@ -769,7 +829,76 @@ void basicQuit(BotNet *bn, char *rest)
 }
 
 /*
- *
+ *  netchan protocol routines
+ */
+
+void netchanNeedop(BotNet *source, char *rest)
+{
+	BotNet	*bn;
+	BotInfo	*binfo;
+	char	*channel;
+	int	guid;
+
+	guid = asc2int(chop(&rest));
+	channel = chop(&rest);
+	if (errno || guid < 1 || !channel)
+		return;
+
+	botnet_relay(source,"CO%i %s\n",guid,channel);
+
+	for(bn=botnetlist;bn;bn=bn->next)
+	{
+		if (bn->status != BN_LINKED)
+			continue;
+		for(binfo=bn->botinfo;binfo;binfo=binfo->next)
+		{
+			if (binfo->guid == guid)
+				check_botinfo(binfo,channel);
+		}
+        }
+}
+
+#ifdef SUPPRESS
+
+void netchanSuppress(BotNet *source, char *rest)
+{
+	Mech	*backup;
+	const char *cmd;
+	int	crc,i,j;
+
+	botnet_relay(source,"CS%s\n",rest);
+
+	cmd = chop(&rest);
+
+	// convert command to const command
+	for(i=0;mcmd[i].name;i++)
+	{
+		j = stringcasecmp(mcmd[i].name,cmd);
+		if (j < 0)
+			continue;
+		if (j > 0)
+			return;
+		cmd = mcmd[i].name;
+		break;
+	}
+
+	if (mcmd[i].name == NULL)
+		return;
+
+	crc = asc2int(rest);
+
+	// to all local bots
+	for(backup=botlist;backup;backup=backup->next)
+	{
+		backup->supres_cmd = cmd;
+		backup->supres_crc = crc;
+	}
+}
+
+#endif /* SUPPRESS */
+
+/*
+ *  paryline protocol routines
  */
 
 void partyAuth(BotNet *bn, char *rest)
@@ -979,7 +1108,7 @@ void partyMessage(BotNet *bn, char *rest)
 }
 
 /*
- *
+ *  use sharing protocol routines
  */
 
 void ushareUser(BotNet *bn, char *rest)
@@ -1218,7 +1347,7 @@ void ushareDelete(BotNet *bn, char *rest)
  *
  */
 
-void botnet_parse(BotNet *bn, char *rest)
+void parse_botnet(BotNet *bn, char *rest)
 {
 	int	i;
 
@@ -1427,7 +1556,7 @@ void process_botnet(void)
 				bn->has_data = (rest) ? TRUE : FALSE;
 				if (rest)
 				{
-					botnet_parse(bn,rest);
+					parse_botnet(bn,rest);
 					if (!deadlinks)
 						goto has_data; /* process more lines if link list is unchanged */
 					goto clean;
@@ -1655,4 +1784,5 @@ void do_cmd(COMMAND_ARGS)
 }
 
 #endif /* REDIRECT */
+
 #endif /* BOTNET */

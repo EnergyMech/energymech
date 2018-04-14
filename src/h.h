@@ -136,11 +136,6 @@ void new_port_bounce(const struct Setting *);
 void select_bounce(void);
 void process_bounce(void);
 
-/* chanban.c */
-
-void process_chanbans(void);
-void chanban_action(char *, char *, Shit *);
-
 /* channel.c */
 
 void check_idlekick(void);
@@ -160,26 +155,27 @@ void delete_modemask(Chan *, char *, int);
 void purge_banlist(Chan *);
 void channel_massmode(const Chan *, char *, int, char, char);
 void channel_massunban(Chan *, char *, time_t);
-ChanUser *find_chanuser(Chan *, const char *);
-void remove_chanuser(Chan *, const char *);
-void make_chanuser(char *, char *);
-void purge_chanusers(Chan *);
-char *get_nuh(const ChanUser *);
-void do_join(COMMAND_ARGS)					__page(CMD1_SEG);
-void do_part(COMMAND_ARGS)					__page(CMD1_SEG);
-void do_cycle(COMMAND_ARGS)					__page(CMD1_SEG);
-void do_forget(COMMAND_ARGS)					__page(CMD1_SEG);
-void do_channels(COMMAND_ARGS)					__page(CMD1_SEG);
-void do_wall(COMMAND_ARGS)					__page(CMD1_SEG);
-void do_mode(COMMAND_ARGS)					__page(CMD1_SEG);
-void do_names(COMMAND_ARGS)					__page(CMD1_SEG);
-void do_cchan(COMMAND_ARGS)					__page(CMD1_SEG);
-void do_invite(COMMAND_ARGS)					__page(CMD1_SEG);
-void do_sayme(COMMAND_ARGS)					__page(CMD1_SEG);
-void do_who(COMMAND_ARGS)					__page(CMD1_SEG);
-void do_topic(COMMAND_ARGS)					__page(CMD1_SEG);
-void do_showidle(COMMAND_ARGS)					__page(CMD1_SEG);
-void do_idle(COMMAND_ARGS)					__page(CMD1_SEG);
+LS ChanUser *find_chanuser(Chan *, const char *);
+LS ChanUser *find_chanbot(Chan *, const char *);
+LS void remove_chanuser(Chan *, const char *);
+LS void make_chanuser(char *, char *);
+LS void purge_chanusers(Chan *);
+LS char *get_nuh(const ChanUser *);
+LS void do_join(COMMAND_ARGS)					__page(CMD1_SEG);
+LS void do_part(COMMAND_ARGS)					__page(CMD1_SEG);
+LS void do_cycle(COMMAND_ARGS)					__page(CMD1_SEG);
+LS void do_forget(COMMAND_ARGS)					__page(CMD1_SEG);
+LS void do_channels(COMMAND_ARGS)				__page(CMD1_SEG);
+LS void do_wall(COMMAND_ARGS)					__page(CMD1_SEG);
+LS void do_mode(COMMAND_ARGS)					__page(CMD1_SEG);
+LS void do_names(COMMAND_ARGS)					__page(CMD1_SEG);
+LS void do_cchan(COMMAND_ARGS)					__page(CMD1_SEG);
+LS void do_invite(COMMAND_ARGS)					__page(CMD1_SEG);
+LS void do_sayme(COMMAND_ARGS)					__page(CMD1_SEG);
+LS void do_who(COMMAND_ARGS)					__page(CMD1_SEG);
+LS void do_topic(COMMAND_ARGS)					__page(CMD1_SEG);
+LS void do_showidle(COMMAND_ARGS)				__page(CMD1_SEG);
+LS void do_idle(COMMAND_ARGS)					__page(CMD1_SEG);
 
 /* core.c */
 
@@ -408,11 +404,15 @@ void botnet_binfo_relay(BotNet *source, BotInfo *binfo);
 void botnet_binfo_tofile(int sock, BotInfo *binfo);
 void botnet_dumplinklist(BotNet *bn);
 int connect_to_bot(NetCfg *cfg);
+LS void check_botjoin(Chan *chan, ChanUser *cu);
+LS void check_botinfo(BotInfo *binfo, const char *channel);
 void basicAuth(BotNet *bn, char *rest);
 void basicAuthOK(BotNet *bn, char *rest);
 void basicBanner(BotNet *bn, char *rest);
 void basicLink(BotNet *bn, char *version);
 void basicQuit(BotNet *bn, char *rest);
+LS void netchanNeedop(BotNet *source, char *rest);
+LS void netchanSuppress(BotNet *, char *)			__page(CORE_SEG);
 void partyAuth(BotNet *bn, char *rest);
 int commandlocal(int dg, int sg, char *from, char *command);
 void partyCommand(BotNet *bn, char *rest);
@@ -420,22 +420,15 @@ void partyMessage(BotNet *bn, char *rest);
 void ushareUser(BotNet *bn, char *rest);
 void ushareTick(BotNet *bn, char *rest);
 void ushareDelete(BotNet *bn, char *rest);
-void botnet_parse(BotNet *bn, char *rest);
+void parse_botnet(BotNet *bn, char *rest);
 void botnet_newsock(void);
 void select_botnet(void);
 void process_botnet(void);
 void do_link(COMMAND_ARGS)					__page(CMD1_SEG);
 void do_cmd(COMMAND_ARGS)					__page(CMD1_SEG);
-
 /* net_chan.c */
 
-LS int makecrc(const char *)					__page(CORE_SEG);
-LS void send_suppress(const char *, const char *)		__page(CORE_SEG);
-ChanUser *find_chanbot(Chan *chan, char *nick);
-void check_botjoin(Chan *chan, ChanUser *cu);
-void check_botinfo(BotInfo *binfo, const char *channel);
-void netchanNeedop(BotNet *source, char *rest);
-LS void netchanSuppress(BotNet *, char *)			__page(CORE_SEG);
+
 
 /* note.c */
 
@@ -462,62 +455,64 @@ void do_notify(COMMAND_ARGS)					__page(CMD1_SEG);
 
 /* ons.c */
 
-void on_kick(char *from, char *rest);
-void on_join(Chan *chan, char *from);
-void on_nick(char *from, char *newnick);
-void on_msg(char *from, char *to, char *rest);
-void on_mode(char *from, char *channel, char *rest);
-void common_public(Chan *chan, char *from, char *spyformat, char *rest);
-void on_action(char *from, char *to, char *rest);
-int access_needed(char *name);
-void do_chaccess(COMMAND_ARGS)					__page(CMD1_SEG);
-void do_last(COMMAND_ARGS)					__page(CMD1_SEG);
+LS uint32_t makecrc(const char *)				__page(CORE_SEG);
+LS void send_suppress(const char *, const char *)		__page(CORE_SEG);
+LS void on_kick(char *from, char *rest);
+LS void on_join(Chan *chan, char *from);
+LS void on_nick(char *from, char *newnick);
+LS void on_msg(char *from, char *to, char *rest);
+LS void on_mode(char *from, char *channel, char *rest);
+LS void common_public(Chan *chan, char *from, char *spyformat, char *rest);
+LS void on_action(char *from, char *to, char *rest);
+LS int access_needed(char *name);
+LS void do_chaccess(COMMAND_ARGS)				__page(CMD1_SEG);
+LS void do_last(COMMAND_ARGS)					__page(CMD1_SEG);
 
 /* parse.c */
 
-void parse_error(char *from, char *rest);
-void parse_invite(char *from, char *rest);
-void parse_join(char *from, char *rest);
-void parse_mode(char *from, char *rest);
-void parse_notice(char *from, char *rest);
-void parse_part(char *from, char *rest);
-void parse_ping(char *from, char *rest);
-void parse_pong(char *from, char *rest);
-void parse_privmsg(char *from, char *rest);
-void parse_quit(char *from, char *rest);
-void parse_topic(char *from, char *rest);
-void parse_wallops(char *from, char *rest);
-void parse_213(char *from, char *rest);
-void parse_219(char *from, char *rest);
-void parse_251(char *from, char *rest);
-void parse_252(char *from, char *rest);
-void parse_253(char *from, char *rest);
-void parse_254(char *from, char *rest);
-void parse_255(char *from, char *rest);
-void parse_301(char *from, char *rest);
-void parse_303(char *from, char *rest);
-void parse_311(char *from, char *rest);
-void parse_312(char *from, char *rest);
-void parse_313(char *from, char *rest);
-void parse_315(char *from, char *rest);
-void parse_317(char *from, char *rest);
-void parse_318(char *from, char *rest);
-void parse_319(char *from, char *rest);
-void parse_324(char *from, char *rest);
-void parse_352(char *from, char *rest);
-void parse_367(char *from, char *rest);
-void parse_376(char *from, char *rest);
-void parse_401(char *from, char *rest);
-void parse_433(char *from, char *rest);
-void parse_451(char *from, char *rest);
-void parse_471(char *from, char *rest);
-void parse_473(char *from, char *rest);
-void parse_346(char *from, char *rest);
-void parse_348(char *from, char *rest);
-void parse_368(char *from, char *rest);
-void parse_005(char *from, char *rest);
-uint32_t stringhash(char *s);
-void parseline(char *rest);
+LS void parse_error(char *from, char *rest);
+LS void parse_invite(char *from, char *rest);
+LS void parse_join(char *from, char *rest);
+LS void parse_mode(char *from, char *rest);
+LS void parse_notice(char *from, char *rest);
+LS void parse_part(char *from, char *rest);
+LS void parse_ping(char *from, char *rest);
+LS void parse_pong(char *from, char *rest);
+LS void parse_privmsg(char *from, char *rest);
+LS void parse_quit(char *from, char *rest);
+LS void parse_topic(char *from, char *rest);
+LS void parse_wallops(char *from, char *rest);
+LS void parse_213(char *from, char *rest);
+LS void parse_219(char *from, char *rest);
+LS void parse_251(char *from, char *rest);
+LS void parse_252(char *from, char *rest);
+LS void parse_253(char *from, char *rest);
+LS void parse_254(char *from, char *rest);
+LS void parse_255(char *from, char *rest);
+LS void parse_301(char *from, char *rest);
+LS void parse_303(char *from, char *rest);
+LS void parse_311(char *from, char *rest);
+LS void parse_312(char *from, char *rest);
+LS void parse_313(char *from, char *rest);
+LS void parse_315(char *from, char *rest);
+LS void parse_317(char *from, char *rest);
+LS void parse_318(char *from, char *rest);
+LS void parse_319(char *from, char *rest);
+LS void parse_324(char *from, char *rest);
+LS void parse_352(char *from, char *rest);
+LS void parse_367(char *from, char *rest);
+LS void parse_376(char *from, char *rest);
+LS void parse_401(char *from, char *rest);
+LS void parse_433(char *from, char *rest);
+LS void parse_451(char *from, char *rest);
+LS void parse_471(char *from, char *rest);
+LS void parse_473(char *from, char *rest);
+LS void parse_346(char *from, char *rest);
+LS void parse_348(char *from, char *rest);
+LS void parse_368(char *from, char *rest);
+LS void parse_005(char *from, char *rest);
+LS uint32_t stringhash(char *s);
+LS void parseline(char *rest);
 
 /* partyline.c */
 
@@ -540,22 +535,24 @@ LS void do_perlscript(COMMAND_ARGS)					__page(CMD1_SEG);
 
 /* prot.c */
 
-void send_kick(Chan *chan, const char *nick, const char *format, ...);
-void push_kicks(Chan *chan);
-void unmode_chanuser(Chan *chan, ChanUser *cu);
-void send_mode(Chan *chan, int pri, int type, char plusminus, char modeflag, void *data);
-int mode_effect(Chan *chan, qMode *mode);
-void push_modes(Chan *chan, int lowpri);
-void update_modes(Chan *chan);
-int check_mass(Chan *chan, ChanUser *doer, int type);
-void mass_action(Chan *chan, ChanUser *doer);
-void prot_action(Chan *chan, char *from, ChanUser *doer, char *target, ChanUser *victim);
+LS void send_kick(Chan *chan, const char *nick, const char *format, ...);
+LS void push_kicks(Chan *chan);
+LS void unmode_chanuser(Chan *chan, ChanUser *cu);
+LS void send_mode(Chan *chan, int pri, int type, char plusminus, char modeflag, void *data);
+LS int mode_effect(Chan *chan, qMode *mode);
+LS void push_modes(Chan *chan, int lowpri);
+LS void update_modes(Chan *chan);
+LS int check_mass(Chan *chan, ChanUser *doer, int type);
+LS void mass_action(Chan *chan, ChanUser *doer);
+LS void prot_action(Chan *chan, char *from, ChanUser *doer, char *target, ChanUser *victim);
+LS void process_chanbans(void);
+LS void chanban_action(char *, char *, Shit *);
 LS void check_dynamode(Chan *)						__page(CORE_SEG);
-void do_opdeopme(COMMAND_ARGS)						__page(CMD1_SEG);
-void do_opvoice(COMMAND_ARGS)						__page(CMD1_SEG);
-void do_kickban(COMMAND_ARGS)						__page(CMD1_SEG);
-void do_unban(COMMAND_ARGS)						__page(CMD1_SEG);
-void do_banlist(COMMAND_ARGS)						__page(CMD1_SEG);
+LS void do_opdeopme(COMMAND_ARGS)					__page(CMD1_SEG);
+LS void do_opvoice(COMMAND_ARGS)					__page(CMD1_SEG);
+LS void do_kickban(COMMAND_ARGS)					__page(CMD1_SEG);
+LS void do_unban(COMMAND_ARGS)						__page(CMD1_SEG);
+LS void do_banlist(COMMAND_ARGS)					__page(CMD1_SEG);
 
 /* python.c */
 #ifdef PYTHON

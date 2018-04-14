@@ -28,6 +28,38 @@
 #include "text.h"
 #include "mcmd.h"
 
+#ifdef SUPPRESS
+
+uint32_t makecrc(const char *args)
+{
+	uint32_t crc = 0;
+	int	n = 0;
+
+	while(args[n])
+		crc += ((((crc * 0xc960ebb3) ^ 0x14d0bd4d) + 0x9ff77d71) * args[n++]) - 0xb07daba7;
+
+	return(crc);
+}
+
+void send_suppress(const char *command, const char *args)
+{
+	Mech	*backup;
+	int	crc;
+
+	crc = makecrc(args);
+	for(backup=botlist;backup;backup=backup->next)
+	{
+		if (backup != current)
+		{
+			backup->supres_cmd = command;
+			backup->supres_crc = crc;
+		}
+	}
+	botnet_relay(NULL,"CS%s %i\n",command,crc);
+}
+
+#endif /* SUPPRESS */
+
 /*
  *  :nick!user@host KICK #channel kicknick :message
  */
