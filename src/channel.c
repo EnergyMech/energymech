@@ -476,7 +476,8 @@ void channel_massmode(const Chan *chan, char *pattern, int filtmode, char mode, 
 		{
 			if ((Strlen2(deopstring,burst)) >= MSGLEN-2) // burst is never NULL
 			{
-				write(current->sock,burst,strlen(burst));
+				if (write(current->sock,burst,strlen(burst)) == -1)
+					return;
 #ifdef DEBUG
 				debug("(channel_massmode)\n%s\n",burst);
 #endif /* DEBUG */
@@ -489,7 +490,8 @@ void channel_massmode(const Chan *chan, char *pattern, int filtmode, char mode, 
 
 	if (strlen(burst))
 	{
-		write(current->sock,burst,strlen(burst));
+		if (write(current->sock,burst,strlen(burst)) == -1)
+			return;
 #ifdef DEBUG
 		debug("(...)\n%s\n",burst);
 #endif /* DEBUG */

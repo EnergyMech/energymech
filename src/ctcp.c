@@ -152,7 +152,7 @@ void dcc_pushfile(Client *client, off_t where)
 	sz = read(client->fileno,tempdata,sz);
 	if (sz < 1)
 		return;
-	write(client->sock,tempdata,sz);
+	sz = write(client->sock,tempdata,sz);
 }
 
 int dcc_freeslots(int uaccess)
@@ -235,7 +235,8 @@ void parse_dcc(Client *client)
 		{
 			s = read(client->sock,bigtemp,4096);
 			if (s > 0)
-				write(client->fileno,bigtemp,s);
+				if (write(client->fileno,bigtemp,s) == -1)
+					return;
 		}
 		while(s > 0);
 
@@ -244,7 +245,10 @@ void parse_dcc(Client *client)
 
 		where = oc = lseek(client->fileno,0,SEEK_CUR);
 		where = htonl(where);
-		write(client->sock,&where,4);
+
+		if (write(client->sock,&where,4) == -1)
+			return;
+
 		client->lasttime = now;
 
 		if (oc == client->fileend)

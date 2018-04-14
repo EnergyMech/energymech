@@ -299,7 +299,9 @@ void send_redirect(char *message)
 		if ((fd = open(redirect.to,O_WRONLY|O_CREAT|O_APPEND,NEWFILEMODE)) < 0)
 			return;
 		fmt = stringcat(message,"\n");
-		write(fd,message,(fmt-message));
+		if (write(fd,message,(fmt-message)) == -1)
+			return;
+
 		close(fd);
 		return;
 #ifdef BOTNET
@@ -936,7 +938,7 @@ void do_info(COMMAND_ARGS)
 			{
 				avg = (stats->userpeak + stats->userlow) / 2;
 			}
-			sprintf(p,"%-7lu %-4i %i",avg,stats->userpeak,stats->userlow);
+			sprintf(p,"%-7u %-4i %i",avg,stats->userpeak,stats->userlow);
 			to_user(from,FMT_PLAIN,text);
 			sprintf(text,"Messages: %i   Notices: %i   Joins: %i   Parts: %i   Kicks: %i   Quits: %i",
 				stats->privmsg,stats->notice,stats->joins,stats->parts,stats->kicks,stats->quits);

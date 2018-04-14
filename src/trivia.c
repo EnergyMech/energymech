@@ -365,10 +365,13 @@ char *random_question(char *triv_rand)
 	n--;
 
 	lseek(ifd,(n * sizeof(entry)),SEEK_SET);
-	read(ifd,&entry,sizeof(entry));
+	if (read(ifd,&entry,sizeof(entry)) == -1)
+		return(NULL);
 
 	lseek(fd,entry.off,SEEK_SET);
-	read(fd,triv_rand,entry.sz);
+	if (read(fd,triv_rand,entry.sz) == -1)
+		return(NULL);
+
 	triv_rand[entry.sz] = 0;
 
 	close(fd);
