@@ -304,7 +304,7 @@ void do_cpuinfo(COMMAND_ARGS)
 
 	*bogostr = 0;
 	*cpustr = 0;
-	if (bogo == 1)
+	if (bogo)
 		sprintf(bogostr,", %s BogoMips",vmlib);
 	if (cpus > 1 || (cores > cpus))
 	{
