@@ -1,0 +1,73 @@
+;
+;  server connection timeout limit = 60 seconds
+;
+set ctimeout	60
+
+;
+;  in this example, servers are loaded by netcfg
+;
+
+;
+;  this is sorta how a botnet configuration would look like...
+;
+set linkport	5000
+set linkpass	your_lame_password
+set autolink	1
+
+;
+;  thats all the botnet stuff for now, in this example, the rest is loaded by netcfg
+;
+
+;
+;  create a new bot
+;
+;  1        the globally uniqe ID (guid), used for botnet linking
+;  emech3   the bots nick
+;
+nick		1 emech3
+set altnick	myemech3 monkey3 dummy3 fuzzy3
+
+;
+;  set connection variables for this bot
+;
+set servergroup freenet
+set userfile	mech.passwd
+set ident	robot
+set ircname	EnergyMech 3: The Next Generation
+set umodes	+w
+set cmdchar	.
+set modes	4
+set cc		1
+
+;
+;  join a channel
+;
+join		#anychannel
+set pub		1
+set aop		1
+set avoice	1
+set prot	4
+
+;
+;  setup command restrictions for commands loaded with netcfg
+;  all netcfg access restriction commands are optional, by default everything is unrestricted
+;
+
+;  run netcfg commands as a level 90 user with global access
+netcfg access * 90
+
+;  disallow all commands
+netcfg disallow *
+
+;  allow listed commands again (access permissions still apply)
+netcfg allow servergroup server link
+
+;
+;  load 'groupsetup.set' from 192.168.1.99, port 5000, using password 'gronkadonk'
+;
+netcfg groupsetup.set 192.168.1.99:5000 gronkadonk
+
+;
+; Can you guess?
+;
+die You did not edit your configuation file!

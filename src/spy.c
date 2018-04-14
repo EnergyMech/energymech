@@ -28,6 +28,10 @@
 #include "text.h"
 #include "mcmd.h"
 
+#ifdef STATS
+#include <math.h>
+#endif
+
 #ifdef DEBUG
 
 LS const char SPY_DEFS[][12] =
@@ -199,6 +203,278 @@ int spy_source(char *from, int *t_src, const char **src)
 		return(-1);
 	return(get_useraccess(from,*src));
 }
+
+#ifdef REDIRECT
+
+int begin_redirect(char *from, char *args)
+{
+	char	*pt,*nick;
+
+	if (!args)
+		return(0);
+	pt = STRCHR(args,'>');
+	if (pt)
+	{
+		*pt = 0;
+		nick = pt+1;
+		pt--;
+		while((pt > args) && (*pt == ' '))
+		{
+			*pt = 0;
+			pt--;
+		}
+		while(*nick == ' ')
+			nick++;
+		if (*nick)
+		{
+#ifdef DEBUG
+			debug("(begin_redirect) from %s --> %s\n",from,nick);
+#endif /* DEBUG */
+			if (ischannel(nick))
+			{
+				if (find_channel_ac(nick))
+				{
+					redirect.to = stringdup(nick);
+					redirect.method = R_PRIVMSG;
+					return(0);
+				}
+				else
+				{
+					to_user(from,ERR_CHAN,nick);
+					return(-1);
+				}
+			}
+			if (*nick == '>')
+			{
+				nick++;
+				while(*nick == ' ')
+					nick++;
+				if (!*nick)
+				{
+					to_user(from,"Missing name for redirect.");
+					return(-1);
+				}
+				if (is_safepath(nick,FILE_MAY_EXIST) != FILE_IS_SAFE) // redirect output is appended
+				{
+					to_user(from,"Bad filename.");
+					return(-1);
+				}
+				redirect.to = stringdup(nick);
+				redirect.method = R_FILE;
+				return(0);
+			}
+			if ((pt = find_nuh(nick)))
+			{
+				redirect.to = stringdup(nick);
+				redirect.method = R_NOTICE;
+				return(0);
+			}
+			else
+			{
+				to_user(from,TEXT_UNKNOWNUSER,nick);
+				return(-1);
+			}
+		}
+		else
+		{
+			to_user(from,"Bad redirect");
+			return(-1);
+		}
+	}
+	return(0);
+}
+
+void send_redirect(char *message)
+{
+	Strp	*new,**pp;
+	char	*fmt;
+	int	fd;
+
+	if (!redirect.to)
+		return;
+
+	switch(redirect.method)
+	{
+	case R_FILE:
+		if ((fd = open(redirect.to,O_WRONLY|O_CREAT|O_APPEND,NEWFILEMODE)) < 0)
+			return;
+		fmt = stringcat(message,"\n");
+		write(fd,message,(fmt-message));
+		close(fd);
+		return;
+#ifdef BOTNET
+	case R_BOTNET:
+		{
+			char	tempdata[MAXLEN];
+			Mech	*backup;
+
+			/* PM<targetguid> <targetuserhost> <source> <message> */
+			sprintf(tempdata,"%i %s %s %s",redirect.guid,redirect.to,current->nick,message);
+			backup = current;
+			partyMessage(NULL,tempdata);
+			current = backup;
+		}
+		return;
+#endif /* BOTNET */
+	case R_NOTICE:
+		fmt = "NOTICE %s :%s";
+		break;
+	/* case R_PRIVMSG: */
+	default:
+		fmt = "PRIVMSG %s :%s";
+		break;
+	}
+
+	pp = &current->sendq;
+	while(*pp)
+		pp = &(*pp)->next;
+
+	*pp = new = (Strp*)Calloc(sizeof(Strp) + StrlenX(message,fmt,redirect.to,NULL));
+	/* Calloc sets to zero new->next = NULL; */
+	sprintf(new->p,fmt,redirect.to,message);
+}
+
+void end_redirect(void)
+{
+	if (redirect.to)
+		Free((char**)&redirect.to);
+}
+
+#endif /* REDIRECT */
+
+#ifdef URLCAPTURE
+
+char *urlhost(const char *url)
+{
+	char	copy[strlen(url)];
+	const char *end,*beg,*dst;
+	int	n = 0;
+
+	beg = end = url;
+	while(*end)
+	{
+		if (*end == '@')
+			beg = end+1;
+		else
+		if (*end == '/')
+		{
+			if (n == 1)
+				beg = end+1;
+			else
+			if (n == 2)
+				break;
+			n++;
+		}
+		end++;
+	}
+	stringcpy_n(copy,beg,(end-beg));
+#ifdef DEBUG
+	debug("(urlhost) host = %s\n",copy);
+#endif
+}
+
+void urlcapture(const char *rest)
+{
+	Strp	*sp,*nx;
+	char	*dest,url[MSGLEN];
+	int	n;
+
+	dest = url;
+	while(*rest && *rest != ' ' && dest < url+MSGLEN-1)
+		*(dest++) = *(rest++);
+	*dest = 0;
+
+#ifdef DEBUG
+	debug("(urlcapture) URL = \"%s\"\n",url);
+#endif /* ifdef DEBUG */
+	urlhost(url);
+
+	send_spy(SPYSTR_URL,"%s",url);
+
+	if ((n = urlhistmax) < 0)
+		return;
+
+	prepend_strp(&urlhistory,url);
+
+	for(sp=urlhistory;sp;sp=sp->next)
+	{
+		if (n <= 0)
+		{
+			purge_strplist(sp->next);
+			sp->next = NULL;
+			return;
+		}
+		n--;
+	}
+}
+
+#endif /* ifdef URLCAPTURE */
+
+#ifdef STATS
+
+void stats_loghour(Chan *chan, char *filename, int hour)
+{
+	ChanStats *stats;
+	time_t	when;
+	int	fd;
+
+	if (!(stats = chan->stats))
+		return;
+
+	when = (now - (now % 3600));
+
+	if ((fd = open(filename,O_WRONLY|O_APPEND|O_CREAT,NEWFILEMODE)) >= 0)
+	{
+		stats->userseconds += stats->users * (when - stats->lastuser);
+		to_file(fd,"H %s %i %i %i %i\n",chan->name,hour,
+			(stats->flags & CSTAT_PARTIAL) ? -stats->userseconds : stats->userseconds,
+			stats->userpeak,stats->userlow);
+		close(fd);
+	}
+	stats->LHuserseconds = stats->userseconds;
+	stats->userseconds = 0;
+	stats->lastuser = when;
+	stats->flags = 0;
+}
+
+void stats_plusminususer(Chan *chan, int plusminus)
+{
+	ChanStats *stats;
+	ChanUser *cu;
+
+	if (!(stats = chan->stats))
+	{
+		set_mallocdoer(stats_plusminususer);
+		chan->stats = stats = (ChanStats*)Calloc(sizeof(ChanStats)); /* Calloc sets memory to 0 */
+		for(cu=chan->users;cu;cu=cu->next)
+			stats->users++;
+		stats->userpeak = stats->users;
+		stats->userlow = stats->users;
+		stats->lastuser = now;
+		stats->flags = CSTAT_PARTIAL;
+	}
+
+	/*
+	 *  add (number of users until now * seconds since last user entered/left)
+	 */
+	stats->userseconds += stats->users * (now - stats->lastuser);
+
+	stats->lastuser = now;
+	stats->users += plusminus;	/* can be both negative (-1), zero (0) and positive (+1) */
+
+	if (stats->userpeak < stats->users)
+		stats->userpeak = stats->users;
+	if (stats->userlow > stats->users)
+		stats->userlow = stats->users;
+
+#ifdef DEBUG
+	debug("(stats_plusminususer) %s: %i users, %i userseconds, %i high, %i low; %s (%lu)\n",
+		chan->name,stats->users,stats->userseconds,stats->userpeak,stats->userlow,
+		atime(stats->lastuser),stats->lastuser);
+#endif /* DEBUG */
+}
+
+#endif /* ifdef STATS */
 
 /*
  *
@@ -579,3 +855,99 @@ rspy_dest_ok:
 	}
 	spy_typecount(current);
 }
+
+#ifdef URLCAPTURE
+
+/*
+help:URLHIST:[max]
+
+Display a list of URLs seen by the bot in order most recent to oldest.
+
+   [max]   Maximum number of URLs to display.
+*/
+void do_urlhist(COMMAND_ARGS)
+{
+	Strp	*sp;
+	char	*thenum;
+	int	n,maxnum;
+
+	if (urlhistory == NULL)
+	{
+		to_user(from,"No URLs recorded.");
+		return;
+	}
+
+	if (!rest || !*rest)
+		maxnum = urlhistmax;
+	else
+	{
+		thenum = chop(&rest);
+		maxnum = asc2int(thenum);
+	}
+	if ((maxnum < 1) || (maxnum > urlhistmax))
+		usage(from);    /* usage for CurrentCmd->name */
+
+	n = 1;
+	for(sp=urlhistory;sp;sp=sp->next)
+	{
+		if (n > maxnum)
+			break;
+		to_user(from,"[%i] %s",n,sp->p);
+		n++;
+	}
+}
+
+#endif /* URLCAPTURE */
+
+#ifdef STATS
+
+void do_info(COMMAND_ARGS)
+{
+	ChanStats *stats;
+	Chan	*chan;
+	char	*p;
+	char	text[MSGLEN];
+	uint32_t avg;
+
+	if (current->chanlist == NULL)
+	{
+		to_user(from,ERR_NOCHANNELS);
+		return;
+	}
+	to_user(from,"\037channel\037                            "
+		"\037average\037 \037peak\037 \037low\037");
+	for(chan=current->chanlist;chan;chan=chan->next)
+	{
+		*(p = text) = 0;
+		p = stringcat(p,chan->name);
+		if (chan == current->activechan)
+			p = stringcat(p," (current)");
+		if ((stats = chan->stats))
+		{
+			if (stats && stats->flags == CSTAT_PARTIAL)
+				p = stringcat(p," (partial)");
+			while(p < text+35)
+				*(p++) = ' ';
+			if (stats->LHuserseconds > 0)
+			{
+				avg = stats->LHuserseconds / (60*60);
+			}
+			else
+			{
+				avg = (stats->userpeak + stats->userlow) / 2;
+			}
+			sprintf(p,"%-7lu %-4i %i",avg,stats->userpeak,stats->userlow);
+			to_user(from,FMT_PLAIN,text);
+			sprintf(text,"Messages: %i   Notices: %i   Joins: %i   Parts: %i   Kicks: %i   Quits: %i",
+				stats->privmsg,stats->notice,stats->joins,stats->parts,stats->kicks,stats->quits);
+		}
+		else
+		{
+			stringcpy(p," (no current data)");
+		}
+		to_user(from,FMT_PLAIN,text);
+	}
+}
+
+#endif /* STATS */
+

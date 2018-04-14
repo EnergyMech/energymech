@@ -650,7 +650,7 @@ void purge_chanusers(Chan *chan)
 		remove_chanuser(chan,chan->users->nick);
 }
 
-char *get_nuh(ChanUser *user)
+char *get_nuh(const ChanUser *user)
 {
 	sprintf(nuh_buf,"%s!%s",user->nick,user->userhost);
 	return(nuh_buf);

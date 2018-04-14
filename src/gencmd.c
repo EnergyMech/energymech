@@ -67,6 +67,7 @@ struct
 	{ 0, "VERIFY",		"do_auth",		 0		| NOPUB	| CBANG			}, // catch login attempts
 #ifdef TOYBOX
 	{ 0, "8BALL",		"do_8ball",		 0		| CBANG	| SUPRES		},
+	{ 0, "RAND",		"do_rand",		 0		| CBANG	| SUPRES		},
 #endif /* TOYBOX */
 
 	/*

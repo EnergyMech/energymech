@@ -164,7 +164,7 @@ ChanUser *find_chanuser(Chan *, const char *);
 void remove_chanuser(Chan *, const char *);
 void make_chanuser(char *, char *);
 void purge_chanusers(Chan *);
-char *get_nuh(ChanUser *);
+char *get_nuh(const ChanUser *);
 void do_join(COMMAND_ARGS)					__page(CMD1_SEG);
 void do_part(COMMAND_ARGS)					__page(CMD1_SEG);
 void do_cycle(COMMAND_ARGS)					__page(CMD1_SEG);
@@ -586,7 +586,6 @@ void send_redirect(char *);
 void end_redirect(void);
 
 /* reset.c */
-//			;
 
 char *recover_client(char *env);
 char *recover_debug(char *env);
@@ -641,47 +640,48 @@ void send_spy(const char *src, const char *format, ...);
 void send_global(const char *src, const char *format, ...);
 void spy_typecount(Mech *bot);
 int spy_source(char *from, int *t_src, const char **src);
-void do_spy(COMMAND_ARGS)						__page(CMD1_SEG);
-void do_rspy(COMMAND_ARGS)						__page(CMD1_SEG);
-
-/* stats.c */
-
+char *urlhost(const char *);
+LS void urlcapture(const char *)					__page(CORE_SEG);
 void stats_loghour(Chan *chan, char *filename, int hour);
 void stats_plusminususer(Chan *chan, int plusminus);
+void do_spy(COMMAND_ARGS)						__page(CMD1_SEG);
+void do_rspy(COMMAND_ARGS)						__page(CMD1_SEG);
 void do_info(COMMAND_ARGS)						__page(CMD1_SEG);
+LS void do_urlhist(COMMAND_ARGS)					__page(CMD1_SEG);
 
 /* tcl.c */
 #ifdef TCL
 
-char *tcl_var_read(Tcl_TVInfo *vinfo, Tcl_Interp *I, char *n1, char *n2, int flags);
-char *tcl_var_write(Tcl_TVInfo *vinfo, Tcl_Interp *I, char *n1, char *n2, int flags);
-int tcl_timer_jump(Hook *hook);
-int tcl_parse_jump(char *from, char *rest, Hook *hook);
-void tcl_dcc_complete(Client *client, int cps);
-int tcl_hook(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[]);
-int tcl_unhook(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[]);
-int tcl_userlevel(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[]);
-int tcl_debug(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[]);
-int tcl_to_server(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[]);
-int tcl_to_file(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[]);
-int tcl_dcc_sendfile(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[]);
-int tcl_dns_jump(char *host, char *resolved, Hook *hook);
-int tcl_dns(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[]);
-void init_tcl(void);
-void do_tcl(COMMAND_ARGS)						__page(CMD1_SEG);
+LS char *tcl_var_read(Tcl_TVInfo *vinfo, Tcl_Interp *I, char *n1, char *n2, int flags);
+LS char *tcl_var_write(Tcl_TVInfo *vinfo, Tcl_Interp *I, char *n1, char *n2, int flags);
+LS int tcl_timer_jump(Hook *hook);
+LS int tcl_parse_jump(char *from, char *rest, Hook *hook);
+LS void tcl_dcc_complete(Client *client, int cps);
+LS int tcl_hook(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[]);
+LS int tcl_unhook(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[]);
+LS int tcl_userlevel(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[]);
+LS int tcl_debug(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[]);
+LS int tcl_to_server(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[]);
+LS int tcl_to_file(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[]);
+LS int tcl_dcc_sendfile(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[]);
+LS int tcl_dns_jump(char *host, char *resolved, Hook *hook);
+LS int tcl_dns(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[]);
+LS void init_tcl(void);
+LS void do_tcl(COMMAND_ARGS)						__page(CMD1_SEG);
 
 #endif /* TCL */
 
 /* toybox.c */
 
-int read_bigcharset_callback(char *rest);
-int read_bigcharset(char *fname);
-int read_ascii(char *rest);
-void do_bigsay(COMMAND_ARGS)						__page(CMD1_SEG);
-void do_random_msg(COMMAND_ARGS)					__page(CMD1_SEG);
-void do_randtopic(COMMAND_ARGS)						__page(CMD1_SEG);
-void do_8ball(COMMAND_ARGS)						__page(CMD1_SEG);
+LS int read_bigcharset_callback(char *rest);
+LS int read_bigcharset(char *fname);
+LS int read_ascii(char *rest);
+LS void do_bigsay(COMMAND_ARGS)						__page(CMD1_SEG);
+LS void do_random_msg(COMMAND_ARGS)					__page(CMD1_SEG);
+LS void do_randtopic(COMMAND_ARGS)					__page(CMD1_SEG);
+LS void do_8ball(COMMAND_ARGS)						__page(CMD1_SEG);
 LS void do_ascii(COMMAND_ARGS)						__page(CMD1_SEG);
+LS void do_rand(COMMAND_ARGS)						__page(CMD1_SEG);
 
 /* trivia.c */
 
@@ -708,14 +708,7 @@ void uptime_death(int type);
 void process_uptime(void);
 void do_upsend(COMMAND_ARGS)						__page(CMD1_SEG);
 
-/* urlcap.c */
-
-char *urlhost(const char *);
-LS void urlcapture(const char *)					__page(CORE_SEG);
-LS void do_urlhist(COMMAND_ARGS)					__page(CMD1_SEG);
-
 /* user.c */
-
 
 LS void cfg_user(char *)					__page(CFG1_SEG);
 void cfg_modcount(char *);

@@ -518,7 +518,6 @@ LS const char notify_opt[NF_OPTIONS][10] =
 #define NFF_FULL	8
 #define NFF_SEEN	16
 
-LS char *nf_from;
 LS int nf_header;
 
 void nfshow_brief(Notify *nf)
@@ -547,8 +546,8 @@ void nfshow_brief(Notify *nf)
 		s = " never seen";
 
 	if (!nf_header)
-		to_user(nf_from,"\037nick\037         \037last seen\037             \037note\037");
-	to_user(nf_from,(nf->info) ? "%-9s   %-22s %s" : "%-9s   %s",
+		to_user(global_from,"\037nick\037         \037last seen\037             \037note\037");
+	to_user(global_from,(nf->info) ? "%-9s   %-22s %s" : "%-9s   %s",
 		nf->nick,s,nf->info);
 	nf_header++;
 }
@@ -560,15 +559,15 @@ void nfshow_full(Notify *nf)
 	char	*s,*opt;
 
 	if (nf_header)
-		to_user(nf_from," ");
-	to_user(nf_from,(nf->status == NF_MASKONLINE) ? "Nick: \037%s\037" : "Nick: %s",nf->nick);
+		to_user(global_from," ");
+	to_user(global_from,(nf->status == NF_MASKONLINE) ? "Nick: \037%s\037" : "Nick: %s",nf->nick);
 	if (nf->info)
-		to_user(nf_from,"Note: %s",nf->info);
+		to_user(global_from,"Note: %s",nf->info);
 	if (nf->mask)
-		to_user(nf_from,"Mask: %s",nf->mask);
+		to_user(global_from,"Mask: %s",nf->mask);
 	if (nf->log)
 	{
-		to_user(nf_from,"Online history:");
+		to_user(global_from,"Online history:");
 		for(nlog=nf->log;nlog;nlog=nlog->next)
 		{
 			opt = mem;
@@ -597,7 +596,7 @@ void nfshow_full(Notify *nf)
 				*(opt++) = ' ';
 			*opt = 0;
 			s = (nlog->realname) ? "%s: %s (%s)" : "%s: %s";
-			to_user(nf_from,s,mem,nlog->userhost,nlog->realname);
+			to_user(global_from,s,mem,nlog->userhost,nlog->realname);
 		}
 	}
 	nf_header++;
@@ -645,7 +644,7 @@ void do_notify(COMMAND_ARGS)
 	char	*opt;
 	int	n,flags;
 
-	nf_from = from;
+	global_from = from;
 	flags = nf_header = 0;
 	*message = 0;
 

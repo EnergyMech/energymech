@@ -1225,17 +1225,21 @@ void botnet_parse(BotNet *bn, char *rest)
 #ifdef TELNET
 	if (bn->status == BN_UNKNOWN)
 	{
-		if (!stringcmp(rest,telnetprompt))
+		if (!stringcmp(rest,telnetprompt)) // another bot sent me its telnetprompt
 			return;
-		if (*rest != 'B')
+#ifdef NETCFG
+		if (strncmp(rest,"netcfg ",7) == 0)
 		{
-			if (check_telnet(bn->sock,rest))
-			{
-				bn->sock = -1;
-				bn->status = BN_DEAD;
-				deadlinks = TRUE;
-				return;
-			}
+			goto not_a_botnet_connection;
+		}
+#endif /* NETCFG */
+		if (check_telnet(bn->sock,rest))
+		{
+not_a_botnet_connection:
+			bn->sock = -1;
+			bn->status = BN_DEAD;
+			deadlinks = TRUE;
+			return;
 		}
 	}
 #endif /* TELNET */

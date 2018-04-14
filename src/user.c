@@ -1505,11 +1505,15 @@ usage:
 			to_user(from,"Problem adding %s (global mask)",mask);
 			return;
 		}
+/*
+// With ipv6 and other funky crap, this is no longer suitable
+
 		if (matches("*@?*.?*",mask))
 		{
 			to_user(from,"Problem adding %s (invalid mask)",mask);
 			return;
 		}
+*/
 #endif /* NEWBIE */
 		addtouser(&user->mask,mask,TRUE);
 		change++;

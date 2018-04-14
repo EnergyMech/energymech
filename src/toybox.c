@@ -157,6 +157,11 @@ int read_bigcharset(char *fname)
 	return(0);
 }
 
+int read_ascii(char *rest)
+{
+	to_user_q(global_from,FMT_PLAIN,rest);
+}
+
 /*
  *
  *
@@ -322,13 +327,6 @@ void do_8ball(COMMAND_ARGS)
 	to_user_q(from,FMT_PLAIN,message);
 }
 
-char *ascii_from;
-
-int read_ascii(char *rest)
-{
-	to_user_q(ascii_from,FMT_PLAIN,rest);
-}
-
 void do_ascii(COMMAND_ARGS)
 {
 	char	fname[MSGLEN];
@@ -368,8 +366,105 @@ ascii_badfile:
 		goto ascii_badfile;
 #endif
 
-	ascii_from = from;
+	global_from = from;
 	readline(fd,&read_ascii);		/* readline closes fd */
+}
+
+/*
+help:RAND:[[min[-| ]]max|"nick"|"luser"]
+
+Tell the user a random number or channel nick.
+
+Valid forms:
+
+RAND		Number between 1 and 100 (incl. 1 and 100)
+RAND 10		Number between 1 and 10  (incl. 1 and 10)
+RAND 0 10	Number between 0 and 10  (incl. 0 and 10)
+RAND 0-10	Same
+RAND nick	Random channel non-bot user
+RAND luser	Random channel user with no bot access
+
+By default, the bot picks a number between 1 and 100 (incl. 1 and 100)
+
+If the command ``RAND nick'' is issued in a channel, the bot picks a random channel
+user (after eliminating all known bots) and says the nick in the channel.
+
+If the command ``RAND luser'' is issued in a channel, the bot picks a random channel
+user that has no access in the bots userlist and says the nick in the channel.
+
+*/
+void do_rand(COMMAND_ARGS)
+{
+	const char *opt;
+	const ChanUser *cu;
+	int	r,min = 1,max = 100,maxaccess = -1;
+
+	if (!rest && *rest == 0)
+		goto pick_randnum;
+
+	if (attrtab[(uchar)*rest] & NUM)
+	{
+		max = 0;
+		while(attrtab[(uchar)*rest] & NUM)
+			max = 10 * max + (*(rest++) - '0');
+		if (*rest == '-' || *rest == ' ')
+			rest++;
+		if ((attrtab[(uchar)*rest] & NUM) == 0)
+			goto pick_randnum;
+		min = max;
+		max = 0;
+		while(attrtab[(uchar)*rest] & NUM)
+			max = 10 * max + (*(rest++) - '0');
+		goto pick_randnum;
+	}
+	opt = chop(&rest);
+	if (stringcasecmp(opt,"nick") == 0)
+		maxaccess = OWNERLEVEL;
+	if (stringcasecmp(opt,"luser") == 0)
+		maxaccess = 0;
+	if (maxaccess >= 0 && CurrentChan)
+	{
+		max = 0;
+		for(cu=CurrentChan->users;cu;cu=cu->next)
+		{
+			if (get_useraccess(get_nuh(cu),to) <= maxaccess)
+				max++;
+		}
+		if (max < 2)
+		{
+			to_user_q(from,"Unable to pick at random, too few choices");
+			return;
+		}
+		r = RANDOM(0,max);
+#ifdef DEBUG
+		debug("(do_rand) pick a rand user: max = %i, r = %i\n",max,r);
+#endif
+		max = 0;
+		for(cu=CurrentChan->users;cu;cu=cu->next)
+		{
+			if (get_useraccess(get_nuh(cu),to) <= maxaccess)
+			{
+				if (r == max)
+				{
+					to_user_q(from,"Random %suser: %s",(maxaccess == 0) ? "l" : "",cu->nick);
+					return;
+				}
+				max++;
+			}
+		}
+		to_user_q(from,"Unable to pick at random...");
+		return;
+	}
+pick_randnum:
+	if (max == 0 || max < min)
+		max = 100;
+	if (min < 0 || min > max)
+		min = 1;
+	r = RANDOM(min,max);
+#ifdef DEBUG
+	debug("(do_rand) pick a rand number: min = %i, max = %i, r = %i\n",min,max,r);
+#endif
+	to_user_q(from,"Random number: %i",r);
 }
 
 #endif /* TOYBOX */
