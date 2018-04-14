@@ -355,6 +355,12 @@ void to_user_q(const char *target, const char *format, ...)
 
 	stringcat(message,"\n");
 
+	if (startup > 0)
+	{
+		write(1,message,strlen(message));
+		return;
+	}
+
 	fmt = "NOTICE %s :%s";
 	if (CurrentChan)
 	{
