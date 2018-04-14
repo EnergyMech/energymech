@@ -6,6 +6,7 @@ src/Makefile
 src/config.h
 src/mcmd.h
 src/usercombo.h
+src/githash.h
 trivia/*.index
 
 # compiled files
@@ -28,6 +29,8 @@ mech.pid
 mech.session
 root.zone*
 trick.conf
+mech.trivscore
+trivia/megatrivia.txt
 
 #  developer files
 .use_size
@@ -36,3 +39,9 @@ debug*
 *.log
 *.stats
 github
+
+src/calc.c
+src/x
+src/y
+src/z
+

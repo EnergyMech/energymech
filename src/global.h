@@ -33,6 +33,8 @@
 
 #endif /* MAIN_C */
 
+#include "githash.h"
+
 /*
  *
  */
@@ -40,8 +42,8 @@
 #define DEFAULTCMDCHAR			'-'
 #define MECHUSERLOGIN			"v3.energymech.net"
 
-BEG const char VERSION[]		MDEF("3.0.99p4");
-BEG const char SRCDATE[]		MDEF("March 13th, 2018");
+BEG const char VERSION[]		MDEF("3.1p" GITHASH);
+BEG const char SRCDATE[]		MDEF("April 14th, 2018");
 #ifdef __CYGWIN__
 BEG const char BOTCLASS[]		MDEF("WinMech");
 #else /* ! CYGWIN */

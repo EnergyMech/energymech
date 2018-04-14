@@ -1094,8 +1094,12 @@ fi
 #
 #   is this a git environment
 #
+def_git='#undef HAVE_GIT'
 echo $ac_n "checking for git ... "$ac_c
 GITEXE=`config/which git`
+if [ -x $GITEXE -a -r .git ]; then
+	def_git='#define HAVE_GIT'
+fi
 echo $ac_t "$GITEXE"
 
 #
@@ -1469,6 +1473,7 @@ s|@DEF_URLCAPTURE@|$def_urlcapture|;
      s|@DEF_WEB@|$def_web|;
  s|@DEF_WINGATE@|$def_wingate|;
 
+s|@DEF_GIT@|$def_git|;
 s|@LIT_END@|$LIT_END|;
 s|@BIG_END@|$BIG_END|;
 s|@DEF_CRYPT_FUNCTION@|$CRYPT_FUNCTION|;
