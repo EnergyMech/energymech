@@ -29,15 +29,8 @@
 
 #include <sys/utsname.h>
 
-char	omni[224]; // 32*7
-#define vmpeak	&omni[0]
-#define vmsize	&omni[32]
-#define vmrss	&omni[64]
-#define vmdata	&omni[96]
-#define vmstk	&omni[128]
-#define vmexe	&omni[160]
-#define vmlib	&omni[192]
 /*
+Emulate this, but use the same memory space:
 char	vmpeak[32];
 char	vmsize[32];
 char	vmrss[32];
@@ -46,6 +39,14 @@ char	vmstk[32];
 char	vmexe[32];
 char	vmlib[32];
 */
+char	omni[224]; // 32*7
+#define vmpeak	&omni[0]
+#define vmsize	&omni[32]
+#define vmrss	&omni[64]
+#define vmdata	&omni[96]
+#define vmstk	&omni[128]
+#define vmexe	&omni[160]
+#define vmlib	&omni[192]
 
 struct // statusvalues
 {
@@ -96,76 +97,90 @@ int parse_proc_status(char *line)
 	return(FALSE);
 }
 
-int sentmodel;
-int physid,cpus,cores,addsiblings;
+int havemodel,bogo,procct,physid,cpus,cores,siblings;
 
 /*
 proton@endemic:~/energymech/src> cat /proc/loadavg
 0.00 0.00 0.00 1/178 6759
+
 processor       : 0
-vendor_id       : GenuineIntel
-cpu family      : 6
-model           : 23
 model name      : Intel(R) Core(TM)2 Quad  CPU   Q8200  @ 2.33GHz
-stepping        : 7
-microcode       : 0x705
-cpu MHz         : 2024.267
-cache size      : 2048 KB
 physical id     : 0
-siblings        : 4
+siblings        : 4 <-- total number of cores in all cpus
 core id         : 0
 cpu cores       : 4
+bogomips        : 4533.39
+
 */
+
+const char *cfind(const char *s1, const char *s2)
+{
+	while(*s2)
+	{
+		while(*s1 == ' ' || *s1 == '\t')
+			s1++;
+		if (tolowertab[(uchar)(*s1)] != tolowertab[(uchar)(*s2)])
+			return(NULL);
+		s1++;
+		s2++;
+	}
+	while(*s1 == ' ' || *s1 == '\t' || *s1 == ':')
+		s1++;
+	return(s1);
+}
 
 int parse_proc_cpuinfo(char *line)
 {
-	char	*src,*dst;
-	int	spc;
+	const char *src;
+	char	*dst = omni,*end = omni+sizeof(omni)-1;
+	int	v;
 
-	if (sentmodel == 0 && strncmp(line,"model name\t: ",13) == 0)
+	if ((src = cfind(line,"cpumodel")) || (src = cfind(line,"modelname")))
 	{
-		spc = 0;
-		src = line+13;
-		dst = omni;
-		while(*src)
+		if (havemodel == 1)
+			return(FALSE);
+		*(dst++) = ' '; // prime with a leading space
+		while(*src && dst < end)
 		{
-			if (*src == ' ')
-			{
-				if (spc++)
-				{
-					src++;
-					continue;
-				}
-			}
-			else
-				spc = 0;
-			*dst++ = *src++;
+			if (*src != ' ' || dst[-1] != ' ')
+				*(dst++) = *src;
+			src++;
 		}
 		*dst = 0;
 #ifdef DEBUG
 		debug("(parse_proc_cpuinfo) model name = %s\n",omni);
 #endif
-		to_user_q(global_from,"Cpu: %s\n",omni);
-		sentmodel++;
+		havemodel = 1;
 	}
-	else
-	if (strncmp(line,"physical id\t: ",14) == 0)
+	if ((src = cfind(line,"physicalid")) || (src = cfind(line,"core")))
 	{
-		spc = asc2int(line+14);
-		if (errno == 0 && spc != physid)
+		v = asc2int(src);
+		if (errno == 0)
 		{
-			cpus++;
-			addsiblings = 1;
-			physid = spc;
+			physid += (v+1);
 		}
 	}
 	else
-	if (addsiblings == 1 && strncmp(line,"siblings\t: ",11) == 0)
+	if (siblings == 0 && (src = cfind(line,"siblings")))
 	{
-		spc = asc2int(line+11);
-		addsiblings = 0;
-		cores += spc;
+		cores = siblings = asc2int(src);
 	}
+	else
+	if ((src = cfind(line,"bogomips")))
+	{
+		bogo++;
+		if (bogo != 1)
+			return(FALSE);
+		dst = vmlib;
+		while(*src && dst < end)
+		{
+			if (*src != ' ' || dst[-1] != ' ')
+				*(dst++) = *src;
+			src++;
+		}
+		*dst = 0;
+	}
+	return(FALSE); // return false to continue reading lines
 }
 
 /*
@@ -223,9 +238,23 @@ See also: hostinfo, meminfo
 */
 void do_cpuinfo(COMMAND_ARGS)
 {
-	char	*a1,*a2,*a3;
+	char	bogostr[64],cpustr[64];
+	char	*a1,*a2,*a3,*dst;
 	int	fd,n;
 
+#ifdef DEVELOPING
+	a1 = chop(&rest);
+	if (a1)
+		sprintf(bogostr,"/home/git/cpuinfo/%s",a1);
+	else
+		stringcpy(bogostr,"/proc/cpuinfo");
+	if ((fd = open(bogostr,O_RDONLY)) < 0)
+//	if ((fd = open("/home/git/cpuinfo/mips3",O_RDONLY)) < 0)
+//	if ((fd = open("/home/git/cpuinfo/mips2",O_RDONLY)) < 0)
+//	if ((fd = open("/home/git/cpuinfo/mips1",O_RDONLY)) < 0)
+//	if ((fd = open("/home/git/cpuinfo/intel1",O_RDONLY)) < 0)
+//	if ((fd = open("/home/git/cpuinfo/cosmiccow",O_RDONLY)) < 0)
+#endif
 	if ((fd = open("/proc/cpuinfo",O_RDONLY)) < 0)
 #ifdef DEBUG
 	{
@@ -237,9 +266,8 @@ void do_cpuinfo(COMMAND_ARGS)
 #endif
 
 	global_from = from;
-	sentmodel = 0;
-	physid = -1;
-	cpus = cores = addsiblings = 0;
+	havemodel = bogo = siblings = procct = cpus = cores = physid = 0;
+	omni[1] = 0;
 	readline(fd,&parse_proc_cpuinfo); // readline closes fd
 
 	if ((fd = open("/proc/loadavg",O_RDONLY)) < 0)
@@ -263,12 +291,29 @@ void do_cpuinfo(COMMAND_ARGS)
 	if (!a3 || !*a3)
 		return;
 
-	to_user_q(from,"Load: %s(1m) %s(5m) %s(15m) [%i physical cpu%s, %i core%s]\n",
-		a1,a2,a3,cpus,(cpus == 1) ? "" : "s",cores,(cores == 1) ? "" : "s");
 #ifdef DEBUG
-	debug("(do_cpuinfo) Load: %s(1m) %s(5m) %s(15m) [%i physical cpu%s, %i core%s]\n",
-		a1,a2,a3,cpus,(cpus == 1) ? "" : "s",cores,(cores == 1) ? "" : "s");
+	debug("(do_cpuinfo) procct %i, physid %i, cores %i, bogo %i\n",procct,physid,cores,bogo);
 #endif
+
+	if (cores == 0)
+		cores = bogo;
+	if (cores && physid && (physid % cores) == 0)
+		cpus = (physid / cores)-1;
+	if (cores && (cpus == 0 || physid == cores))
+		cpus = 1;
+
+	*bogostr = 0;
+	*cpustr = 0;
+	if (bogo == 1)
+		sprintf(bogostr,", %s BogoMips",vmlib);
+	if (cpus > 1 || (cores > cpus))
+	{
+		sprintf(cpustr,", %i physical cpu%s",cpus,(cpus == 1) ? "" : "s");
+		if (cores)
+			sprintf(STREND(cpustr),", %i core%s",cores,(cores == 1) ? "" : "s");
+	}
+	to_user_q(from,"%s%s%s, loadavg: %s(1m) %s(5m) %s(15m)",
+		omni+1,bogostr,cpustr,a1,a2,a3);
 }
 
 #endif /* HOSTINFO */
