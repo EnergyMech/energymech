@@ -17,7 +17,7 @@
 #   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-MISCFILES =	CREDITS LICENSE README README.TCL TODO VERSIONS VERSIONS-1 Makefile configure \
+MISCFILES =	CREDITS FEATURES LICENSE README README.TCL TODO VERSIONS VERSIONS-2.x Makefile configure \
 		checkmech sample.conf sample.py sample.tcl sample.userfile default.bigchars public/README trivia/README
 
 ASCIIFILES =	ascii/README ascii/bbw ascii/camel ascii/goatse ascii/mech ascii/phooler
@@ -58,8 +58,8 @@ TRIVFILES =	trivia/mkindex.c
 SRCFILES =	src/alias.c src/auth.c src/bounce.c src/chanban.c src/channel.c src/core.c src/ctcp.c src/debug.c src/dns.c \
 		src/function.c src/gencmd.c src/greet.c src/help.c src/hostinfo.c src/irc.c src/kicksay.c src/main.c src/mega.c \
 		src/net.c src/net_chan.c src/note.c src/notify.c src/ons.c src/parse.c src/partyline.c src/perl.c src/prot.c \
-		src/python.c src/redirect.c src/reset.c src/seen.c src/shit.c src/socket.c src/spy.c src/stats.c src/tcl.c \
-		src/toybox.c src/trivia.c src/uptime.c src/urlcap.c src/user.c src/vars.c src/web.c \
+		src/python.c src/reset.c src/seen.c src/shit.c src/socket.c src/spy.c src/tcl.c \
+		src/toybox.c src/trivia.c src/uptime.c src/user.c src/vars.c src/web.c \
 		src/lib/md5.c src/lib/md5.h src/lib/string.c
 
 HDRFILES =	src/defines.h src/global.h src/h.h src/settings.h src/structs.h src/text.h src/usage.h

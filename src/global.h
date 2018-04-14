@@ -105,6 +105,7 @@ BEG User	*CurrentUser		MDEF(NULL);
 BEG Shit	*CurrentShit		MDEF(NULL);
 BEG const OnMsg	*CurrentCmd		MDEF(NULL);
 BEG User	*cfgUser		MDEF(NULL);
+BEG const char	*global_from		MDEF(NULL);
 
 BEG User	__internal_users[2];
 #define CoreUser (__internal_users[0])

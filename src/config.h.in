@@ -22,9 +22,10 @@
 #define CONFIG_H
 
 /*
- *  DEBUG: extreme amounts of debug code, needed if you want to use the -d commandline switch
+ *  ALIAS: create aliases for commands
  */
-@DEF_DEBUG@
+@DEF_ALIAS@
+#define MAXALIASRECURSE 20
 
 /*
  *  BOTNET: support for connecting bots to eachother in a botnet
@@ -32,27 +33,27 @@
 @DEF_BOTNET@
 
 /*
- *  TELNET: connecting to the partyline via telnet
+ *  BOUNCE: support for `standalone' irc proxy
  */
-@DEF_TELNET@
-#define TELNET_TIMEOUT		60	/* 60 seconds to enter password */
+@DEF_BOUNCE@
 
 /*
- *  ALIAS: create aliases for commands
+ *  Standard CTCP replies (PING, FINGER, VERSION), and commands (CTCP, PING).
+ *  DCC CHAT and the CHAT command still works even if this is undefined.
  */
-@DEF_ALIAS@
-#define MAXALIASRECURSE 20
+@DEF_CTCP@
+#define CTCP_SLOTS	6		/* how many slots we have to send out CTCP replies */
+#define CTCP_TIMEOUT	60		/* how long before a used slot expires and can be used again */
 
 /*
- *  Support for SEEN command, undefined by default
- *  because it consumes a lardass amount of memory
+ *  DEBUG: extreme amounts of debug code, needed if you want to use the -d commandline switch
  */
-@DEF_SEEN@
+@DEF_DEBUG@
 
 /*
- *  sessions support (mech.session)
+ *  DYNAMODE: dynamic updating of the +l channel user limit
  */
-@DEF_SESSION@
+@DEF_DYNAMODE@
 
 /*
  *  Support to alter commandlevels on the fly. undefine
@@ -61,14 +62,30 @@
 @DEF_DYNCMD@
 
 /*
- *  NEWBIE: support for some newbie spanking routines
+ *  GREET: greet known users when they join a channel
  */
-@DEF_NEWBIE@
+@DEF_GREET@
 
 /*
- *  WINGATE: support for proxy connections through wingates
+ *  HOSTINFO: share information about the host that the bot is running on
  */
-@DEF_WINGATE@
+@DEF_HOSTINFO@
+
+/*
+ *  IDWRAP: support for idwrap ident spoofing
+ */
+@DEF_IDWRAP@
+#define IDWRAP_PATH	@IDWRAP_PATH@
+
+/*
+ *  IRCD_EXTENSIONS: support some special features of new ircds
+ */
+@DEF_IRCD_EXT@
+#ifdef IRCD_EXTENSIONS
+@DEF_CHANBAN@
+#else
+#undef CHANBAN
+#endif /* IRCD_EXTENSIONS */
 
 /*
  *  SHACRYPT: support use of SHA to hash passwords
@@ -81,14 +98,6 @@
 @DEF_MD5@
 
 /*
- *  Standard CTCP replies (PING, FINGER, VERSION), and commands (CTCP, PING).
- *  DCC CHAT and the CHAT command still works even if this is undefined.
- */
-@DEF_CTCP@
-#define CTCP_SLOTS	6		/* how many slots we have to send out CTCP replies */
-#define CTCP_TIMEOUT	60		/* how long before a used slot expires and can be used again */
-
-/*
  *
  */
 @DEF_DCCFILE@
@@ -97,19 +106,9 @@
 #define DCC_FILETIMEOUT		90
 
 /*
- *  UPTIME: send uptime packets to uptime.energymech.net
- */
-@DEF_UPTIME@
-
-/*
  *  REDIRECT: send command output from certain commands to a different target
  */
 @DEF_REDIRECT@
-
-/*
- *  GREET: greet known users when they join a channel
- */
-@DEF_GREET@
 
 /*
  *  PERL: scripting using the perl language (may not be supported on all hosts)
@@ -127,14 +126,14 @@
 @DEF_PYTHON@
 
 /*
- *  DYNAMODE: dynamic updating of the +l channel user limit
+ *  NETCFG: support for loading config blocks from the internet/other bots
  */
-@DEF_DYNAMODE@
+@DEF_NETCFG@
 
 /*
- *  WEB: serving documents via HTTP
+ *  NEWBIE: support for some newbie spanking routines
  */
-@DEF_WEB@
+@DEF_NEWBIE@
 
 /*
  *  NOTE: enable commands to leave notes for users to read at a later time
@@ -147,10 +146,26 @@
 @DEF_NOTIFY@
 
 /*
- *  IDWRAP: support for idwrap ident spoofing
+ *  Support for SEEN command, undefined by default
+ *  because it consumes a lardass amount of memory
  */
-@DEF_IDWRAP@
-#define IDWRAP_PATH	@IDWRAP_PATH@
+@DEF_SEEN@
+
+/*
+ *  sessions support (mech.session)
+ */
+@DEF_SESSION@
+
+/*
+ *  SUPPRESS: suppress duplication of certain commands
+ */
+@DEF_SUPPRESS@
+
+/*
+ *  TELNET: connecting to the partyline via telnet
+ */
+@DEF_TELNET@
+#define TELNET_TIMEOUT		60	/* 60 seconds to enter password */
 
 /*
  *  TRIVIA: support for playing trivia game
@@ -163,11 +178,6 @@
 @DEF_TOYBOX@
 
 /*
- *  BOUNCE: support for `standalone' irc proxy
- */
-@DEF_BOUNCE@
-
-/*
  *  STATS: channel statistics
  */
 @DEF_STATS@
@@ -178,19 +188,9 @@
 @DEF_RAWDNS@
 
 /*
- *  IRCD_EXTENSIONS: support some special features of new ircds
+ *  UPTIME: send uptime packets to uptime.energymech.net
  */
-@DEF_IRCD_EXT@
-#ifdef IRCD_EXTENSIONS
-@DEF_CHANBAN@
-#else
-#undef CHANBAN
-#endif /* IRCD_EXTENSIONS */
-
-/*
- *  HOSTINFO: share information about the host that the bot is running on
- */
-@DEF_HOSTINFO@
+@DEF_UPTIME@
 
 /*
  *  URLCAPTURE: capture url's mentioned
@@ -198,9 +198,14 @@
 @DEF_URLCAPTURE@
 
 /*
- *  SUPPRESS: suppress duplication of certain commands
+ *  WEB: serving documents via HTTP
  */
-@DEF_SUPPRESS@
+@DEF_WEB@
+
+/*
+ *  WINGATE: support for proxy connections through wingates
+ */
+@DEF_WINGATE@
 
 /*
  *  FASTNICK: faster nick regain if the nick is seen when released
@@ -496,6 +501,13 @@ const char __mx_opts[] =	""
 #define OPT_COMMA	", "
 #undef	OPT_COREONLY
 #endif /* BOTNET */
+
+#ifdef NETCFG
+			OPT_COMMA "netcfg"
+#undef	OPT_COMMA
+#define OPT_COMMA	", "
+#undef	OPT_COREONLY
+#endif /* NETCFG */
 
 #ifdef NEWBIE
 			OPT_COMMA "newbie"

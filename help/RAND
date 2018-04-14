@@ -1,0 +1,19 @@
+ 
+Tell the user a random number.
+ 
+Valid forms:
+ 
+RAND            Number between 1 and 100 (incl. 1 and 100)
+RAND 10         Number between 1 and 10  (incl. 1 and 10)
+RAND 0 10       Number between 0 and 10  (incl. 0 and 10)
+RAND 0-10       Same
+RAND nick       Random channel non-bot user
+RAND luser      Random channel user with no bot access
+ 
+By default, the bot picks a number between 1 and 100 (incl. 1 and 100)
+ 
+If the command ``RAND nick'' is issued in a channel, the bot picks a random channel
+user (after eliminating all known bots) and says the nick in the channel.
+ 
+If the command ``RAND luser'' is issued in a channel, the bot picks a random channel
+user that has no access in the bots userlist and says the nick in the channel.

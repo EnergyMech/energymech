@@ -96,7 +96,6 @@ int parse_proc_status(char *line)
 	return(FALSE);
 }
 
-char *cpufrom;
 int sentmodel;
 int physid,cpus,cores,addsiblings;
 
@@ -146,7 +145,7 @@ int parse_proc_cpuinfo(char *line)
 #ifdef DEBUG
 		debug("(parse_proc_cpuinfo) model name = %s\n",omni);
 #endif
-		to_user_q(cpufrom,"Cpu: %s\n",omni);
+		to_user_q(global_from,"Cpu: %s\n",omni);
 		sentmodel++;
 	}
 	else
@@ -237,7 +236,7 @@ void do_cpuinfo(COMMAND_ARGS)
 		return;
 #endif
 
-	cpufrom = from;
+	global_from = from;
 	sentmodel = 0;
 	physid = -1;
 	cpus = cores = addsiblings = 0;

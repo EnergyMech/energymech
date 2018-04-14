@@ -43,6 +43,7 @@ set_feature_defaults() {
   ft_hostinfo=$ft_default
   ft_ircd_ext=$ft_default
   ft_md5=$ft_default
+  ft_netcfg=$ft_default
   ft_newbie=$ft_default
   ft_note=$ft_default
   ft_notify=$ft_default
@@ -106,6 +107,7 @@ do
           ircd_ext )	ft_ircd_ext=$yesno ;;
 	  libmusl )	try_libmusl=$yesno ;;
           md5 )		ft_md5=$yesno ;;
+	  netcfg )	ft_netcfg=$yesno ;;
           newbie )	ft_newbie=$yesno ;;
           note )	ft_note=$yesno ;;
           notify )	ft_notify=$yesno ;;
@@ -153,8 +155,8 @@ do
 
   case "$feature" in
     alias | botnet | bounce | chanban | ctcp | dccfile | debug | dynamode | dyncmd | greet | hostinfo | idwrap | ircd_ext | libmusl | md5 \
-    | newbie | note | notify | perl | profiling | python | rawdns | redirect | seen | session | sha | stats | suppress | tcl | telnet | toybox \
-    | trivia | uptime | urlcapture | web | wingate )
+    | netcfg | newbie | note | notify | perl | profiling | python | rawdns | redirect | seen | session | sha | stats | suppress | tcl \
+    | telnet | toybox | trivia | uptime | urlcapture | web | wingate )
       case _"$optarg"_ in
         _yes_ | _no_ | __ )
           ;;
@@ -212,6 +214,8 @@ do
 	libmusl_no )			try_libmusl=no ;;
         md5_yes | md5_ )		ft_md5=yes ;;
         md5_no )			ft_md5=no ;;
+	netcfg_yes | netcfg_ )		ft_netcfg=yes ;;
+	netcfg_no )			ft_netcfg=no ;;
         newbie_yes | newbie_ )		ft_newbie=yes ;;
         newbie_no )			ft_newbie=no ;;
         note_yes | note_ )		ft_note=yes ;;
@@ -273,6 +277,7 @@ do
         ircd_ext )     ft_ircd_ext=no ;;
 	libmusl )	try_libmusl=no ;;
         md5 )          ft_md5=no ;;
+	netcfg )	ft_netcfg=no ;;
         newbie )       ft_newbie=no ;;
         note )         ft_note=no ;;
         notify )       ft_notify=no ;;
@@ -348,6 +353,7 @@ Features and packages:
   --with-libmusl[=/PATH/TO/musl-gcc]
 				Try to use libmusl instead of system default
   --with-md5			Support for hashing passwords with the MD5 hashing algorithm
+  --with-netcfg			Support for loading config blocks from the internet/other bots
   --with-newbie			Newbie support for extra sanity checks and error messages
   --with-note
   --with-notify
@@ -736,6 +742,25 @@ fi
 echo $ac_t "$has_unaligned"
 
 rm -f $TESTP
+
+#
+#  is there a sendfile() system call?
+#
+
+has_sendfile=no
+DEF_SENDFILE='#undef HAS_SENDFILE'
+TESTC=config/sendfile.c
+
+echo $ac_n "checking if system has sendfile() ... "$ac_c
+
+$CC -c $TESTC -o $TESTO 1> /dev/null 2> /dev/null
+if [ -r $TESTO ]; then
+  has_sendfile=yes
+  DEF_SENDFILE='#define HAS_SENDFILE'
+fi
+echo $ac_t "$has_sendfile"
+
+rm -f $TESTO
 
 #
 #  where is inet_addr() ?
@@ -1204,6 +1229,13 @@ test "$ft_ircd_ext" && $out "$ft_ircd_ext" && ans=$ft_ircd_ext
 test -z "$ft_ircd_ext" && read ans
 test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_ircd_ext='#define IRCD_EXTENSIONS'
 
+def_netcfg='#undef NETCFG'
+unset ans
+$out $ac_n "[ ALPHA] Netcfg support? ............................ [Y/n] "$ac_c
+test "$ft_netcfg" && $out "$ft_netcfg" && ans=$ft_netcfg
+test -z "$ft_netcfg" && read ans
+test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes && def_netcfg='#define NETCFG'
+
 def_newbie='#undef NEWBIE'
 unset ans
 $out $ac_n "[STABLE] Newbie support? ............................ [Y/n] "$ac_c
@@ -1416,6 +1448,7 @@ s|@DEF_HOSTINFO@|$def_hostinfo|;
 s|@DEF_IRCD_EXT@|$def_ircd_ext|;
      s|@DEF_MD5@|$def_md5|;
      s|@DEF_SHA@|$def_sha|;
+  s|@DEF_NETCFG@|$def_netcfg|;
   s|@DEF_NEWBIE@|$def_newbie|;
     s|@DEF_NOTE@|$def_note|;
   s|@DEF_NOTIFY@|$def_notify|;

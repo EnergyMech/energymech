@@ -952,6 +952,17 @@ int main(int argc, char **argv, char **envp)
 			debug_on_exit = TRUE;
 			break;
 #endif /* DEBUG */
+		case 'e': // run a single command before exiting
+			startup = 3;
+			++argv;
+			if (*argv)
+			{
+				//void on_msg(char *from, char *to, char *rest)
+				//on_msg();
+			}
+			else
+				to_file(1,"error: Missing argument for -e <command string>\n");
+			_exit(0);
 		case 't':
 			startup = 666;
 			break;
