@@ -32,15 +32,13 @@ root.zone*
 trick.conf
 mech.trivscore
 trivia/megatrivia.txt
+*.log
+*.stats
 
 #  developer files
 .use_size
 conf
 debug*
-*.log
-*.stats
-github
-
 src/calc.c
 src/x
 src/y

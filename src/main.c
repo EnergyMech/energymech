@@ -18,6 +18,62 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
+#ifdef MEGA_C
+#define MAIN_C
+#include "config.h"
+#include "defines.h"
+#include "structs.h"
+#include "global.h"
+#ifdef TCL
+#include <tcl.h>
+#endif
+#include "h.h"
+#include "text.h"
+#include "mcmd.h"
+#undef MAIN_C
+#define VARS_C
+#include "settings.h"
+#undef VARS_C
+
+#include "alias.c"
+#include "auth.c"
+#include "bounce.c"
+#include "channel.c"
+#include "core.c"
+#include "ctcp.c"
+#include "debug.c"
+#undef DEBUG_C
+#include "dns.c"
+#include "function.c"
+#include "greet.c"
+#include "help.c"
+#include "hostinfo.c"
+#include "io.c"
+#include "irc.c"
+#include "lib/string.c"
+#include "net.c"
+#include "note.c"
+#include "ons.c"
+#include "parse.c"
+#include "partyline.c"
+#if defined(TCL) && defined(PERL)
+#undef STRINGIFY
+#endif
+#include "perl.c"
+#include "prot.c"
+#include "python.c"
+#include "reset.c"
+#include "seen.c"
+#include "shit.c"
+#include "spy.c"
+#include "tcl.c"
+#include "toybox.c"
+#include "uptime.c"
+#include "user.c"
+#include "vars.c"
+#include "web.c"
+#else /* ifdef MEGA_C */
+
 #define MAIN_C
 #include "config.h"
 
@@ -27,6 +83,8 @@
 #include "h.h"
 #include "text.h"
 #include "mcmd.h"
+
+#endif /* ifdef-else MEGA_C */
 
 /*
  *  we generally try to mess around as little as possible here

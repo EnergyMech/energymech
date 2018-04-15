@@ -576,7 +576,7 @@ LS void do_banlist(COMMAND_ARGS)					__page(CMD1_SEG);
 
 #ifdef PYTHON
 
-#ifdef DEBUG_C
+#if defined(DEBUG_C) || defined(MEGA_C)
 PyObject *python_hook(PyObject *self, PyObject *args, PyObject *keywds);
 PyObject *python_unhook(PyObject *self, PyObject *args, PyObject *keywds);
 #endif
@@ -655,7 +655,7 @@ LS void do_urlhist(COMMAND_ARGS)					__page(CMD1_SEG);
 LS int tcl_timer_jump(Hook *hook);
 LS int tcl_parse_jump(char *from, char *rest, Hook *hook);
 LS void tcl_dcc_complete(Client *client, int cps);
-#ifdef DEBUG_C
+#if defined(DEBUG_C) || defined(MEGA_C)
 LS int tcl_hook(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[]);
 #endif
 //LS int tcl_unhook(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[]);
@@ -673,32 +673,30 @@ LS void do_tcl(COMMAND_ARGS)						__page(CMD1_SEG);
 
 /* toybox.c */
 
-LS int read_bigcharset_callback(char *rest);
-LS int read_bigcharset(char *fname);
-LS int read_ascii(char *rest);
+LS int read_bigcharset_callback(char *);
+LS int read_bigcharset(char *);
+LS int read_ascii(char *);
+LS void trivia_week_toppers(void);
+LS void hint_one(void);
+LS void hint_two(void);
+LS void hint_three(void);
+LS void trivia_cleanup(void);
+LS void trivia_check(Chan *, char *);
+LS void trivia_no_answer(void);
+LS char *random_question(char *);
+LS void trivia_question(void);
+LS void trivia_tick(void);
+LS void write_triviascore(void);
+LS int trivia_score_callback(char *);
+LS void read_triviascore(void);
 LS void do_bigsay(COMMAND_ARGS)						__page(CMD1_SEG);
 LS void do_random_msg(COMMAND_ARGS)					__page(CMD1_SEG);
 LS void do_randtopic(COMMAND_ARGS)					__page(CMD1_SEG);
 LS void do_8ball(COMMAND_ARGS)						__page(CMD1_SEG);
 LS void do_ascii(COMMAND_ARGS)						__page(CMD1_SEG);
 LS void do_rand(COMMAND_ARGS)						__page(CMD1_SEG);
+LS void do_trivia(COMMAND_ARGS)						__page(CMD1_SEG);
 
-/* trivia.c */
-
-void trivia_week_toppers(void);
-void hint_one(void);
-void hint_two(void);
-void hint_three(void);
-void trivia_cleanup(void);
-void trivia_check(Chan *chan, char *rest);
-void trivia_no_answer(void);
-char *random_question(char *triv_rand);
-void trivia_question(void);
-void trivia_tick(void);
-void write_triviascore(void);
-int trivia_score_callback(char *rest);
-void read_triviascore(void);
-void do_trivia(COMMAND_ARGS)						__page(CMD1_SEG);
 
 /* uptime.c */
 

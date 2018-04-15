@@ -276,7 +276,7 @@ typedef struct User
 
 #ifdef BOTNET
 	int		modcount;
-	int		guid;
+	uint16_t	guid;
 	int		tick;
 	int		addsession;
 #endif /* BOTNET */
@@ -519,7 +519,7 @@ typedef struct Mech
 {
 	struct		Mech *next;
 
-	int		guid;			/* globally uniqe ID		*/
+	uint16_t	guid;			/* globally uniqe ID		*/
 	int		connect;
 	int		sock;
 	struct in_addr	ip;			/* for DCC			*/
@@ -656,7 +656,7 @@ typedef struct BotInfo
 {
 	struct		BotInfo *next;
 
-	int		guid;
+	uint16_t	guid;
 	int		hops;
 
 	char		*version;
@@ -678,7 +678,7 @@ typedef struct BotNet
 	 *  they are copied partially in that order in net.c
 	 */
 
-	int		guid;		/* remote bot guid	*/
+	uint16_t	guid;		/* remote bot guid	*/
 	int		lsid;		/* local session id	*/
 	int		rsid;		/* remote session id	*/
 
@@ -709,7 +709,7 @@ typedef struct NetCfg
 {
 	struct		NetCfg *next;
 
-	int		guid;
+	uint16_t	guid;
 	uint16_t	port;
 	uint16_t	linked; //:1;
 
@@ -762,7 +762,7 @@ typedef struct Hook
 	struct	Hook *next;
 
 	int		(*func)();
-	int		guid;	/* guid filter */
+	uint16_t	guid;	/* guid filter */
 	int		flags;
 	union {
 	void		*any;

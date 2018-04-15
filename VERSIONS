@@ -1,5 +1,7 @@
 3.1 -- WORK IN PROGRESS (~April, 2018)
 
+ * Fixed: Issue #25, clients lost when doing reset, no more
+ * Fixed: compiler warnings and missing defines/conflicting defines with certain options
  * Added: configure now saves the options selected in ./myconfig for later re-use
  * Fixed: Missing ifdef BOTNET in user.c
  * Added: Git version hash included in version string if git environment is found.

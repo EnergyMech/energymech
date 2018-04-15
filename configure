@@ -1499,16 +1499,6 @@ s|@PTSIZE_DEFINE64@|$PTSIZE_DEFINE64|;
 s|@UNALIGNED_MEM@|$UNALIGNED_MEM|;
 " < src/config.h.in >> src/config.h
 
-if [ "$install" = yes ]; then
-  make $makejobs -C src energymech
-  exit
-fi
-
-if [ "$compile" = yes ]; then
-  make $makejobs -C src energymech
-  exit
-fi
-
 save_myconfig() {
   names="alias botnet bounce chanban ctcp dccfile debug dynamode dyncmd greet hostinfo idwrap ircd_ext libmusl md5
     netcfg newbie note notify perl profiling python rawdns redirect seen session sha stats suppress tcl
@@ -1539,16 +1529,28 @@ if [ -w ./myconfig -o ! -e ./myconfig ]; then
   save_myconfig
 fi
 
-echo ''
-echo 'All done. You can now "make install"'
-if [ ! "$cores" = 1 ]; then
-  echo "For speedy compiling, use \`\`make -j$cores''"
+if [ "$install" = yes ]; then
+  make $makejobs -C src energymech
+  exit
 fi
-echo ''
-echo "Your chosen ./configure options have been saved to ./myconfig"
-echo 'if you wish to save ./myconfig in its current state, chmod -w ./myconfig'
-echo ''
-echo 'Submit your bugreports at https://github.com/MadCamel/energymech/issues'
-echo ''
-echo 'You have read the README file I hope?'
-echo ''
+
+if [ "$compile" = yes ]; then
+  make $makejobs -C src energymech
+  exit
+fi
+
+$out ''
+$out 'All done. You can now "make install"'
+if [ ! "$cores" = 1 ]; then
+  $out "For speedy compiling, use \`\`make -j$cores''"
+fi
+$out ''
+$out "Your chosen ./configure options have been saved to ./myconfig"
+$out 'if you wish to save ./myconfig in its current state, chmod -w ./myconfig'
+$out ''
+$out 'Submit your bugreports at https://github.com/MadCamel/energymech/issues'
+$out ''
+$out 'You have read the README file I hope?'
+$out ''
+
+

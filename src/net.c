@@ -1354,8 +1354,13 @@ void parse_botnet(BotNet *bn, char *rest)
 #ifdef TELNET
 	if (bn->status == BN_UNKNOWN)
 	{
-		if (!stringcmp(rest,telnetprompt)) // another bot sent me its telnetprompt
+		if (rest[0] == 'B' && rest[1] == 'B' && (attrtab[(uchar)rest[2]] & NUM))
+		{
+			basicBanner(bn,rest+2);
 			return;
+		}
+		//if (!stringcmp(rest,telnetprompt)) // another bot sent me its telnetprompt // dont assume identical prompts
+		//	return;
 #ifdef NETCFG
 		if (strncmp(rest,"netcfg ",7) == 0)
 		{
