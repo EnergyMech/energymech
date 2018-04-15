@@ -108,7 +108,6 @@ LS const struct
 #endif
 { NULL, }};
 
-
 LS struct
 {
 	void	*func;

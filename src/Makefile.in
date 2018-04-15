@@ -48,14 +48,14 @@ INCS =		$(BASEINCLUDES) mcmd.h text.h usercombo.h
 TESTFILES =	aliastest safepathtest
 
 OFILES =	alias.o auth.o bounce.o channel.o core.o ctcp.o debug.o dns.o function.o greet.o \
-		help.o hostinfo.o io.o irc.o kicksay.o main.o net.o note.o notify.o ons.o parse.o partyline.o \
+		help.o hostinfo.o io.o irc.o main.o net.o note.o ons.o parse.o partyline.o \
 		perl.o prot.o python.o reset.o seen.o shit.o spy.o tcl.o toybox.o \
-		trivia.o uptime.o user.o vars.o web.o lib/string.o @MD5_O@ @SHA_O@
+		uptime.o user.o vars.o web.o lib/string.o @MD5_O@ @SHA_O@
 
 SRCFILES =	alias.c auth.c bounce.c channel.c core.c ctcp.c debug.c dns.c function.c greet.c \
-		help.c hostinfo.c io.c irc.c kicksay.c main.c net.c note.c notify.c ons.c parse.c partyline.c \
+		help.c hostinfo.c io.c irc.c main.c net.c note.c ons.c parse.c partyline.c \
 		perl.c prot.c python.c reset.c seen.c shit.c spy.c tcl.c toybox.c \
-		trivia.c uptime.c user.c vars.c web.c lib/string.c @MD5_C@ @SHA_C@
+		uptime.c user.c vars.c web.c lib/string.c @MD5_C@ @SHA_C@
 
 .PHONY:		all clean mega-install mega mega-static test commands
 
@@ -77,6 +77,8 @@ usercombo.h:	gencmd
 
 githash.h:	gencmd
 		./gencmd githash.h
+
+global.h:	githash.h
 
 install:	$(INSTALLNAME)
 		$(CHMOD) $(INSTALLMODE) $(INSTALLNAME)
@@ -107,12 +109,12 @@ mega-install:	mega $(SRCFILES) $(INCS) usage.h
 		$(MV) $(INSTALLNAME) $(INSTALLDIR)
 
 mega:		$(SRCFILES) $(INCS) usage.h
-		$(CROSS_COMPILE)$(CC) $(CFLAGS) -o $(INSTALLNAME) mega.c -DGENDATE="`./gencmd date`" -I. $(LPROF) $(LIBS) $(LDSCRIPT) $(PYINCLUDE) $(TCLINCLUDE) $(I_PERL) $(L_PERL)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -o $(INSTALLNAME) main.c -DMEGA_C -DGENDATE="`./gencmd date`" -I. $(LPROF) $(LIBS) $(LDSCRIPT) $(PYINCLUDE) $(TCLINCLUDE) $(I_PERL) $(L_PERL)
 #@oc@		$(CROSS_COMPILE)objcopy -R .note -R .comment $(INSTALLNAME)
 @sz@		size $(INSTALLNAME)
 
 mega-static:	$(SRCFILES) $(INCS) usage.h
-		$(CROSS_COMPILE)$(CC) $(CFLAGS) -o $(INSTALLNAME) mega.c -DGENDATE="`./gencmd date`" -I. $(LPROF) $(LIBS) $(LDSCRIPT) $(PYINCLUDE) $(TCLINCLUDE) $(I_PERL) $(L_PERL) -static
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -o $(INSTALLNAME) main.c -DMEGA_C -DGENDATE="`./gencmd date`" -I. $(LPROF) $(LIBS) $(LDSCRIPT) $(PYINCLUDE) $(TCLINCLUDE) $(I_PERL) $(L_PERL) -static
 #@oc@		$(CROSS_COMPILE)objcopy -R .note -R .comment $(INSTALLNAME)
 @sz@		size $(INSTALLNAME)
 
@@ -188,9 +190,6 @@ io.o:		io.c $(INCS)
 irc.o:		irc.c $(INCS)
 		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
-kicksay.o:	kicksay.c $(INCS)
-		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
-
 main.o:		main.c $(INCS) githash.h
 		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< -DGENDATE="`./gencmd date`" $(CPROF) $(PYINCLUDE)
 
@@ -198,9 +197,6 @@ net.o:		net.c $(INCS)
 		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
 note.o:		note.c $(INCS)
-		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
-
-notify.o:	notify.c $(INCS)
 		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
 ons.o:		ons.c $(INCS)
@@ -237,9 +233,6 @@ tcl.o:		tcl.c $(INCS)
 		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF) $(TCLINCLUDE)
 
 toybox.o:	toybox.c $(INCS)
-		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
-
-trivia.o:	trivia.c $(INCS)
 		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
 uptime.o:	uptime.c $(INCS)
