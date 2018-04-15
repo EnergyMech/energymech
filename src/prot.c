@@ -40,10 +40,10 @@ void send_kick(Chan *chan, const char *nick, const char *format, ...)
 	va_list	vargs;
 
 	/*
-	 *  gsockdata safe to use since we're a `tail' function
+	 *  globaldata safe to use since we're a `tail' function
 	 */
 	va_start(vargs,format);
-	vsprintf(gsockdata,format,vargs);
+	vsprintf(globaldata,format,vargs);
 	va_end(vargs);
 
 	pp = &chan->kicklist;
@@ -51,11 +51,11 @@ void send_kick(Chan *chan, const char *nick, const char *format, ...)
 		pp = &(*pp)->next;
 
 	set_mallocdoer(send_kick);
-	*pp = new = (qKick*)Calloc(sizeof(qKick) + Strlen2(nick,gsockdata)); // gsockdata is never NULL
+	*pp = new = (qKick*)Calloc(sizeof(qKick) + Strlen2(nick,globaldata)); // globaldata is never NULL
 	/* Calloc sets to zero new->next = NULL; */
 
 	new->reason = stringcpy(new->nick,nick) + 1;
-	stringcpy(new->reason,gsockdata);
+	stringcpy(new->reason,globaldata);
 }
 
 void push_kicks(Chan *chan)
@@ -589,7 +589,7 @@ void chanban_action(char *nick, char *channel, Shit *shit)
 					cu->flags |= CU_CHANBAN;
 					format_uh(nuh,1); // returns mask in 'nuh' buffer (nuh_buf)
 					send_mode(CurrentChan,90,QM_RAWMODE,'+','b',(void*)nuh);
-					send_kick(CurrentChan,nick,"%s (%s)",shit->reason,channel); // clobbers gsockdata
+					send_kick(CurrentChan,nick,"%s (%s)",shit->reason,channel); // clobbers globaldata
 				}
 			}
 		}

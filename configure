@@ -879,6 +879,8 @@ fi
 #
 if [ "$has_md5" = yes ]; then
   echo "checking for MD5 in crypt() ... (cached) yes"
+elif [ "$ft_md5" = no ]; then
+  has_md5=notest
 elif [ ! "$ft_md5" = no ]; then
   TESTC=config/pw.c
   echo $ac_n "checking for MD5 in crypt() ... "$ac_c
@@ -922,7 +924,9 @@ fi
 has_perl=no
 perlinclude=
 libperl=
-if [ ! "$ft_perl" = no ]; then
+if [ "$ft_perl" = no ]; then
+  has_perl=notest
+elif [ ! "$ft_perl" = no ]; then
   echo $ac_n "checking for perl ... "$ac_c
   pinc1=`perl -MConfig -e 'print $Config{archlib}'`
   if [ -r $pinc1/CORE/perl.h -a -r $pinc1/CORE/EXTERN.h -a -r $pinc1/CORE/XSUB.h ]; then
@@ -943,7 +947,9 @@ fi
 #  check for tcl
 #
 has_tcl=no
-if [ ! "$ft_tcl" = no ]; then
+if [ "$ft_tcl" = no ]; then
+  has_tcl=notest
+elif [ ! "$ft_tcl" = no ]; then
   echo $ac_n "checking for tcl ... "$ac_c
   TESTC=config/tcl.c
   tclconfig=
@@ -990,7 +996,9 @@ fi
 #  check for python
 #
 has_python=no
-if [ ! "$ft_python" = no ]; then
+if [ "$ft_python" = no ]; then
+  has_python=notest
+elif [ ! "$ft_python" = no ]; then
   echo $ac_n "checking for python ... "$ac_c
   TESTC=config/python.c
   libpython=
@@ -1266,6 +1274,8 @@ unset ans
 $out $ac_n "[STABLE] Password hashing with MD5? (less secure) ... [Y/n] "$ac_c
 if [ "$has_md5" = no ]; then
   $out 'no (unsupported)'
+elif [ "$has_md5" = notest ]; then
+  $out 'no'
 else
   test "$ft_md5" && $out "$ft_md5" && ans=$ft_md5
   test -z "$ft_md5" && read ans
@@ -1283,14 +1293,13 @@ else
   test -z "$ans" -o "$ans" = y -o "$ans" = Y -o "$ans" = yes -o "$ans" = YES -o "$ans" = Yes -o "$ans" = internal && def_sha='#define SHACRYPT'
 fi
 
-#
-#  perl support not yet functional (2009-05-11)
-#
 def_perl='#undef PERL'
 unset ans
 $out $ac_n "[ ALPHA] Scripting with Perl? ....................... [y/N] "$ac_c
 if [ "$has_perl" = no ]; then
   $out 'no (unsupported)'
+elif [ "$has_perl" = notest ]; then
+  $out 'no'
 else
   test "$ft_perl" && $out "$ft_perl" && ans=$ft_perl
   test -z "$ft_perl" && read ans
@@ -1302,6 +1311,8 @@ unset ans
 $out $ac_n "[ BETA ] Scripting with Python? ..................... [y/N] "$ac_c
 if [ "$has_python" = no ]; then
   $out 'no (unsupported)'
+elif [ "$has_python" = notest ]; then
+  $out 'no'
 else
   test "$ft_python" && $out "$ft_python" && ans=$ft_python
   test -z "$ft_python" && read ans
@@ -1317,6 +1328,8 @@ unset ans
 $out $ac_n "[ BETA ] Scripting with Tcl? ........................ [y/N] "$ac_c
 if [ "$has_tcl" = no ]; then
   $out 'no (unsupported)'
+elif [ "$has_tcl" = notest ]; then
+  $out 'no'
 else
   test "$ft_tcl" && $out "$ft_tcl" && ans=$ft_tcl
   test -z "$ft_tcl" && read ans
@@ -1496,17 +1509,46 @@ if [ "$compile" = yes ]; then
   exit
 fi
 
+save_myconfig() {
+  names="alias botnet bounce chanban ctcp dccfile debug dynamode dyncmd greet hostinfo idwrap ircd_ext libmusl md5
+    netcfg newbie note notify perl profiling python rawdns redirect seen session sha stats suppress tcl
+    telnet toybox trivia uptime urlcapture web wingate"
+  echo "./configure \\" > ./myconfig
+  chmod 755 ./myconfig
+  for uu in $names
+  do
+    eval v="\$ft_$uu"
+    case "$v" in
+      yes) echo "--with-"$uu" \\" >> ./myconfig ;;
+      no) echo "--without-"$uu" \\" >> ./myconfig ;;
+    esac
+  done
+  test "$compile" = yes && echo "--compile \\" >> ./myconfig
+  test "$install" = yes && echo "--install \\" >> ./myconfig
+  test "$silentopt" = yes && echo "--silence=options \\" >> ./myconfig
+  test "$ft_md5" = internal && echo "--md5=internal \\" >> ./myconfig
+  test "$ft_sha" = internal && echo "--sha=internal \\" >> ./myconfig
+  test "$optitype" = speed && echo "--optimize=speed \\" >> ./myconfig
+  test "$optitype" = size && echo "--optimize=size \\" >> ./myconfig
+  test "$cc_ofp_opt" = yes && echo "--use-ofp \\" >> ./myconfig
+  test "$cc_ofp_opt" = yes && echo "--no-ofp \\" >> ./myconfig
+  test ! "$try_libmusl" = no -a -x "$CC" && echo "--with-libmusl="$CC" \\" >> ./myconfig
+}
+
+if [ -w ./myconfig -o ! -e ./myconfig ]; then
+  save_myconfig
+fi
+
 echo ''
 echo 'All done. You can now "make install"'
 if [ ! "$cores" = 1 ]; then
   echo "For speedy compiling, use \`\`make -j$cores''"
 fi
 echo ''
+echo "Your chosen ./configure options have been saved to ./myconfig"
+echo 'if you wish to save ./myconfig in its current state, chmod -w ./myconfig'
+echo ''
 echo 'Submit your bugreports at https://github.com/MadCamel/energymech/issues'
 echo ''
 echo 'You have read the README file I hope?'
 echo ''
-
-# make:		7.962u 0.870s 0:08.52 103.6%    0+0k 0+0io 0pf+0w
-# make -j4:	8.779u 1.069s 0:03.11 316.0%    0+0k 0+0io 0pf+0w
-# make -j8:	8.977u 1.064s 0:02.92 343.4%    0+0k 0+0io 0pf+0w

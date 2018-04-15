@@ -327,11 +327,32 @@ void do_usage(COMMAND_ARGS)					__page(CMD1_SEG);
 
 /* hostinfo.c */
 
+void monitor_fs(const char *);
+void select_monitor();
+void process_monitor();
 int parse_proc_status(char *line)				__page(CMD1_SEG);
 int parse_proc_cpuinfo(char *line)				__page(CMD1_SEG);
 void do_hostinfo(COMMAND_ARGS)					__page(CMD1_SEG);
 void do_meminfo(COMMAND_ARGS)					__page(CMD1_SEG);
 void do_cpuinfo(COMMAND_ARGS)					__page(CMD1_SEG);
+
+/* io.c */
+
+LS uint32_t get_ip(const char *)					__page(CORE_SEG);
+LS void SockFlags(int)							__page(CORE_SEG);
+LS int SockOpts(void)							__page(CORE_SEG);
+LS int SockListener(int)						__page(CORE_SEG);
+LS int SockConnect(char *, int, int)					__page(CORE_SEG);
+LS int SockAccept(int)							__page(CORE_SEG);
+int to_file(int sock, const char *format, ...);
+void to_server(char *format, ...);
+void to_user_q(const char *, const char *, ...);
+void to_user(const char *, const char *, ...);
+char *sockread(int, char *, char *);
+void readline(int, int (*)(char *));
+void remove_ks(KillSock *);
+int killsock(int);
+LS void do_clearqueue(COMMAND_ARGS)					__page(CMD1_SEG);
 
 /* irc.c */
 
@@ -426,9 +447,6 @@ void select_botnet(void);
 void process_botnet(void);
 void do_link(COMMAND_ARGS)					__page(CMD1_SEG);
 void do_cmd(COMMAND_ARGS)					__page(CMD1_SEG);
-/* net_chan.c */
-
-
 
 /* note.c */
 
@@ -555,32 +573,30 @@ LS void do_unban(COMMAND_ARGS)						__page(CMD1_SEG);
 LS void do_banlist(COMMAND_ARGS)					__page(CMD1_SEG);
 
 /* python.c */
+
 #ifdef PYTHON
 
-char *python_unicode2char(PyUnicodeObject *obj);
+#ifdef DEBUG_C
 PyObject *python_hook(PyObject *self, PyObject *args, PyObject *keywds);
 PyObject *python_unhook(PyObject *self, PyObject *args, PyObject *keywds);
+#endif
+//char *python_unicode2char(PyUnicodeObject *obj);
+//PyObject *python_userlevel(PyObject *self, PyObject *args, PyObject *keywds);
+//PyObject *python_to_server(PyObject *self, PyObject *args, PyObject *keywds);
+//PyObject *python_to_file(PyObject *self, PyObject *args, PyObject *keywds);
+//static PyObject *python_dcc_sendfile(PyObject *self, PyObject *args, PyObject *keywds);
+//PyObject *python_debug(PyObject *self, PyObject *args);
+//PyMODINIT_FUNC pythonInit(void);
+int python_parse_jump(char *, char *, Hook *);
 int python_timer_jump(Hook *hook);
 void python_dcc_complete(Client *client, int cps);
-PyObject *python_userlevel(PyObject *self, PyObject *args, PyObject *keywds);
-PyObject *python_to_server(PyObject *self, PyObject *args, PyObject *keywds);
-PyObject *python_to_file(PyObject *self, PyObject *args, PyObject *keywds);
-static PyObject *python_dcc_sendfile(PyObject *self, PyObject *args, PyObject *keywds);
-PyObject *python_debug(PyObject *self, PyObject *args);
 int python_dns_jump(char *host, char *resolved, Hook *hook);
-PyMODINIT_FUNC pythonInit(void);
 void init_python(void);
 void free_python(void);
 void do_python(COMMAND_ARGS)						__page(CMD1_SEG);
 void do_pythonscript(COMMAND_ARGS)					__page(CMD1_SEG);
 
 #endif /* PYTHON */
-
-/* redirect.c */
-
-int begin_redirect(char *, char *);
-void send_redirect(char *);
-void end_redirect(void);
 
 /* reset.c */
 
@@ -613,24 +629,6 @@ void do_rshit(COMMAND_ARGS)						__page(CMD1_SEG);
 void do_shitlist(COMMAND_ARGS)						__page(CMD1_SEG);
 void do_clearshit(COMMAND_ARGS)						__page(CMD1_SEG);
 
-/* socket.c */
-
-LS uint32_t get_ip(const char *)						__page(CORE_SEG);
-LS void SockFlags(int)							__page(CORE_SEG);
-LS int SockOpts(void)							__page(CORE_SEG);
-LS int SockListener(int)						__page(CORE_SEG);
-LS int SockConnect(char *, int, int)					__page(CORE_SEG);
-LS int SockAccept(int)							__page(CORE_SEG);
-int to_file(int sock, const char *format, ...);
-void to_server(char *format, ...);
-void to_user_q(const char *, const char *, ...);
-void to_user(const char *, const char *, ...);
-char *sockread(int, char *, char *);
-void readline(int, int (*)(char *));
-void remove_ks(KillSock *);
-int killsock(int);
-LS void do_clearqueue(COMMAND_ARGS)					__page(CMD1_SEG);
-
 /* spy.c */
 
 void send_spy(const char *src, const char *format, ...);
@@ -639,6 +637,9 @@ void spy_typecount(Mech *bot);
 int spy_source(char *from, int *t_src, const char **src);
 char *urlhost(const char *);
 LS void urlcapture(const char *)					__page(CORE_SEG);
+int begin_redirect(char *, char *);
+void send_redirect(char *);
+void end_redirect(void);
 void stats_loghour(Chan *chan, char *filename, int hour);
 void stats_plusminususer(Chan *chan, int plusminus);
 void do_spy(COMMAND_ARGS)						__page(CMD1_SEG);
@@ -649,20 +650,22 @@ LS void do_urlhist(COMMAND_ARGS)					__page(CMD1_SEG);
 /* tcl.c */
 #ifdef TCL
 
-LS char *tcl_var_read(Tcl_TVInfo *vinfo, Tcl_Interp *I, char *n1, char *n2, int flags);
-LS char *tcl_var_write(Tcl_TVInfo *vinfo, Tcl_Interp *I, char *n1, char *n2, int flags);
+//LS char *tcl_var_read(Tcl_TVInfo *vinfo, Tcl_Interp *I, char *n1, char *n2, int flags);
+//LS char *tcl_var_write(Tcl_TVInfo *vinfo, Tcl_Interp *I, char *n1, char *n2, int flags);
 LS int tcl_timer_jump(Hook *hook);
 LS int tcl_parse_jump(char *from, char *rest, Hook *hook);
 LS void tcl_dcc_complete(Client *client, int cps);
+#ifdef DEBUG_C
 LS int tcl_hook(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[]);
-LS int tcl_unhook(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[]);
-LS int tcl_userlevel(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[]);
-LS int tcl_debug(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[]);
-LS int tcl_to_server(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[]);
-LS int tcl_to_file(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[]);
-LS int tcl_dcc_sendfile(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[]);
-LS int tcl_dns_jump(char *host, char *resolved, Hook *hook);
-LS int tcl_dns(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[]);
+#endif
+//LS int tcl_unhook(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[]);
+//LS int tcl_userlevel(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[]);
+//LS int tcl_debug(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[]);
+//LS int tcl_to_server(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[]);
+//LS int tcl_to_file(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[]);
+//LS int tcl_dcc_sendfile(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[]);
+//LS int tcl_dns_jump(char *host, char *resolved, Hook *hook);
+//LS int tcl_dns(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[]);
 LS void init_tcl(void);
 LS void do_tcl(COMMAND_ARGS)						__page(CMD1_SEG);
 

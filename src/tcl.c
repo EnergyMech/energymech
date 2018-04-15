@@ -189,7 +189,7 @@ void tcl_dcc_complete(Client *client, int cps)
 	vname = Tcl_NewStringObj("_cps",3);
 	for(hook=hooklist;hook;hook=hook->next)
 	{
-		if (hook->flags == HOOK_DCC_COMPLETE &&
+		if (hook->flags == MEV_DCC_COMPLETE &&
 			hook->guid && current && hook->guid == current->guid)
 		{
 			Tcl_SetVar(energymech_tcl,"_filetarget",client->whom,0);
@@ -234,19 +234,19 @@ int tcl_hook(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[])
 		return(TCL_ERROR);
 
 	if (!stringcasecmp(type,"command"))
-		mode = HOOK_COMMAND;
+		mode = MEV_COMMAND;
 	else
 	if (!stringcasecmp(type,"dcc_complete"))
-		mode = HOOK_DCC_COMPLETE;
+		mode = MEV_DCC_COMPLETE;
 	else
 	if (!stringcasecmp(type,"parse"))
-		mode = HOOK_PARSE;
+		mode = MEV_PARSE;
 	else
 	if (!stringcasecmp(type,"timer"))
 	{
 		if (compile_timer(&hooktimer,command) < 0)
 			return(TCL_ERROR);
-		mode = HOOK_TIMER;
+		mode = MEV_TIMER;
 		sz1  = sizeof(HookTimer);
 	}
 	else
@@ -265,13 +265,13 @@ int tcl_hook(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[])
 
 	switch(mode)
 	{
-	case HOOK_COMMAND:
-	case HOOK_PARSE:
+	case MEV_COMMAND:
+	case MEV_PARSE:
 		stringcpy(hook->type.command,command);
 		hook->func = tcl_parse_jump;
 		break;
 	default:
-	/* case HOOK_TIMER: */
+	/* case MEV_TIMER: */
 		memcpy(hook->type.timer,&hooktimer,sizeof(HookTimer));
 		hook->func = tcl_timer_jump;
 		break;
@@ -499,7 +499,7 @@ int tcl_dns(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[])
 	set_mallocdoer(tcl_dns);
 	hook = (Hook*)Calloc(sizeof(Hook) + strlen(host));
 	hook->guid = (current) ? current->guid : 0;
-	hook->flags = HOOK_DNS;
+	hook->flags = MEV_DNSRESULT;
 	hook->next = hooklist;
 	hooklist = hook;
 	hook->type.host = stringcpy(hook->self,callback) + 1;

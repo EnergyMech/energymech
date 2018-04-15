@@ -517,6 +517,10 @@ mainloop:
 	select_bounce();
 #endif /* BOUNCE */
 
+#ifdef HOSTINFO
+	select_monitor();
+#endif
+
 	/*
 	 *  unset here, reset if needed in bot loop
 	 */
@@ -789,6 +793,10 @@ restart_die:
 #ifdef WEB
 	process_web();
 #endif /* WEB */
+
+#ifdef HOSTINFO
+	process_monitor();
+#endif
 
 #ifdef TRIVIA
 	trivia_tick();
@@ -1133,6 +1141,10 @@ int main(int argc, char **argv, char **envp)
 		signal(SIGABRT,sig_abrt);
 #endif /* DEBUG */
 	}
+
+#ifdef HOSTINFO
+	monitor_fs(executable);
+#endif
 
 	if (startup == 666)
 		exit(0);

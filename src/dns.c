@@ -200,7 +200,7 @@ struct in_addr *get_stored_ip(const char *ipdata)
  */
 #ifdef SCRIPTING
 
-void dns_hook(char *host, char * resolved)
+void dns_hook(char *host, char *resolved)
 {
 	Hook	*hook;
 	Mech	*backbot;
@@ -208,7 +208,7 @@ void dns_hook(char *host, char * resolved)
 	backbot = current;
 	for(hook=hooklist;hook;hook=hook->next)
 	{
-		if (hook->flags == HOOK_DNS && !stringcasecmp(host,hook->type.host))
+		if (hook->flags == MEV_DNSRESULT && !stringcasecmp(host,hook->type.host))
 		{
 			for(current=botlist;current;current=current->next)
 			{
@@ -881,7 +881,7 @@ void do_dns(COMMAND_ARGS)
 		/* flip an IP backwards to resolve hostname */
 		// a11.b22.c33.d44
 		// d44.c33.b22.a11.in-addr.arpa
-		dst = gsockdata;
+		dst = globaldata;
 flipstep:
 		src = host;
 		dot = NULL;
@@ -902,9 +902,9 @@ flipstep:
 		}
 		stringcpy(stringcpy(dst,host),".in-addr.arpa");
 #ifdef DEBUG
-		debug("(do_dns) host flipped to %s\n",gsockdata);
+		debug("(do_dns) host flipped to %s\n",globaldata);
 #endif /* DEBUG */
-		host = gsockdata;
+		host = globaldata;
 	}
 	/* check if its in cache now */
 	if ((res = poll_rawdns(host)))

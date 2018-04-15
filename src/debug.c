@@ -26,6 +26,9 @@
 #include "defines.h"
 #include "structs.h"
 #include "global.h"
+#ifdef TCL
+#include <tcl.h>
+#endif
 #include "h.h"
 #include "settings.h"
 
@@ -231,11 +234,12 @@ LS struct
 #ifdef SCRIPTING
 LS const DEFstruct SCRIPTdefs[] =
 {
-{ HOOK_PARSE,		"HOOK_PARSE"		},
-{ HOOK_TIMER,		"HOOK_TIMER"		},
-{ HOOK_COMMAND,		"HOOK_COMMAND"		},
-{ HOOK_BOTNET,		"HOOK_BOTNET"		},
-{ HOOK_DCC_COMPLETE,	"HOOK_DCC_COMPLETE"	},
+{ MEV_PARSE,		"MEV_PARSE"		},
+{ MEV_TIMER,		"MEV_TIMER"		},
+{ MEV_COMMAND,		"MEV_COMMAND"		},
+{ MEV_BOTNET,		"MEV_BOTNET"		},
+{ MEV_DCC_COMPLETE,	"MEV_DCC_COMPLETE"	},
+{ MEV_DNSRESULT,	"MEV_DNSRESULT"		},
 #ifdef TCL
 { .v.func=tcl_timer_jump,	"tcl_timer_jump"	},
 { .v.func=tcl_parse_jump,	"tcl_parse_jump"	},
@@ -1293,7 +1297,7 @@ void debug_scripthook(void)
 		debug("  ; func\t\t"mx_pfmt" %s\n",(mx_ptr)h->func,funcdef(SCRIPTdefs,h->func));
 		debug("  ; guid\t\t%i\n",h->guid);
 		debug("  ; flags\t\t%s (%i)\n",strdef(SCRIPTdefs,h->flags),h->flags);
-		if (h->flags == HOOK_TIMER)
+		if (h->flags == MEV_TIMER)
 		{
 			debug("  ; timer\t\t"mx_pfmt"\n",(mx_ptr)h->type.timer);
 			debug("  ; timer.second1\t%s ( 0..29)\n",uint32tobin(30,h->type.timer->second1));

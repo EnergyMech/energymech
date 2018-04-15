@@ -478,8 +478,8 @@ listcheck:
 	checksum = "";
 	if (user->pass)
 	{
-		sprintf(gsockdata,"%s %s %s",from,user->name,user->pass);
-		checksum = makepass(gsockdata);
+		sprintf(globaldata,"%s %s %s",from,user->name,user->pass);
+		checksum = makepass(globaldata);
 	}
 	botnet_relay(NULL,"PA%s %s %s\n",user->name,from,checksum);
 #endif /* BOTNET */

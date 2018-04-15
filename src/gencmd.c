@@ -22,9 +22,9 @@
 #include "config.h"
 #include "structs.h"
 
-char	gsockdata[MAXLEN];
+char	globaldata[MAXLEN];
 
-#include "socket.c"
+#include "io.c"
 
 /*
 

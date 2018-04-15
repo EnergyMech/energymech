@@ -44,6 +44,7 @@ LS const char SPY_DEFS[][12] =
 	"SPY_RAWIRC",
 	"SPY_BOTNET",
 	"SPY_URL",
+	"SPY_SYSMON",
 };
 
 #endif /* DEBUG */
@@ -178,6 +179,9 @@ struct
 #ifdef URLCAPTURE
 { SPYSTR_URL,		SPY_URL		},
 #endif /* URLCAPTURE */
+#ifdef HOSTINFO
+{ SPYSTR_SYSMON,	SPY_SYSMON	},
+#endif
 { NULL, 0 },
 };
 

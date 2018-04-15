@@ -406,6 +406,9 @@ enum {
 #ifdef URLCAPTURE
 #define SPY_URL			8
 #endif /* URLCAPTURE */
+#ifdef HOSTINFO
+#define SPY_SYSMON		9
+#endif /* HOSTINFO */
 
 #define SPYF_ANY		1
 #define SPYF_CHANNEL		(1 << SPY_CHANNEL)
@@ -456,14 +459,14 @@ enum {
 #endif /* __CYGWIN__ */
 
 /*
- *  scripting hooks
+ *  scripting events
  */
-#define HOOK_PARSE		0
-#define HOOK_TIMER		1
-#define HOOK_COMMAND		2
-#define HOOK_BOTNET		3
-#define HOOK_DCC_COMPLETE	4
-#define HOOK_DNS		5
+#define MEV_PARSE		0
+#define MEV_TIMER		1
+#define MEV_COMMAND		2
+#define MEV_BOTNET		3
+#define MEV_DCC_COMPLETE	4
+#define MEV_DNSRESULT		5
 
 /*
  *

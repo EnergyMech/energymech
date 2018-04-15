@@ -185,15 +185,15 @@ void botnet_relay(BotNet *source, char *format, ...)
 		if (!sz)
 		{
 			va_start(msg,format);
-			vsprintf(gsockdata,format,msg);
+			vsprintf(globaldata,format,msg);
 			va_end(msg);
-			sz = strlen(gsockdata);
+			sz = strlen(globaldata);
 		}
 
-		if (write(bn->sock,gsockdata,sz) < 0)
+		if (write(bn->sock,globaldata,sz) < 0)
 			botnet_deaduplink(bn);
 #ifdef DEBUG
-		debug("[bnr] {%i} %s",bn->sock,gsockdata);
+		debug("[bnr] {%i} %s",bn->sock,globaldata);
 #endif /* DEBUG */
 	}
 }
@@ -927,8 +927,8 @@ void partyAuth(BotNet *bn, char *rest)
 					m = 0;
 					if (user->pass)
 					{
-						sprintf(gsockdata,"%s %s %s",userhost,user->name,user->pass);
-						m = passmatch(gsockdata,checksum);
+						sprintf(globaldata,"%s %s %s",userhost,user->name,user->pass);
+						m = passmatch(globaldata,checksum);
 					}
 					if (m)
 					{

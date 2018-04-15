@@ -281,19 +281,19 @@ int to_file(int sock, const char *format, ...)
 		return(-1);
 
 	va_start(msg,format);
-	vsprintf(gsockdata,format,msg);
+	vsprintf(globaldata,format,msg);
 	va_end(msg);
 
 #if defined(DEBUG) && !defined(GENCMD_C)
-	i = write(sock,gsockdata,strlen(gsockdata));
-	rest = gsockdata;
+	i = write(sock,globaldata,strlen(globaldata));
+	rest = globaldata;
 	while((line = get_token(&rest,"\n")))	/* rest cannot be NULL */
 		debug("(out) {%i} %s\n",sock,nullstr(line));
 	if (i < 0)
 		debug("(out) {%i} errno = %i\n",sock,errno);
 	return(i);
 #else /* DEBUG */
-	return(write(sock,gsockdata,strlen(gsockdata)));
+	return(write(sock,globaldata,strlen(globaldata)));
 #endif /* DEBUG */
 }
 
@@ -314,7 +314,7 @@ void to_server(char *format, ...)
 		return;
 
 	va_start(msg,format);
-	vsprintf(gsockdata,format,msg);
+	vsprintf(globaldata,format,msg);
 	va_end(msg);
 
 	/*
@@ -323,7 +323,7 @@ void to_server(char *format, ...)
 	 */
 	current->sendq_time += 2;
 
-	if (write(current->sock,gsockdata,strlen(gsockdata)) < 0)
+	if (write(current->sock,globaldata,strlen(globaldata)) < 0)
 	{
 #ifdef DEBUG
 		debug("[StS] {%i} errno = %i\n",current->sock,errno);
@@ -334,7 +334,7 @@ void to_server(char *format, ...)
 		return;
 	}
 #ifdef DEBUG
-	rest = gsockdata;
+	rest = globaldata;
 	while((line = get_token(&rest,"\n")))	/* rest cannot be NULL */
 		debug("[StS] {%i} %s\n",current->sock,line);
 #endif /* DEBUG */
@@ -531,7 +531,7 @@ char *sockread(int s, char *rest, char *line)
 	}
 	rdst = src;
 
-	n = read(s,gsockdata,MSGLEN-2);
+	n = read(s,globaldata,MSGLEN-2);
 	switch(n)
 	{
 	case 0:
@@ -540,8 +540,8 @@ char *sockread(int s, char *rest, char *line)
 		return(NULL);
 	}
 
-	gsockdata[n] = 0;
-	src = gsockdata;
+	globaldata[n] = 0;
+	src = globaldata;
 
 	while(*src)
 	{
