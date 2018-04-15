@@ -20,14 +20,13 @@
 */
 #define HOSTINFO_C
 #include "config.h"
-
 #ifdef HOSTINFO
 #include "defines.h"
 #include "structs.h"
 #include "global.h"
 #include "h.h"
-
 #include <sys/utsname.h>
+#include <sys/inotify.h>
 
 /*
 Emulate this, but use the same memory space:
@@ -279,11 +278,11 @@ void do_cpuinfo(COMMAND_ARGS)
 #else
 		return;
 #endif
-	n = read(fd,gsockdata,MSGLEN-2);
-	gsockdata[n] = 0;
+	n = read(fd,globaldata,MSGLEN-2);
+	globaldata[n] = 0;
 	close(fd);
 
-	rest = gsockdata;
+	rest = globaldata;
 	a1 = chop(&rest);
 	a2 = chop(&rest);
 	a3 = chop(&rest);
@@ -314,6 +313,101 @@ void do_cpuinfo(COMMAND_ARGS)
 	}
 	to_user_q(from,"%s%s%s, loadavg: %s(1m) %s(5m) %s(15m)",
 		omni+1,bogostr,cpustr,a1,a2,a3);
+}
+
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+
+#ifdef DEBUG
+
+struct
+{
+	int	value;
+	char	*str;
+
+} in2str[] =
+{
+{ IN_ACCESS,		"IN_ACCESS" },		// File was accessed (read)
+{ IN_ATTRIB,		"IN_ATTRIB" },		// Metadata changed, e.g., permissions, timestamps, extended attributes, link count, UID, GID, etc.
+{ IN_CLOSE_WRITE,	"IN_CLOSE_WRITE" },	// File opened for writing was closed
+{ IN_CLOSE_NOWRITE,	"IN_CLOSE_NOWRITE" },	// File not opened for writing was closed
+{ IN_CREATE,		"IN_CREATE" },		// File/directory created in watched directory
+{ IN_DELETE,		"IN_DELETE" },		// File/directory deleted from watched directory
+{ IN_DELETE_SELF,	"IN_DELETE_SELF" },	// Watched file/directory was itself deleted
+{ IN_MODIFY,		"IN_MODIFY" },		// File was modified
+{ IN_MOVE_SELF,		"IN_MOVE_SELF" },	// Watched file/directory was itself moved
+{ IN_MOVED_FROM,	"IN_MOVED_FROM" },	// Generated for the directory containing the old filename when a file is renamed
+{ IN_MOVED_TO,		"IN_MOVED_TO" },	// Generated for the directory containing the new filename when a file is renamed
+{ IN_OPEN,		"IN_OPEN" },		// File was opened
+{ 0,			NULL		}
+};
+
+char *inomask2str(uint32_t mask, char *dst)
+{
+	const char *src;
+	int	i,n = 0;
+
+	for(i=0;in2str[i].str;i++)
+	{
+		if ((mask & in2str[i].value) == in2str[i].value)
+		{
+			if (n)
+				dst[n++] = '|';
+			src = in2str[i].str;
+			for(;src[n];n++)
+				dst[n] = src[n];
+		}
+	}
+	dst[n] = 0;
+	return(dst);
+}
+
+#endif /* DEBUG */
+
+int	ino;
+
+void monitor_fs(const char *file)
+{
+	struct inotify_event *ivent;
+
+	ino = inotify_init();
+	inotify_add_watch(ino,file,IN_ALL_EVENTS);
+#ifdef DEBUG
+	debug("(monitor_fs) added notifier on %s [fd %i]\n",file,ino);
+#endif
+}
+
+void select_monitor()
+{
+	FD_SET(ino,&read_fds);
+}
+
+void process_monitor()
+{
+	struct inotify_event *ivent;
+	char	tmp[256];
+	int	n;
+
+	if (FD_ISSET(ino,&read_fds))
+	{
+		ivent = (struct inotify_event *)&globaldata;
+
+		n = read(ino,globaldata,sizeof(struct inotify_event));
+		if (ivent->len > 0)
+			read(ino,ivent->name,ivent->len);
+		else
+			*ivent->name = 0;
+#ifdef DEBUG
+		debug("ino %i, n %i, sz %i\n",ino,n,sizeof(in2str));
+		debug("wd %i, mask %lu, cookie %lu, len %lu, name %s\n",
+			ivent->wd,ivent->mask,ivent->cookie,ivent->len,ivent->name);
+		debug("%s\n",inomask2str(ivent->mask,tmp));
+		debug("(process_monitor) ino %i bytes read, int wd = %i, uint32_t mask = %s (%lu), uint32_t cookie = %lu, uint32_t len = %lu, char name = %s\n",
+			n,ivent->wd,inomask2str(ivent->mask,tmp),ivent->mask,ivent->cookie,ivent->len,ivent->name);
+#endif
+		if ((ivent->mask & IN_CLOSE_WRITE) == IN_CLOSE_WRITE)
+			return;
+		send_global(SPYSTR_SYSMON,"Alert: Executable was touched");
+	}
 }
 
 #endif /* HOSTINFO */

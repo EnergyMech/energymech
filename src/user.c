@@ -637,7 +637,7 @@ void mirror_user(User *user)
 	}
 	current = backup; // assume my old identity
 #ifdef DEBUG
-	debug("(x)\n");
+	debug("(mirror_user) %s[%i] finished\n",user->name,user->x.x.access);
 #endif /* DEBUG */
 }
 
@@ -1585,7 +1585,9 @@ void change_pass(User *user, char *pass)
 	if (strlen(user->pass) <= strlen(enc))
 	{
 		stringcpy(user->pass,enc);
+#ifdef BOTNET
 		user->modcount++;
+#endif /* BOTNET */
 	}
 	/*
 	 *  password is stuck in a solid malloc in a linked list

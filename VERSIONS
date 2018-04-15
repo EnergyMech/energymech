@@ -1,5 +1,7 @@
 3.1 -- WORK IN PROGRESS (~April, 2018)
 
+ * Added: configure now saves the options selected in ./myconfig for later re-use
+ * Fixed: Missing ifdef BOTNET in user.c
  * Added: Git version hash included in version string if git environment is found.
  * Added: RAND command (toybox). Usage: RAND [[min[-| ]]max|"nick"|"luser"]
  * Added: Energymech can now link with libmusl (--with-libmusl[=/PATH/TO/musl-gcc])

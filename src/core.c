@@ -1059,8 +1059,8 @@ void update(SequenceTime *this)
 			temp = TEXT_NOTINSERVLIST;
 			if ((sp = find_server(current->server)))
 			{
-				sprintf(gsockdata,"%s:%i",(*sp->realname) ? sp->realname : sp->name,sp->port);
-				temp = gsockdata;
+				sprintf(globaldata,"%s:%i",(*sp->realname) ? sp->realname : sp->name,sp->port);
+				temp = globaldata;
 			}
 			chantemp = (current->activechan) ? current->activechan->name : TEXT_NONE;
 			send_spy(SPYSTR_STATUS,"C:%s AC:%i CS:%s",chantemp,x,temp);

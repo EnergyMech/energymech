@@ -68,6 +68,9 @@ BEG const char SPYSTR_BOTNET[]		MDEF("botnet");
 #ifdef URLCAPTURE
 BEG const char SPYSTR_URL[]		MDEF("url");
 #endif /* URLCAPTURE */
+#ifdef URLCAPTURE
+BEG const char SPYSTR_SYSMON[]		MDEF("sysmon");
+#endif /* URLCAPTURE */
 
 BEG const char STR_MECHRESET[]		MDEF("MECHRESET=");
 
@@ -117,7 +120,7 @@ BEG User	__internal_users[2];
  *  generic output buffer, can be used as buffer in any `leaf' function
  *  (functions that do not call any other non-trivial functions)
  */
-BEG char	gsockdata[MAXLEN];
+BEG char	globaldata[MAXLEN];
 BEG char	nick_buf[MAXHOSTLEN];
 BEG char	nuh_buf[NUHLEN];
 
@@ -451,6 +454,19 @@ LS coreServerGroup defaultServerGroup =
 	0,			/* servergroup */
 	"default"		/* name */
 };
+
+LS struct
+{
+	const char *string;
+	const int id;
+
+} meventstrings[] = {
+{ "parse",		MEV_PARSE },
+{ "timer",		MEV_TIMER },
+{ "command",		MEV_COMMAND },
+{ "botnet",		MEV_BOTNET },
+{ "dcc_complete",	MEV_DCC_COMPLETE },
+{ "dnsresult",		MEV_DNSRESULT }};
 
 #else /* MAIN_C */
 

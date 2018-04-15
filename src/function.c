@@ -230,7 +230,7 @@ void table_buffer(const char *format, ...)
 	int	sz;
 
 	va_start(msg,format);
-	sz = sizeof(Strp) + vsprintf(gsockdata,format,msg);
+	sz = sizeof(Strp) + vsprintf(globaldata,format,msg);
 	va_end(msg);
 
 	for(sp=&e_table;*sp;sp=&(*sp)->next)
@@ -239,7 +239,7 @@ void table_buffer(const char *format, ...)
 	set_mallocdoer(table_buffer);
 	*sp = (Strp*)Calloc(sz);
 	/* Calloc sets to zero (*sp)->next = NULL; */
-	stringcpy((*sp)->p,gsockdata);
+	stringcpy((*sp)->p,globaldata);
 }
 
 void table_send(const char *from, const int space)

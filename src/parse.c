@@ -1513,7 +1513,7 @@ void parseline(char *rest)
 		/*
 		 *  does the hook match?
 		 */
-		if (hook->flags == HOOK_PARSE && !stringcasecmp(command,hook->type.command))
+		if (hook->flags == MEV_PARSE && !stringcasecmp(command,hook->type.command))
 		{
 			if (hook->func(from,rest,hook))
 				/* if the hook returns non-zero, the input should not be parsed internally */

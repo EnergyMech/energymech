@@ -49,16 +49,17 @@ by Nemesis128 <stnsls@gmail.com>
 #if PY_MAJOR_VERSION >= 3
 
 char *python_unicode2char(PyUnicodeObject *obj)
-{ /* try to get a valid char* from PyUnicode object.
-    returned str must be free'd afterwards. */
-    int sz = PyUnicode_GET_SIZE(obj);
-    wchar_t *wcs = (wchar_t*) malloc(sizeof(wchar_t) * sz);
-    PyUnicode_AsWideChar(obj, wcs, sz);
-    char *cs = (char*) malloc(sizeof(char) * (sz + 1));
-    wcstombs(cs, wcs, sz);
-    cs[sz] = '\0';
-    free(wcs);
-    return cs;
+{	/* try to get a valid char* from PyUnicode object.
+	   returned str must be free'd afterwards. */
+	int sz = PyUnicode_GET_SIZE(obj);
+
+	wchar_t *wcs = (wchar_t*) malloc(sizeof(wchar_t) * sz);
+	PyUnicode_AsWideChar(obj, wcs, sz);
+	char *cs = (char*) malloc(sizeof(char) * (sz + 1));
+	wcstombs(cs, wcs, sz);
+	cs[sz] = '\0';
+	free(wcs);
+	return cs;
 }
 
 #endif /* Py3k */
@@ -66,39 +67,42 @@ char *python_unicode2char(PyUnicodeObject *obj)
 static PyObject *python_error; /* emech exception object */
 
 static PyObject *python_getvar(PyObject *self, PyObject *args)
-{ /* get some global var */
+{	/* get some global var */
+	int vartype;
+
 #ifdef DEBUG
-    if (!current)
-    {
-        PyErr_SetString(python_error, "(python_getvar) No current bot?!");
-        return NULL;
-    }
+	if (!current)
+	{
+		PyErr_SetString(python_error, "(python_getvar) No current bot?!");
+		return NULL;
+	}
 #endif /* DEBUG */
-    int vartype;
-    if (!PyArg_ParseTuple(args, "i", &vartype))
-        return NULL;
-    switch (vartype)
-    {
-    case PYVAR_guid:
-        return Py_BuildValue("i", current ? current->guid : -1);
-    case PYVAR_currentnick:
-        return Py_BuildValue("s", CurrentNick);
-    case PYVAR_botnick:
-        return Py_BuildValue("s", current && current->nick ? current->nick : "");
-    case PYVAR_wantnick:
-        return Py_BuildValue("s", current && current->wantnick ? current->wantnick : "");
-    case PYVAR_userhost:
-        return Py_BuildValue("s", current && current->userhost ? current->userhost : "");
-    case PYVAR_server:
-        return Py_BuildValue("i", current && current->server ? current->server : -1);
-    case PYVAR_nextserver:
-        return Py_BuildValue("i", current && current->nextserver ? current->nextserver : -1);
-    case PYVAR_currentchan:
-        return Py_BuildValue("s", current && current->activechan ? current->activechan->name : "");
-    default:
-        PyErr_SetString(python_error, "(python_getvar) invalid var");
-        return NULL;
-    }
+
+	if (!PyArg_ParseTuple(args, "i", &vartype))
+		return NULL;
+
+	switch(vartype)
+	{
+	case PYVAR_guid:
+		return Py_BuildValue("i", current ? current->guid : -1);
+	case PYVAR_currentnick:
+		return Py_BuildValue("s", CurrentNick);
+	case PYVAR_botnick:
+		return Py_BuildValue("s", current && current->nick ? current->nick : "");
+	case PYVAR_wantnick:
+		return Py_BuildValue("s", current && current->wantnick ? current->wantnick : "");
+	case PYVAR_userhost:
+		return Py_BuildValue("s", current && current->userhost ? current->userhost : "");
+	case PYVAR_server:
+		return Py_BuildValue("i", current && current->server ? current->server : -1);
+	case PYVAR_nextserver:
+		return Py_BuildValue("i", current && current->nextserver ? current->nextserver : -1);
+	case PYVAR_currentchan:
+		return Py_BuildValue("s", current && current->activechan ? current->activechan->name : "");
+	default:
+		PyErr_SetString(python_error, "(python_getvar) invalid var");
+		return NULL;
+	}
 }
 
 /* From channel.c */
@@ -106,15 +110,21 @@ static PyObject *python_getvar(PyObject *self, PyObject *args)
 static PyObject *python_is_chanuser(PyObject *self, PyObject *args, PyObject *keywds)
 /* Return True if $nick is on $chan, else False */
 {
-    char *chan, *nick;
-    static char *kwlist[] = {"chan", "nick", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "ss", kwlist, &chan, &nick))
-        return NULL;
-    Chan *ch = (Chan*) find_channel(chan, CHAN_ANY);
-    if (!ch) Py_RETURN_FALSE;
-    ChanUser *cu = find_chanuser(ch, nick);
-    if (!cu) Py_RETURN_FALSE;
-    Py_RETURN_TRUE;
+	char *chan, *nick;
+	static char *kwlist[] = {"chan", "nick", NULL};
+
+	if (!PyArg_ParseTupleAndKeywords(args, keywds, "ss", kwlist, &chan, &nick))
+		return NULL;
+
+	Chan *ch = (Chan*) find_channel(chan, CHAN_ANY);
+
+	if (!ch)
+		Py_RETURN_FALSE;
+
+	ChanUser *cu = find_chanuser(ch, nick);
+	if (!cu)
+		Py_RETURN_FALSE;
+	Py_RETURN_TRUE;
 }
 
 #if 0
@@ -122,38 +132,41 @@ static PyObject *python_is_chanuser(PyObject *self, PyObject *args, PyObject *ke
 static PyObject *python_do_join(PyObject *self, PyObject *args, PyObject *keywds)
 /* Join a channel */
 {
-    char *from, *to="", *rest;
-    int cmdaccess = 100;
-    static char *kwlist[] = {"from", "rest", "cmdaccess", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "ss|i", kwlist,
-        &from, &rest, &cmdaccess))
-        return NULL;
-    do_join(from, to, rest, cmdaccess);
-    Py_RETURN_NONE;
+	char *from, *to="", *rest;
+	int cmdaccess = 100;
+	static char *kwlist[] = {"from", "rest", "cmdaccess", NULL};
+
+	if (!PyArg_ParseTupleAndKeywords(args, keywds, "ss|i", kwlist, &from, &rest, &cmdaccess))
+		return NULL;
+
+	do_join(from, to, rest, cmdaccess);
+	Py_RETURN_NONE;
 }
 
 static PyObject *python_do_part(PyObject *self, PyObject *args, PyObject *keywds)
 /* Part a channel */
 {
-    char *from, *to, *rest="";
-    int cmdaccess = 100;
-    static char *kwlist[] = {"from", "to", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "ss", kwlist, &from, &to))
-        return NULL;
-    do_part(from, to, rest, cmdaccess);
-    Py_RETURN_NONE;
+	char *from, *to, *rest="";
+	int cmdaccess = 100;
+	static char *kwlist[] = {"from", "to", NULL};
+	if (!PyArg_ParseTupleAndKeywords(args, keywds, "ss", kwlist, &from, &to))
+		return NULL;
+	do_part(from, to, rest, cmdaccess);
+	Py_RETURN_NONE;
 }
 
 static PyObject *python_do_cycle(PyObject *self, PyObject *args, PyObject *keywds)
 /* Cycle a channel */
 {
-    char *from, *to, *rest="";
-    int cmdaccess = 100;
-    static char *kwlist[] = {"from", "to", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "ss", kwlist, &from, &to))
-        return NULL;
-    do_cycle(from, to, rest, cmdaccess);
-    Py_RETURN_NONE;
+	char *from, *to, *rest="";
+	int cmdaccess = 100;
+	static char *kwlist[] = {"from", "to", NULL};
+
+	if (!PyArg_ParseTupleAndKeywords(args, keywds, "ss", kwlist, &from, &to))
+		return NULL;
+
+	do_cycle(from, to, rest, cmdaccess);
+	Py_RETURN_NONE;
 }
 
 static PyObject *python_do_wall(PyObject *self, PyObject *args, PyObject *keywds)
@@ -239,13 +252,16 @@ static PyObject *python_do_idle(PyObject *self, PyObject *args, PyObject *keywds
 static PyObject *python_find_nuh(PyObject *self, PyObject *args, PyObject *keywds)
 /* Find nuh */
 {
-    char *nick, *nuh;
-    static char *kwlist[] = {"nick", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "s", kwlist, &nick))
-        return NULL;
-    nuh = find_nuh(nick);
-    if (nuh == NULL) Py_RETURN_NONE;
-    else return Py_BuildValue("s", nuh);
+	char *nick, *nuh;
+	static char *kwlist[] = {"nick", NULL};
+
+	if (!PyArg_ParseTupleAndKeywords(args, keywds, "s", kwlist, &nick))
+		return NULL;
+
+	if ((nuh = find_nuh(nick)) == NULL)
+		Py_RETURN_NONE;
+	else
+		return Py_BuildValue("s", nuh);
 }
 
 /* From core.c */
@@ -291,34 +307,33 @@ static PyObject *python_do_server(PyObject *self, PyObject *args, PyObject *keyw
 
 PyObject *python_hook(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    Hook *hook;
-    HookTimer hooktimer;
-    PyObject *cb, *funcname;
-    char *type, *command, *cbname;
-    int guid = 0, mode, sz1, sz2;
+	Hook *hook;
+	HookTimer hooktimer;
+	PyObject *cb, *funcname;
+	char *type, *command, *cbname;
+	int guid = 0, mode, sz1, sz2;
+	static char *kwlist[] = {"type", "command", "callback", "guid", NULL};
 
-    static char *kwlist[] = {"type", "command", "callback", "guid", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "ssO|i", kwlist,
-        &type, &command, &cb, &guid))
-        return NULL;
+	if (!PyArg_ParseTupleAndKeywords(args, keywds, "ssO|i", kwlist, &type, &command, &cb, &guid))
+		return NULL;
 
-    /* check callback function */
-    if (!PyFunction_Check(cb))
-    {
-        PyErr_SetString(python_error, "(python_hook) callback is not a function");
-        return NULL;
-    }
-    funcname = PyObject_GetAttrString(cb, "__name__"); /* new ref */
-    if (!funcname)
-    {
-        PyErr_SetString(python_error, "(python_hook) cant get function name");
-        return NULL;
-    }
+	/* check callback function */
+	if (!PyFunction_Check(cb))
+	{
+		PyErr_SetString(python_error, "(python_hook) callback is not a function");
+		return NULL;
+	}
+	funcname = PyObject_GetAttrString(cb, "__name__"); /* new ref */
+	if (!funcname)
+	{
+		PyErr_SetString(python_error, "(python_hook) cant get function name");
+		return NULL;
+	}
 
 #if PY_MAJOR_VERSION >= 3
-    cbname = python_unicode2char((PyUnicodeObject*) funcname);
+	cbname = python_unicode2char((PyUnicodeObject*) funcname);
 #else
-    cbname = PyString_AsString(funcname); /* not a copy! */
+	cbname = PyString_AsString(funcname); /* not a copy! */
 #endif /* Py3k */
 
     mode = strlen(type);
@@ -334,34 +349,34 @@ PyObject *python_hook(PyObject *self, PyObject *args, PyObject *keywds)
         return NULL;
     }
 
-    if (!stringcasecmp(type, "command"))
-        mode = HOOK_COMMAND;
-    else
-    if (!stringcasecmp(type, "dcc_complete"))
-        mode = HOOK_DCC_COMPLETE;
-    else
-    if (!stringcasecmp(type, "parse"))
-        mode = HOOK_PARSE;
-    else
-    if (!stringcasecmp(type, "timer"))
-    {
-        if (compile_timer(&hooktimer, command) < 0)
-        {
-            Py_DECREF(funcname);
+	if (!stringcasecmp(type, "command"))
+		mode = MEV_COMMAND;
+	else
+	if (!stringcasecmp(type, "dcc_complete"))
+		mode = MEV_DCC_COMPLETE;
+	else
+	if (!stringcasecmp(type, "parse"))
+		mode = MEV_PARSE;
+	else
+	if (!stringcasecmp(type, "timer"))
+	{
+		if (compile_timer(&hooktimer, command) < 0)
+		{
+			Py_DECREF(funcname);
 #if PY_MAJOR_VERSION >= 3
-            free(cbname);
+			free(cbname);
 #endif /* Py3k */
-            PyErr_SetString(python_error, "(python_hook) cant compile timer");
-            return NULL;
-        }
-        mode = HOOK_TIMER;
-        sz1  = sizeof(HookTimer);
-    }
-    else
-    {
-        Py_DECREF(funcname);
+			PyErr_SetString(python_error, "(python_hook) cant compile timer");
+			return NULL;
+		}
+		mode = MEV_TIMER;
+		sz1  = sizeof(HookTimer);
+	}
+	else
+	{
+		Py_DECREF(funcname);
 #if PY_MAJOR_VERSION >= 3
-        free(cbname);
+		free(cbname);
 #endif /* Py3k */
         PyErr_SetString(python_error, "(python_hook) invalid hook type");
         return NULL;
@@ -378,13 +393,13 @@ PyObject *python_hook(PyObject *self, PyObject *args, PyObject *keywds)
 
     switch(mode)
     {
-    case HOOK_COMMAND:
-    case HOOK_PARSE:
+    case MEV_COMMAND:
+    case MEV_PARSE:
         stringcpy(hook->type.command, command);
         hook->func = python_parse_jump;
         break;
     default:
-    /* case HOOK_TIMER: */
+    /* case MEV_TIMER: */
         memcpy(hook->type.timer, &hooktimer, sizeof(HookTimer));
         hook->func = python_timer_jump;
         break;
@@ -469,7 +484,7 @@ void python_dcc_complete(Client *client, int cps)
 
     for (hook = hooklist; hook; hook = hook->next)
     {
-        if (hook->flags == HOOK_DCC_COMPLETE &&
+        if (hook->flags == MEV_DCC_COMPLETE &&
             hook->guid && current && hook->guid == current->guid)
         {
             /* get callback object */
@@ -715,7 +730,7 @@ static PyObject *python_dns(PyObject *self, PyObject *args, PyObject *keywds)
     set_mallocdoer(python_dns);
     hook = (Hook*)Calloc(sizeof(Hook) + strlen(host));
     hook->guid = (current) ? current->guid : 0;
-    hook->flags = HOOK_DNS;
+    hook->flags = MEV_DNSRESULT;
     hook->next = hooklist;
     hooklist = hook;
     hook->type.host = stringcpy(hook->self, cbname) + 1;
@@ -889,9 +904,9 @@ PyMODINIT_FUNC pythonInit(void)
     PyModule_AddIntConstant(m, "define_debug", 0);
 #endif /* DEBUG */
 
-    PyModule_AddStringConstant(m, "HOOK_COMMAND", "command");
-    PyModule_AddStringConstant(m, "HOOK_PARSE", "parse");
-    PyModule_AddStringConstant(m, "HOOK_TIMER", "timer");
+    PyModule_AddStringConstant(m, "MEV_COMMAND", "command");
+    PyModule_AddStringConstant(m, "MEV_PARSE", "parse");
+    PyModule_AddStringConstant(m, "MEV_TIMER", "timer");
     PyModule_AddStringConstant(m, "DCC_COMPLETE", "dcc_complete");
 
     PyModule_AddIntConstant(m, "OK", 0);
