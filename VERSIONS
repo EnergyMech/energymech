@@ -1,5 +1,6 @@
 3.1 -- WORK IN PROGRESS (~April, 2018)
 
+ * Added: Newbie mode warnings about config/userfiles readable by others (exposing passwords)
  * Fixed: Issue #25, clients lost when doing reset, no more
  * Fixed: compiler warnings and missing defines/conflicting defines with certain options
  * Added: configure now saves the options selected in ./myconfig for later re-use
