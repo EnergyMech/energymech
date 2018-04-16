@@ -1066,6 +1066,27 @@ int main(int argc, char **argv, char **envp)
 		to_file(1,TEXT_HDR_FEAT,__mx_opts);
 	}
 
+#ifdef NEWBIE
+	if (stat(configfile,&st));
+	{
+		if ((st.st_mode & (S_IWGRP|S_IWOTH)) != 0)
+		{
+			to_file(1,"error: configfile is writeable by others, exiting...\n");
+			_exit(0);
+		}
+		if ((st.st_mode & (S_IRGRP|S_IROTH)) != 0)
+			to_file(1,"warning: configfile is readable by others\n");
+	}
+	if (stat(".",&st));
+	{
+		if ((st.st_mode & (S_IWGRP|S_IWOTH)) != 0)
+		{
+			to_file(1,"error: energymech home directory is writeable by others, exiting...\n");
+			_exit(0);
+		}
+	}
+#endif /* NEWBIE */
+
 	if (versiononly)
 		_exit(0);	/* _exit() here because we dont want a profile file to be written */
 
@@ -1117,8 +1138,23 @@ int main(int argc, char **argv, char **envp)
 	for(current=botlist;current;current=current->next)
 	{
 		if ((opt = current->setting[STR_USERFILE].str_var))
+#ifndef NEWBIE
 			read_userlist(opt);
-#ifdef NEWBIE
+	}
+#else
+		{
+			if (stat(opt,&st));
+			{
+				if ((st.st_mode & (S_IWGRP|S_IWOTH)) != 0)
+				{
+					to_file(1,"error: userfile(%s) is writeable by others, exiting...\n",opt);
+					_exit(0);
+				}
+				if ((st.st_mode & (S_IRGRP|S_IROTH)) != 0)
+					to_file(1,"warning: userfile(%s) is readable by others\n",opt);
+			}
+			read_userlist(opt);
+		}
 		if (current->userlist == NULL)
 		{
 			to_file(1,"init: No userlist loaded for %s\n",nullstr(current->nick));
@@ -1129,9 +1165,8 @@ int main(int argc, char **argv, char **envp)
 	{
 		_exit(1);
 	}
-#else
-	}
 #endif /* NEWBIE */
+
 	for(current=botlist;current;current=current->next)
 	{
 		mirror_userlist();
@@ -1143,7 +1178,7 @@ int main(int argc, char **argv, char **envp)
 	if (!mechresetenv)
 		to_file(1,INFO_RUNNING);
 
-	if (do_fork)
+	if (do_fork && startup != 666)
 	{
 		close(0);
 		close(1);
@@ -1205,7 +1240,10 @@ int main(int argc, char **argv, char **envp)
 #endif
 
 	if (startup == 666)
-		exit(0);
+	{
+		to_file(1,"init: test run completed, exiting...\n");
+		_exit(0);
+	}
 	startup = FALSE;
 	doit();
 }

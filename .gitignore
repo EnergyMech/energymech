@@ -23,14 +23,9 @@ trivia/mkindex
 # mech typical user config files
 *~
 *.bak
-mech.passwd
-mech.conf
-mech.users
-mech.pid
-mech.session
+mech.*
 root.zone*
 trick.conf
-mech.trivscore
 trivia/megatrivia.txt
 *.log
 *.stats
