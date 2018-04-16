@@ -21,9 +21,9 @@ Compiling?
 ~~~~~~~~~~
 To compile the source:
 
-1) git clone https://github.com/MadCamel/energymech.git
+1) git clone https://github.com/EnergyMech/energymech.git
 -- If you don't have git you can still download the source:
-    wget http://github.com/MadCamel/energymech/archive/master.tar.gz
+    wget http://github.com/EnergyMech/energymech/archive/master.tar.gz
     tar xvf master.tar.gz
 
 2) cd energymech
@@ -112,11 +112,11 @@ Updated Files?
 ~~~~~~~~~~~~~~
 The main distribution site for the EnergyMech is:
 
-   https://github.com/MadCamel/energymech
+   https://github.com/EnergyMech/energymech
 
 Extra files for users of EnergyMech can be found at:
 
-   https://github.com/joonicks/energymech-extra
+   https://github.com/EnergyMech/energymech-extra
 
 Files, documentation and tips can be found at:
 
@@ -129,4 +129,4 @@ IT COMES TO CONFIGURING AND USING IT.
 
 ---*---
 
-proton, April 3rd, 2018.
+proton, April 17th, 2018.
