@@ -513,7 +513,7 @@ void datestamp(void)
 void githash(void)
 {
 #ifdef HAVE_GIT
-	system("git log -n 1 | grep commit | sed -r 's/^commit (.{7}).*/#define GITHASH \" (git:\\1)\"/g;' > githash.h");
+	system("./lib/git.sh > githash.h");
 #else
 	system("echo '#define GITHASH \"\"' > githash.h");
 #endif
