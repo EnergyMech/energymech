@@ -178,7 +178,7 @@ int read_bigcharset(char *fname)
 		bigc = orig_fontlist;
 		orig_fontlist = bigc->next;
 		if (bigc->data)
-			purge_strplist(bigc->data);
+			purge_linklist((void**)&bigc->data);
 		Free((char**)&bigc);
 	}
 

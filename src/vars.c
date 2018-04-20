@@ -269,6 +269,14 @@ void ec_ver(char *from, const char *to)
 	nobo_strcpy(VERSION);
 }
 
+void ec_guid(char *from, const char *to)
+{
+	char	tmp[32];
+
+	sprintf(tmp,"%i",current->guid);
+	nobo_strcpy(tmp);
+}
+
 LS const struct
 {
 	void	(*func)(char *, const char *);
@@ -287,6 +295,7 @@ LS const struct
 	{ ec_server,		"$server",	7	},
 	{ ec_up,		"$up",		3	},
 	{ ec_ver,		"$ver",		4	},
+	{ ec_guid,		"$guid",	5	},
 	{ NULL,			"",		0	},
 };
 

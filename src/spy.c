@@ -406,8 +406,7 @@ void urlcapture(const char *rest)
 	{
 		if (n <= 0)
 		{
-			purge_strplist(sp->next);
-			sp->next = NULL;
+			purge_linklist((void**)&sp->next);
 			return;
 		}
 		n--;
