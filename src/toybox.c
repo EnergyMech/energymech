@@ -90,14 +90,11 @@ int read_bigcharset_callback(char *rest)
 	if (!stringcasecmp(opt,"chars") && charheight)
 	{
 		charlines = charheight;
-
 		opt = chop(&rest);
+
 		set_mallocdoer(read_bigcharset_callback);
 		newchar = (BigC*)Calloc(sizeof(BigC) + strlen(opt));
-		/* Calloc sets to zero
-		newchar->width = 0;
-		newchar->data = NULL;
-		*/
+
 		newchar->next = fontlist;
 		fontlist = newchar;
 		stringcpy(newchar->chars,opt);
@@ -141,7 +138,6 @@ int read_bigcharset_callback(char *rest)
 		*n = asc2int(rest);
 		if (errno) *n = 0;
 	}
-
 	return(FALSE);
 }
 
@@ -163,6 +159,7 @@ int read_bigcharset(char *fname)
 	orig_spacewidth = spacewidth;
 	orig_kerning = kerning;
 
+	fontlist = NULL;
 	charlines = 0;
 	spacewidth = 0;
 	charheight = 0;
@@ -173,12 +170,15 @@ int read_bigcharset(char *fname)
 	/*
 	 *  free the old font if there is one
 	 */
+#ifdef DEBUG
+	debug("(read_bigcharset) purge old charset, if there is one. orig = %p\n",orig_fontlist);
+#endif
 	while(orig_fontlist)
 	{
 		bigc = orig_fontlist;
 		orig_fontlist = bigc->next;
 		if (bigc->data)
-			purge_strplist(bigc->data);
+			purge_linklist((void**)&bigc->data);
 		Free((char**)&bigc);
 	}
 
@@ -708,6 +708,7 @@ void read_triviascore(void)
 
 void do_bigsay(COMMAND_ARGS)
 {
+#define OEND	(output + MSGLEN - 1)
 	/*
 	 *  on_msg checks CARGS + CAXS
 	 */
@@ -717,11 +718,25 @@ void do_bigsay(COMMAND_ARGS)
 	char	*pt,*tail,*temp,*temp2;
 	int	i,x;
 
-#ifdef DEBUG
-	debug("(do_bigsay) rest = \"%s\"\n",rest);
-#endif /* DEBUG */
+	if (fontname && *rest != '-')
+		goto reuse_font;
 
 	stringcpy(output,BIGSAY_DEFAULTFONT);
+
+	if (rest[0] == '-')
+	{
+		temp = chop(&rest);
+		if (temp[1] == '-')
+			; // allow .bigsay -- -dash-
+		else
+		if (STRCHR(temp,'/') == NULL) // no filesystem perversions...
+		{
+			stringcat(stringcpy(output,temp+1),".bigchars"); // temp+1 = skip initial '-'
+		}
+	}
+#ifdef DEBUG
+	debug("(do_bigsay) fontfile %s, text = \"%s\"\n",output,rest);
+#endif /* DEBUG */
 
 	if (read_bigcharset(output) < 0)
 	{
@@ -729,7 +744,7 @@ void do_bigsay(COMMAND_ARGS)
 		return;
 	}
 
-#define OEND	(output + MSGLEN - 1)
+reuse_font:
 	for(i=0;i<charheight;i++)
 	{
 		*output = 0;

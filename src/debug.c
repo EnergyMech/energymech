@@ -773,6 +773,7 @@ void debug_core(void)
 	User	*user;
 	int	i;
 
+	debug("; mx_pfmt\t\t\"%s\"\n",mx_pfmt);
 	debug("; VERSION\t\t\"%s\"\n",VERSION);
 	debug("; SRCDATE\t\t\"%s\"\n",SRCDATE);
 	debug("; BOTLOGIN\t\t\"%s\"\n",BOTLOGIN);
@@ -1176,13 +1177,14 @@ void debug_core(void)
 		memtouch(bigc);
 		debug("  ; width\t\t%i\n",bigc->width);
 		debug("  ; chars\t\t\"%s\"\n",bigc->chars);
-		debug("  > data\t\t"mx_pfmt"\n",(mx_ptr)bigc->data);
-		for(st=bigc->data;st;st=st->next)
+		debug("  > data\t\t" mx_pfmt "\n",(mx_ptr)bigc->data);
+		for(st=bigc->data;st != NULL;st=st->next)
 		{
 			memtouch(st);
 			debug("    ; Strp*\t\t"mx_pfmt" { "mx_pfmt", \"%s\" }\n",
 				(mx_ptr)st,(mx_ptr)st->next,st->p);
 		}
+		debug("  ; next\t\t" mx_pfmt "\n",(mx_ptr)bigc->next);
 	}
 #endif /* TOYBOX */
 #ifdef TRIVIA
@@ -1403,7 +1405,7 @@ void debug(char *format, ...)
 	{
 		if (debugfile)
 		{
-			if ((debug_fd = open(debugfile,O_CREAT|O_TRUNC|O_WRONLY,SECUREFILEMODE)) < 0)
+			if ((debug_fd = open(debugfile,O_CREAT|O_APPEND|O_WRONLY,SECUREFILEMODE)) < 0)
 			{
 				dodebug = FALSE;
 				return;

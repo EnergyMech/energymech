@@ -1,0 +1,208 @@
+fontname energymech-capitals-spider-height5-v3
+spacewidth 4
+charheight 5
+kerning 1
+
+chars !
+|
+|
+|
+ 
+o
+
+chars .
+ 
+ 
+ 
+ 
+ 
+o
+
+chars |
+|
+|
+|
+|
+|
+
+chars :
+ 
+o
+ 
+o
+ 
+
+chars aA
+ ,-.
+/   \
+|___|
+|   |
+|   |
+
+chars bB
+,--.
+|   )
+|--{
+|   \
+|___/
+
+chars cC
+ ,--.
+/  
+|
+|
+\___/
+
+chars dD
+,-.
+|  \
+|   |
+|   |
+|___/
+
+chars eE
+,---
+|
+|--
+|
+|___,
+
+chars fF
+,---
+|
+|--
+|
+|
+
+chars gG
+ ,--.
+/  
+|  _
+|   |
+\___/
+
+chars hH
+,   ,
+|   |
+|___|
+|   |
+|   |
+
+chars iI
+ ,
+ |
+ |
+ |
+ |
+
+chars jJ
+    ,
+    |
+    |
+,   |
+\___/
+
+chars kK
+,   ,
+|  /
+|-{
+|  \
+|   \
+
+chars lL
+,
+|
+|
+|
+|___,
+
+chars mM
+,~. ,~.
+|  |  |
+|  |  |
+|  |  |
+|  |  |
+
+chars nN
+,   ,
+|\  |
+| \ |
+|  \|
+|   |
+
+chars oO
+,-~-.
+|   |
+|   |
+|   |
+\___/
+
+chars pP
+,--.
+|   )
+|--'
+|
+|
+
+chars rR
+,--.
+|   )
+|--'
+|  \
+|   \
+
+chars sS
+ ,-~
+(
+ '-.
+    )
+'--'
+
+chars tT
+~-+-~
+  |
+  |
+  |
+  +
+
+chars uU
+,   ,
+|   |
+|   |
+|   |
+\___/
+
+chars vV
+,   ,
+|   |
+'   '
+ \ /
+  V
+
+chars wW
+,  ,  ,
+|  |  |
+|  |  |
+'  |  '
+ \/ \/
+
+chars xX
+.   ,
+ \ /
+  X
+ / \
+/   \
+
+chars yY
+.   ,
+ \ /
+  Y
+  |
+  |
+
+chars zZ
+ -~~,
+   /
+  /
+ /
+/___,
