@@ -97,7 +97,7 @@ void remove_chan(Chan *chan)
 		if (*pp == chan)
 		{
 			*pp = chan->next;
-			purge_banlist(chan);
+			purge_linklist((void**)&chan->banlist);
 			purge_chanusers(chan);
 			delete_vars(chan->setting,CHANSET_SIZE);
 			Free(&chan->name);
@@ -349,20 +349,6 @@ void delete_modemask(Chan *chan, char *mask, int mode)
 }
 
 #endif /* IRCD_EXTENSIONS */
-
-void purge_banlist(Chan *chan)
-{
-	Ban	*ban,*next;
-
-	ban = chan->banlist;
-	while(ban)
-	{
-		next = ban->next;
-		Free((char**)&ban);
-		ban = next;
-	}
-	chan->banlist = NULL;
-}
 
 void channel_massmode(const Chan *chan, char *pattern, int filtmode, char mode, char typechar)
 {

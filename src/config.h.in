@@ -427,15 +427,25 @@
  */
 #ifdef PTSIZE_32BIT
 
+#if defined(__GNUC__)
+#define mx_ptr		void*
+#define mx_pfmt		"%p"
+#else
 #define	mx_ptr		unsigned int
 #define mx_pfmt		"%.8x"
+#endif
 
 #endif
 
 #ifdef PTSIZE_64BIT
 
+#if defined(__GNUC__)
+#define mx_ptr		void*
+#define mx_pfmt		"%p"
+#else
 #define	mx_ptr		long long
 #define mx_pfmt		"%.16Lx"
+#endif
 
 #endif
 

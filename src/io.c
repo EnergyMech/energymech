@@ -689,8 +689,7 @@ void do_clearqueue(COMMAND_ARGS)
 #ifdef DEBUG
 	debug("(do_clearqueue) purging sendq...\n");
 #endif
-	purge_strplist(current->sendq);
-	current->sendq = NULL;
+	purge_linklist((void**)&current->sendq);
 }
 
 #endif /* GENCMD_C */

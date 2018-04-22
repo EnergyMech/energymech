@@ -111,7 +111,7 @@ void parse_join(char *from, char *rest)
 		current->lastchanban = 0;
 #endif /* CHANBAN */
 		to_server("WHO %s\nMODE %s\nMODE %s b\n",rest,rest,rest);
-		purge_banlist(chan);
+		purge_linklist((void**)&chan->banlist);
 		purge_chanusers(chan);
 
 #ifdef STATS

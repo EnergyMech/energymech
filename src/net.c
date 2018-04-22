@@ -64,32 +64,35 @@ LS struct
  */
 typedef struct LinkCmd
 {
-	char	c1;
-	char	c2;
+	char	cmd[2];
 	void	(*func)(BotNet *, char *);
+	int	relay;
 
 } LinkCmd;
 
+#define RELAY_YES	1
+#define RELAY_NO	0
+
 LS const LinkCmd basicProto[] =
 {
-{ 'B', 'A', basicAuth		},
-{ 'B', 'B', basicBanner		},
-{ 'B', 'K', basicAuthOK		},
-{ 'B', 'L', basicLink		},
-{ 'B', 'Q', basicQuit		},
-{ 'C', 'O', netchanNeedop	},
+{ "BA", basicAuth,		RELAY_NO	},
+{ "BB", basicBanner,		RELAY_NO	},
+{ "BK", basicAuthOK,		RELAY_NO	},
+{ "BL", basicLink,		RELAY_NO	},
+{ "BQ", basicQuit,		RELAY_NO	},
+{ "CO", netchanNeedop,		RELAY_YES	},
 #ifdef SUPPRESS
-{ 'C', 'S', netchanSuppress	}, // experimental command supression
+{ "CS", netchanSuppress,	RELAY_YES	}, // experimental command supression
 #endif /* SUPPRESS */
-{ 'P', 'A', partyAuth		},
+{ "PA", partyAuth,		RELAY_YES	},
 #ifdef REDIRECT
-{ 'P', 'C', partyCommand	},
+{ "PC", partyCommand,		RELAY_NO	},
 #endif /* REDIRECT */
-{ 'P', 'M', partyMessage	},
-{ 'U', 'T', ushareTick		},
-{ 'U', 'U', ushareUser		},
-{ 'U', 'D', ushareDelete	},
-{  0,    0, NULL		},
+{ "PM", partyMessage,		RELAY_NO	},
+{ "UT", ushareTick,		RELAY_NO	},
+{ "UU", ushareUser,		RELAY_NO	},
+{ "UD", ushareDelete,		RELAY_YES	},
+{ "\0\0", NULL,			RELAY_NO	},
 };
 
 LS int deadlinks = FALSE;
@@ -844,8 +847,6 @@ void netchanNeedop(BotNet *source, char *rest)
 	if (errno || guid < 1 || !channel)
 		return;
 
-	botnet_relay(source,"CO%i %s\n",guid,channel);
-
 	for(bn=botnetlist;bn;bn=bn->next)
 	{
 		if (bn->status != BN_LINKED)
@@ -865,8 +866,6 @@ void netchanSuppress(BotNet *source, char *rest)
 	Mech	*backup;
 	const char *cmd;
 	int	crc,i,j;
-
-	botnet_relay(source,"CS%s\n",rest);
 
 	cmd = chop(&rest);
 
@@ -1339,8 +1338,6 @@ void ushareDelete(BotNet *bn, char *rest)
 			}
 		}
 	}
-	unchop(orig,rest);
-	botnet_relay(bn,"UD%s\n",orig);
 }
 
 /*
@@ -1383,8 +1380,10 @@ not_a_botnet_connection:
 
 	for(i=0;basicProto[i].func;i++)
 	{
-		if (basicProto[i].c1 == rest[0] && basicProto[i].c2 == rest[1])
+		if (basicProto[i].cmd[0] == rest[0] && basicProto[i].cmd[1] == rest[1])
 		{
+			if (basicProto[i].relay == RELAY_YES)
+				botnet_relay(bn,"%s\n",rest);
 			basicProto[i].func(bn,rest+2);
 			return;
 		}

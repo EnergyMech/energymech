@@ -100,6 +100,9 @@ mega-install:
 test:
 		$(MAKE) -C src test
 
+defines:
+		(gcc -dM -E - < /dev/null) | sort
+
 #
 # packing things up for distribution
 #

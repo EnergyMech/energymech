@@ -194,18 +194,20 @@ Strp *prepend_strp(Strp **pp, const char *string)
 }
 
 /*
- *  Free() a chain of Strp's
+ *  Free() a whole linked list of any suitable type (Strp, Banlist)
  */
-void purge_strplist(Strp *sp)
+void purge_linklist(void **list)
 {
-	Strp	*nxt;
+	Strp	*sp,*nxt;
 
+	sp = *list;
 	while(sp)
 	{
 		nxt = sp->next;
 		Free((char**)&sp);
 		sp = nxt;
 	}
+	*list = NULL;
 }
 
 /*

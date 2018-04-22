@@ -452,10 +452,6 @@ void sig_segv(int crap, siginfo_t *si, void *uap)
 
 	time(&now);
 
-	respawn++;
-	if (respawn > 10)
-		mechexit(1,exit);
-
 #ifdef DEBUG
 	debug("(sigsegv) trying to access "mx_pfmt"\n",(mx_ptr)si->si_addr);
 #ifdef __x86_64__
@@ -474,6 +470,10 @@ void sig_segv(int crap, siginfo_t *si, void *uap)
 		debug_on_exit = FALSE;
 	}
 #endif /* DEBUG */
+
+	respawn++;
+	if (respawn > 10)
+		mechexit(1,exit);
 
 	do_exec = TRUE;
 	sig_suicide(TEXT_SIGSEGV /* comma */ UP_CALL(UPTIME_SIGSEGV));
@@ -1171,6 +1171,7 @@ int main(int argc, char **argv, char **envp)
 	{
 		mirror_userlist();
 	}
+
 #ifdef SEEN
 	read_seenlist();
 #endif /* SEEN */
@@ -1227,8 +1228,12 @@ int main(int argc, char **argv, char **envp)
 		s.sa_flags = SA_SIGINFO;
 		sigemptyset(&s.sa_mask);
 		s.sa_sigaction = sig_segv;
-		sigaction(SIGSEGV, &s, NULL);
-		//signal(SIGSEGV,sig_segv);
+		if (sigaction(SIGSEGV, &s, NULL) < 0)
+		{
+#ifdef DEBUG
+			debug("(main) binding SIGSEGV handler failed: %s\n",strerror(errno));
+#endif
+		}
 #ifdef DEBUG
 		signal(SIGILL,sig_ill);
 		signal(SIGABRT,sig_abrt);
@@ -1245,5 +1250,8 @@ int main(int argc, char **argv, char **envp)
 		_exit(0);
 	}
 	startup = FALSE;
+#ifdef DEBUG
+	debug("(main) entering doit()...\n");
+#endif
 	doit();
 }
