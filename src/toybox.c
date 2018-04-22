@@ -951,7 +951,7 @@ void do_rand(COMMAND_ARGS)
 	const ChanUser *cu;
 	int	r,min = 1,max = 100,maxaccess = -1;
 
-	if (!rest && *rest == 0)
+	if (!rest || *rest == 0)
 		goto pick_randnum;
 
 	if (attrtab[(uchar)*rest] & NUM)
