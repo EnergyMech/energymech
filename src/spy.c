@@ -258,7 +258,7 @@ int begin_redirect(char *from, char *args)
 					to_user(from,"Missing name for redirect.");
 					return(-1);
 				}
-				if (is_safepath(nick,FILE_MAY_EXIST) != FILE_IS_SAFE) // redirect output is appended
+				if (is_safepath(nick,FILE_MAY_EXIST) != FILE_IS_SAFE) /* redirect output is appended */
 				{
 					to_user(from,"Bad filename.");
 					return(-1);
@@ -606,9 +606,9 @@ guid_ok:
 	else
 	{
 		sz = spy_source(from,&t_src,&src);
-		if (sz < 0) // user has insufficient access to source
+		if (sz < 0) /* user has insufficient access to source */
 			goto spy_usage;
-		if (sz < cmdaccess) // user has less access relative to source than the command level of SPY
+		if (sz < cmdaccess) /* user has less access relative to source than the command level of SPY */
 			return;
 	}
 
@@ -619,7 +619,7 @@ guid_ok:
 		 */
 		if (*dest == '>')
 		{
-			// accept both ">file" and "> file"
+			/* accept both ">file" and "> file" */
 			dest++;
 			if (!*dest)
 			{

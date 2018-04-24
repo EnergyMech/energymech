@@ -437,8 +437,8 @@ void parse_privmsg(char *from, char *rest)
 		{
 			if (tolowertab[src[1]] == 't' && tolowertab[src[2]] == 't' && tolowertab[src[3]] == 'p')
 			{
-				if ((src[4] == ':') || // "http:"
-				    (tolowertab[src[4]] == 's' && src[5] == ':')) // "https:"
+				if ((src[4] == ':') || /* "http:" */
+				    (tolowertab[src[4]] == 's' && src[5] == ':')) /* "https:" */
 				{
 					urlcapture(src);
 				}
@@ -854,7 +854,7 @@ void parse_319(char *from, char *rest)
 
 	send_pa(PA_WHOIS,nick,"Channels: %s",rest);
 
-	// if nick is myself (the bot), check for reset recovery
+	/* if nick is myself (the bot), check for reset recovery */
 	if (!nickcmp(nick,current->nick))
 	{
 		if (current->reset)
@@ -869,7 +869,7 @@ loop:
 			/*
 			 *  skip past '+', '-' and '@', etc.
 			 */
-			while(*channel && *channel != '#') // this is a recipe for disaster with other valid channels than '#'
+			while(*channel && *channel != '#') /* this is a recipe for disaster with other valid channels than '#' */
 				channel++;
 			sprintf(nuh,"%s!%s",current->nick,current->userhost);
 #ifdef DEBUG
@@ -890,7 +890,7 @@ loop:
 */
 	else
 	{
-		// check if all sendq is empty (text, kicks and modes)
+		/* check if all sendq is empty (text, kicks and modes) */
 		if (current->sendq)
 		{
 #ifdef DEBUG
@@ -898,7 +898,7 @@ loop:
 #endif /* DEBUG */
 			return;
 		}
-		// CurrentChan is unset and can be used
+		/* CurrentChan is unset and can be used */
 		for(CurrentChan=current->chanlist;CurrentChan;CurrentChan=CurrentChan->next)
 		{
 			if (CurrentChan->kicklist || CurrentChan->modelist)
@@ -910,11 +910,11 @@ loop:
 #ifdef DEBUG
 			debug("(parse_319) Cb: checking %s\n",channel);
 #endif /* DEBUG */
-			if (*channel == '@' || *channel == '+') // opped/voiced user, spin 1
+			if (*channel == '@' || *channel == '+') /* opped/voiced user, spin 1 */
 				channel++;
-			// other user modes might also be present (crazy ircd's), this is insufficient testing
+			/* other user modes might also be present (crazy ircd's), this is insufficient testing */
 
-			// check if the channel is shitted
+			/* check if the channel is shitted */
 			for(shit=current->shitlist;shit;shit=shit->next)
 			{
 				if (!matches(shit->mask,channel))
@@ -1347,7 +1347,7 @@ void parse_005(char *from, char *rest)
 #endif /* DEBUG */
 			while(*s)
 			{
-				//CHANMODES=beIR,k,l,imnpstaqr
+				/*CHANMODES=beIR,k,l,imnpstaqr */
 				if (*s == 'e')
 				{
 					current->ircx_flags |= IRCX_EMODE;
@@ -1471,8 +1471,8 @@ void parseline(char *rest)
 	if (current->spy & SPYF_RAWIRC)
 		send_spy(SPYSTR_RAWIRC,FMT_PLAIN,rest);
 
-//new undernet amusements
-//(in)  {5} NOTICE AUTH :*** You have identd disabled (or broken), to continue to connect you must type /QUOTE PASS 17071
+/*new undernet amusements */
+/*(in)  {5} NOTICE AUTH :*** You have identd disabled (or broken), to continue to connect you must type /QUOTE PASS 17071 */
 	if (current->connect == CN_CONNECTED && *rest == 'N' && !matches("NOTICE AUTH * /QUOTE PASS *",rest))
 	{
 		from = STREND(rest);
@@ -1526,7 +1526,7 @@ void parseline(char *rest)
 
 	cmdhash = stringhash(command);
 
-	//debug("cmdhash = %08X\n",cmdhash);
+	/*debug("cmdhash = %08X\n",cmdhash); */
 	for(i=0;pFuncs[i].hash;i++)
 	{
 		if (cmdhash == pFuncs[i].hash)
@@ -1539,21 +1539,5 @@ void parseline(char *rest)
 			return;
 		}
 	}
-	//debug("unmatched cmdhash %08X\n",cmdhash);
+	/*debug("unmatched cmdhash %08X\n",cmdhash); */
 }
-
-/*
-
-(in)  {2} :weber.freenode.net PONG weber.freenode.net :OT1521044136
-cmdhash = 504F4E47
-unmatched cmdhash 504F4E47
-
-(in)  {2} :weber.freenode.net 347 jooboy #amdx :End of Channel Invite List
-cmdhash = 00333437
-unmatched cmdhash 00333437
-
-(in)  {2} :weber.freenode.net 349 jooboy #amdx :End of Channel Exception List
-cmdhash = 00333439
-unmatched cmdhash 00333439
-
-*/

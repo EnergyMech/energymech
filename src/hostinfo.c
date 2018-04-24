@@ -38,7 +38,7 @@ char	vmstk[32];
 char	vmexe[32];
 char	vmlib[32];
 */
-char	omni[224]; // 32*7
+char	omni[224]; /* 32*7 */
 #define vmpeak	&omni[0]
 #define vmsize	&omni[32]
 #define vmrss	&omni[64]
@@ -47,7 +47,7 @@ char	omni[224]; // 32*7
 #define vmexe	&omni[160]
 #define vmlib	&omni[192]
 
-struct // statusvalues
+struct /* statusvalues */
 {
 	const char *key;
 	const int klen;
@@ -138,7 +138,7 @@ int parse_proc_cpuinfo(char *line)
 	{
 		if (havemodel == 1)
 			return(FALSE);
-		*(dst++) = ' '; // prime with a leading space
+		*(dst++) = ' '; /* prime with a leading space */
 		while(*src && dst < end)
 		{
 			if (*src != ' ' || dst[-1] != ' ')
@@ -179,7 +179,7 @@ int parse_proc_cpuinfo(char *line)
 		}
 		*dst = 0;
 	}
-	return(FALSE); // return false to continue reading lines
+	return(FALSE); /* return false to continue reading lines */
 }
 
 /*
@@ -224,7 +224,7 @@ void do_meminfo(COMMAND_ARGS)
 		*(sv[i].valbuf) = 0;
 	if ((fd = open(fn,O_RDONLY)) < 0)
 		return;
-	readline(fd,&parse_proc_status);	// readline closes fd
+	readline(fd,&parse_proc_status);	/* readline closes fd */
 
 	to_user_q(from,"VM %s (Max %s), RSS %s [ Code %s, Data %s, Libs %s, Stack %s ]",
 		vmsize,vmpeak,vmrss,vmexe,vmdata,vmlib,vmstk);
@@ -248,11 +248,13 @@ void do_cpuinfo(COMMAND_ARGS)
 	else
 		stringcpy(bogostr,"/proc/cpuinfo");
 	if ((fd = open(bogostr,O_RDONLY)) < 0)
-//	if ((fd = open("/home/git/cpuinfo/mips3",O_RDONLY)) < 0)
-//	if ((fd = open("/home/git/cpuinfo/mips2",O_RDONLY)) < 0)
-//	if ((fd = open("/home/git/cpuinfo/mips1",O_RDONLY)) < 0)
-//	if ((fd = open("/home/git/cpuinfo/intel1",O_RDONLY)) < 0)
-//	if ((fd = open("/home/git/cpuinfo/cosmiccow",O_RDONLY)) < 0)
+/*
+	if ((fd = open("/home/git/cpuinfo/mips3",O_RDONLY)) < 0)
+	if ((fd = open("/home/git/cpuinfo/mips2",O_RDONLY)) < 0)
+	if ((fd = open("/home/git/cpuinfo/mips1",O_RDONLY)) < 0)
+	if ((fd = open("/home/git/cpuinfo/intel1",O_RDONLY)) < 0)
+	if ((fd = open("/home/git/cpuinfo/cosmiccow",O_RDONLY)) < 0)
+*/
 #endif
 	if ((fd = open("/proc/cpuinfo",O_RDONLY)) < 0)
 #ifdef DEBUG
@@ -267,7 +269,7 @@ void do_cpuinfo(COMMAND_ARGS)
 	global_from = from;
 	havemodel = bogo = siblings = procct = cpus = cores = physid = 0;
 	omni[1] = 0;
-	readline(fd,&parse_proc_cpuinfo); // readline closes fd
+	readline(fd,&parse_proc_cpuinfo); /* readline closes fd */
 
 	if ((fd = open("/proc/loadavg",O_RDONLY)) < 0)
 #ifdef DEBUG
@@ -315,7 +317,7 @@ void do_cpuinfo(COMMAND_ARGS)
 		omni+1,bogostr,cpustr,a1,a2,a3);
 }
 
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+/*---------------------------------------------------------------------------------------------------------------------------------------------------*/
 
 #ifdef DEBUG
 
@@ -326,18 +328,18 @@ struct
 
 } in2str[] =
 {
-{ IN_ACCESS,		"IN_ACCESS" },		// File was accessed (read)
-{ IN_ATTRIB,		"IN_ATTRIB" },		// Metadata changed, e.g., permissions, timestamps, extended attributes, link count, UID, GID, etc.
-{ IN_CLOSE_WRITE,	"IN_CLOSE_WRITE" },	// File opened for writing was closed
-{ IN_CLOSE_NOWRITE,	"IN_CLOSE_NOWRITE" },	// File not opened for writing was closed
-{ IN_CREATE,		"IN_CREATE" },		// File/directory created in watched directory
-{ IN_DELETE,		"IN_DELETE" },		// File/directory deleted from watched directory
-{ IN_DELETE_SELF,	"IN_DELETE_SELF" },	// Watched file/directory was itself deleted
-{ IN_MODIFY,		"IN_MODIFY" },		// File was modified
-{ IN_MOVE_SELF,		"IN_MOVE_SELF" },	// Watched file/directory was itself moved
-{ IN_MOVED_FROM,	"IN_MOVED_FROM" },	// Generated for the directory containing the old filename when a file is renamed
-{ IN_MOVED_TO,		"IN_MOVED_TO" },	// Generated for the directory containing the new filename when a file is renamed
-{ IN_OPEN,		"IN_OPEN" },		// File was opened
+{ IN_ACCESS,		"IN_ACCESS" },		/* File was accessed (read) */
+{ IN_ATTRIB,		"IN_ATTRIB" },		/* Metadata changed, e.g., permissions, timestamps, extended attributes, link count, UID, GID, etc. */
+{ IN_CLOSE_WRITE,	"IN_CLOSE_WRITE" },	/* File opened for writing was closed */
+{ IN_CLOSE_NOWRITE,	"IN_CLOSE_NOWRITE" },	/* File not opened for writing was closed */
+{ IN_CREATE,		"IN_CREATE" },		/* File/directory created in watched directory */
+{ IN_DELETE,		"IN_DELETE" },		/* File/directory deleted from watched directory */
+{ IN_DELETE_SELF,	"IN_DELETE_SELF" },	/* Watched file/directory was itself deleted */
+{ IN_MODIFY,		"IN_MODIFY" },		/* File was modified */
+{ IN_MOVE_SELF,		"IN_MOVE_SELF" },	/* Watched file/directory was itself moved */
+{ IN_MOVED_FROM,	"IN_MOVED_FROM" },	/* Generated for the directory containing the old filename when a file is renamed */
+{ IN_MOVED_TO,		"IN_MOVED_TO" },	/* Generated for the directory containing the new filename when a file is renamed */
+{ IN_OPEN,		"IN_OPEN" },		/* File was opened */
 { 0,			NULL		}
 };
 

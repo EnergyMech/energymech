@@ -1,5 +1,6 @@
 3.1 -- WORK IN PROGRESS (~April, 2018)
 
+ * Fixed: Compiles clean with -std=c89
  * Added: $guid to esay variables
  * Added: New bigsay font: spider, use with .bigsay -spider cowabunga!
  * Fixed: Error in printing pointers would make lots of debug output go missing

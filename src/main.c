@@ -440,30 +440,46 @@ void sig_bus(int crap)
 /*
  *  SIGSEGV shows no mercy, cant schedule it.
  */
-#ifdef __x86_64__
+#if defined(__linux__) && defined(__x86_64__) && defined(DEBUG) && !defined(__STRICT_ANSI__)
 #include <sys/ucontext.h>
-#endif
 void sig_segv(int crap, siginfo_t *si, void *uap)
 {
-#ifdef __x86_64__
 	mcontext_t *mctx;
-	greg_t	*rsp,*rip; // general registers
-#endif /* __x86_64__ */
+	greg_t	*rsp,*rip; /* general registers */
 
 	time(&now);
 
-#ifdef DEBUG
 	debug("(sigsegv) trying to access "mx_pfmt"\n",(mx_ptr)si->si_addr);
-#ifdef __x86_64__
 	mctx = &((ucontext_t *)uap)->uc_mcontext;
-	rsp = &mctx->gregs[15];	// RSP, 64-bit stack pointer
-	rip = &mctx->gregs[16]; // RIP, 64-bit instruction pointer
+	rsp = &mctx->gregs[15];	/* RSP, 64-bit stack pointer */
+	rip = &mctx->gregs[16]; /* RIP, 64-bit instruction pointer */
 
 	debug("(sigsegv) Stack pointer: "mx_pfmt", Instruction pointer: "mx_pfmt"\n",(mx_ptr)*rsp,(mx_ptr)*rip);
 	debug("(sigsegv) sig_segv() = "mx_pfmt"\n",(mx_ptr)sig_segv);
 	debug("(sigsegv) do_crash() = "mx_pfmt"\n",(mx_ptr)do_crash);
-#endif /* __x86_64__ */
 
+	if (debug_on_exit)
+	{
+		run_debug();
+		debug_on_exit = FALSE;
+	}
+
+	respawn++;
+	if (respawn > 10)
+		mechexit(1,exit);
+
+	do_exec = TRUE;
+	sig_suicide(TEXT_SIGSEGV /* comma */ UP_CALL(UPTIME_SIGSEGV));
+	/* NOT REACHED */
+}
+
+#else /* defined(__linux__) && defined(__x86_64__) && defined(DEBUG) && !defined(__STRICT_ANSI__) */
+
+void sig_segv(int signum)
+{
+	time(&now);
+
+#ifdef DEBUG
 	if (debug_on_exit)
 	{
 		run_debug();
@@ -479,6 +495,8 @@ void sig_segv(int crap, siginfo_t *si, void *uap)
 	sig_suicide(TEXT_SIGSEGV /* comma */ UP_CALL(UPTIME_SIGSEGV));
 	/* NOT REACHED */
 }
+
+#endif /* else defined(__linux__) && defined(__x86_64__) && defined(DEBUG) && !defined(__STRICT_ANSI__) */
 
 /*
  *  SIGTERM
@@ -897,7 +915,7 @@ int main(int argc, char **argv, char **envp)
 	}
 
 	stat("..",&st);
-	parent_inode = st.st_ino; // used for is_safepath()
+	parent_inode = st.st_ino; /* used for is_safepath() */
 
 	srand(now+getpid());
 
@@ -1018,13 +1036,13 @@ int main(int argc, char **argv, char **envp)
 			debug_on_exit = TRUE;
 			break;
 #endif /* DEBUG */
-		case 'e': // run a single command before exiting
+		case 'e': /* run a single command before exiting */
 			startup = 3;
 			++argv;
 			if (*argv)
 			{
-				//void on_msg(char *from, char *to, char *rest)
-				//on_msg();
+				/*void on_msg(char *from, char *to, char *rest)
+				on_msg(); */
 			}
 			else
 				to_file(1,"error: Missing argument for -e <command string>\n");
@@ -1224,16 +1242,18 @@ int main(int argc, char **argv, char **envp)
 	 */
 	if (!makecore)
 	{
+#if defined(__linux__) && defined(__x86_64__) && defined(DEBUG) && !defined(__STRICT_ANSI__)
 		struct sigaction s;
 		s.sa_flags = SA_SIGINFO;
 		sigemptyset(&s.sa_mask);
 		s.sa_sigaction = sig_segv;
 		if (sigaction(SIGSEGV, &s, NULL) < 0)
 		{
-#ifdef DEBUG
 			debug("(main) binding SIGSEGV handler failed: %s\n",strerror(errno));
-#endif
 		}
+#else
+		signal(SIGSEGV,sig_segv);
+#endif
 #ifdef DEBUG
 		signal(SIGILL,sig_ill);
 		signal(SIGABRT,sig_abrt);

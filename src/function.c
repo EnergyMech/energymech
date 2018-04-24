@@ -126,7 +126,7 @@ void Free(char **mem)
 			{
 				debug("(Free) PANIC: Free(0x"mx_pfmt"); Unregistered memory block\n",(mx_ptr)src);
 				run_debug();
-				//exit(1);	// overreacting. just ignore it and accept the leak.
+				/*exit(1);	/* overreacting. just ignore it and accept the leak.  */
 				return;
 			}
 			mp = mp->next;
@@ -896,8 +896,8 @@ int is_safepath(const char *path, int filemustexist)
 #ifdef TEST
 	memset(&st,0,sizeof(st));
 #endif
-	if (*(src = path) == '/') // dont allow starting at root, only allow relative paths
-		return(-1);//(FALSE);
+	if (*(src = path) == '/') /* dont allow starting at root, only allow relative paths */
+		return(-1);
 
 	if (strlen(path) >= PATH_MAX)
 		return(-6);
@@ -910,7 +910,7 @@ int is_safepath(const char *path, int filemustexist)
 	if (filemustexist == FILE_MUST_NOTEXIST && orr == 0)
 		return(-3);
 
-	mo = st.st_mode; // save mode for later
+	mo = st.st_mode; /* save mode for later */
 	dir_r = -1;
 
 	for(dst=tmp;*src;)
@@ -920,9 +920,9 @@ int is_safepath(const char *path, int filemustexist)
 			*dst = 0;
 			if ((dir_r = lstat(tmp,&st)) == -1 && errno == ENOENT)
 				return(-7);
-			if (!(S_ISREG(st.st_mode) || S_ISDIR(st.st_mode))) // disallow all except regular files and directories
+			if (!(S_ISREG(st.st_mode) || S_ISDIR(st.st_mode))) /* disallow all except regular files and directories */
 				return(-4);
-			if (st.st_ino == parent_inode) // disallow traversing below bots homedir
+			if (st.st_ino == parent_inode) /* disallow traversing below bots homedir */
 				return(-5);
 		}
 		if (dst == tmp + PATH_MAX-1)
@@ -958,7 +958,7 @@ void testcase(const char *str, int expected, int filemustexist)
 	{
 		debug("testcase FAIL: testpath %s(%i) %s -> result %i, expected %i\n",
 			(strlen(str)>50) ? "(very long string)" : str,
-			strlen(str),tostr[filemustexist],r,expected);//(r) ? "TRUE" : "FALSE",(expected) ? "TRUE" : "FALSE");
+			strlen(str),tostr[filemustexist],r,expected);/*(r) ? "TRUE" : "FALSE",(expected) ? "TRUE" : "FALSE"); */
 	}
 }
 
@@ -994,7 +994,7 @@ int main(int argc, char **argv)
 
 	dodebug = 1;
         stat("../..",&st);
-        parent_inode = st.st_ino; // used for is_safepath()
+        parent_inode = st.st_ino; /* used for is_safepath() */
 
 	debug("PATH_MAX = %i\n",PATH_MAX);
 	if (argv[1] == NULL)

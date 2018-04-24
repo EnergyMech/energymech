@@ -63,7 +63,7 @@ typedef struct OnMsg
 			lbuf:1,
 			cbang:1,
 			acchan:1,
-			supres:1; // -- 21 bits
+			supres:1; /* -- 21 bits */
 	const char	*cmdarg;
 
 } OnMsg;
@@ -206,7 +206,6 @@ typedef struct Setting
 			char	**strptr;
 
 	} v;
-	//void		*setto;			/* type-casted to whatever */
 	char		*name;
 	int		max;
 	void		(*func)(const struct Setting *);
@@ -711,7 +710,7 @@ typedef struct NetCfg
 
 	uint16_t	guid;
 	uint16_t	port;
-	uint16_t	linked; //:1;
+	uint16_t	linked; /*:1;*/
 
 	char		*host;
 	char		pass[2];
@@ -748,12 +747,12 @@ typedef struct
 {
 	time_t		last;
 	time_t		next;
-	uint32_t	second1;	//:30;
-	uint32_t	second2;	//:30;
-	uint32_t	minute1;	//:30;
-	uint32_t	minute2;	//:30;
-	uint32_t	hour;		//:24;
-	uint32_t	weekday;	//:7;
+	uint32_t	second1;	/*:30;*/
+	uint32_t	second2;	/*:30;*/
+	uint32_t	minute1;	/*:30;*/
+	uint32_t	minute2;	/*:30;*/
+	uint32_t	hour;		/*:24;*/
+	uint32_t	weekday;	/*:7;*/
 
 } HookTimer;
 

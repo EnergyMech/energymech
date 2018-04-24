@@ -553,7 +553,7 @@ recheck_alias:
 
 #ifdef SUPPRESS
 #ifdef BOTNET
-		// experimental command supression
+		/* experimental command supression */
 		if (CurrentCmd->name == current->supres_cmd)
 		{
 			int	crc;
@@ -561,7 +561,7 @@ recheck_alias:
 			crc = makecrc(rest);
 			if (current->supres_crc == crc)
 			{
-				// another bot has already executed this command and is trying to supress its execution on other bots
+				/* another bot has already executed this command and is trying to supress its execution on other bots */
 				current->supres_cmd = NULL;
 				current->supres_crc = 0;
 #ifdef DEBUG
@@ -570,7 +570,7 @@ recheck_alias:
 				return;
 			}
 		}
-		//if command should be supressed ...
+		/*if command should be supressed ... */
 		if (mcmd[i].supres && CurrentChan)
 		{
 			send_suppress(CurrentCmd->name,rest);
@@ -925,7 +925,7 @@ modeloop:
 				break;
 
 			/* whats this??? */
-			shit = get_shituser(parm,channel);  // calls find_shit? clobbers get_nuh buffer
+			shit = get_shituser(parm,channel);  /* calls find_shit? clobbers get_nuh buffer */
 			i = (shit) ? shit->action : 0;
 			if (i < SHIT_PERMABAN)
 			{
@@ -1047,7 +1047,7 @@ void common_public(Chan *chan, char *from, char *spyformat, char *rest)
 
 	doer = find_chanuser(chan,from);
 
-	// check if more than half of rest is caps
+	/* check if more than half of rest is caps */
 	n = upper = 0;
 	while(rest[n])
 	{
@@ -1056,7 +1056,7 @@ void common_public(Chan *chan, char *from, char *spyformat, char *rest)
 		n++;
 	}
 
-	// trigger caps flood action
+	/* trigger caps flood action */
 	if (upper >= n)
 	{
 		if (check_mass(chan,doer,INT_CKL))

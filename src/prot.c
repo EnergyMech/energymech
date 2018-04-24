@@ -51,7 +51,7 @@ void send_kick(Chan *chan, const char *nick, const char *format, ...)
 		pp = &(*pp)->next;
 
 	set_mallocdoer(send_kick);
-	*pp = new = (qKick*)Calloc(sizeof(qKick) + Strlen2(nick,globaldata)); // globaldata is never NULL
+	*pp = new = (qKick*)Calloc(sizeof(qKick) + Strlen2(nick,globaldata)); /* globaldata is never NULL */
 	/* Calloc sets to zero new->next = NULL; */
 
 	new->reason = stringcpy(new->nick,nick) + 1;
@@ -299,22 +299,22 @@ int check_mass(Chan *chan, ChanUser *doer, int type)
 	/*
 	 *  two things we dont want channel users to do
 	 */
-	//case CHK_CAPS:
+	/*case CHK_CAPS: */
 	case INT_CKL:
 		num = INDEX_CAPS;
 		break;
-	//case CHK_PUB:
+	/*case CHK_PUB: */
 	case INT_FL:
 		num = INDEX_FLOOD;
 		break;
 	/*
 	 *  three things we dont want channel ops to do
 	 */
-	//case CHK_DEOP:
+	/*case CHK_DEOP: */
 	case INT_MDL:
 		num = INDEX_DEOP;
 		break;
-	//case CHK_BAN:
+	/*case CHK_BAN: */
 	case INT_MBL:
 		num = INDEX_BAN;
 		break;
@@ -502,7 +502,7 @@ void process_chanbans(void)
 #endif /* DEBUG */
 			continue;
 		}
-		if (current->sendq) // only do chanbans on empty queue
+		if (current->sendq) /* only do chanbans on empty queue */
 		{
 #ifdef DEBUG
 			debug("(process_chanbans) skipping %s (%i), sendq not empty\n",current->nick,current->guid);
@@ -513,7 +513,7 @@ void process_chanbans(void)
 		selcu = NULL;
 		for(anychan=current->chanlist;anychan;anychan=anychan->next)
 		{
-			if (anychan->modelist || anychan->kicklist) // only do chanbans on empty queue
+			if (anychan->modelist || anychan->kicklist) /* only do chanbans on empty queue */
 				goto has_queue;
 			if (anychan->setting[TOG_CHANBAN].int_var && anychan->bot_is_op)
 			{
@@ -554,24 +554,24 @@ void chanban_action(char *nick, char *channel, Shit *shit)
 	ChanUser *cu;
 	char	*nuh;
 
-	// the channel is shitted and the user is on it...
-	// 1, make sure the bot isnt on the channel
-	// 2, kb the user on all channels where the shit is active and i am op
+	/* the channel is shitted and the user is on it...
+	   1, make sure the bot isnt on the channel
+	   2, kb the user on all channels where the shit is active and i am op */
 
-	// check all current channels
+	/* check all current channels */
 	for(CurrentChan=current->chanlist;CurrentChan;CurrentChan=CurrentChan->next)
 	{
-		if (!stringcasecmp(channel,CurrentChan->name)) // if the bot is on the channel, skip it
+		if (!stringcasecmp(channel,CurrentChan->name)) /* if the bot is on the channel, skip it */
 		{
 #ifdef DEBUG
 			debug("(chanban_action) skipping %s: bot is on channel\n",channel);
 #endif /* DEBUG */
 			return;
 		}
-		// is the shit for this channel?
+		/* is the shit for this channel? */
 		if (!stringcasecmp(shit->chan,CurrentChan->name))
 		{
-			// if chanban is turned on && if bot is op (pretty pointless otherwise)
+			/* if chanban is turned on && if bot is op (pretty pointless otherwise) */
 			if (CurrentChan->setting[TOG_CHANBAN].int_var && CurrentChan->bot_is_op)
 			{
 #ifdef DEBUG
@@ -579,17 +579,17 @@ void chanban_action(char *nick, char *channel, Shit *shit)
 #endif /* DEBUG */
 				cu = find_chanuser(CurrentChan,nick);
 				if (!(cu->flags & CU_CHANBAN))
-				// dont kickban the same user multiple times from the same channel
+				/* dont kickban the same user multiple times from the same channel */
 				{
-					nuh = get_nuh(cu); // clobbers nuh_buf
+					nuh = get_nuh(cu); /* clobbers nuh_buf */
 #ifdef DEBUG
 					debug("(chanban_action) slapping %s on %s for being on %s (mask %s): %s\n",
 						nick,CurrentChan->name,channel,shit->mask,shit->reason);
 #endif /* DEBUG */
 					cu->flags |= CU_CHANBAN;
-					format_uh(nuh,1); // returns mask in 'nuh' buffer (nuh_buf)
+					format_uh(nuh,1); /* returns mask in 'nuh' buffer (nuh_buf) */
 					send_mode(CurrentChan,90,QM_RAWMODE,'+','b',(void*)nuh);
-					send_kick(CurrentChan,nick,"%s (%s)",shit->reason,channel); // clobbers globaldata
+					send_kick(CurrentChan,nick,"%s (%s)",shit->reason,channel); /* clobbers globaldata */
 				}
 			}
 		}

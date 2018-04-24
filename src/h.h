@@ -67,7 +67,7 @@
 #define __att2(x,y,z)		/* nothing */
 #endif
 
-// __x86_64__ automatically compiles for regparm optimization
+/* __x86_64__ automatically compiles for regparm optimization */
 #if !defined(__profiling__) && defined(__i386__)
 # define __regparm(x)		regparm(x)
 #else
@@ -406,7 +406,11 @@ LS void sig_int(int)						__page(RARE_SEG);		/* rare */
 LS void sig_ill(int)						__page(RARE_SEG);
 LS void sig_abrt(int)						__page(RARE_SEG);
 LS void sig_bus(int)						__page(CMD1_SEG);
+#if defined(__linux__) && defined(__x86_64__) && defined(DEBUG) && !defined(__STRICT_ANSI__)
 LS void sig_segv(int, siginfo_t *, void *)			__attr(RARE_SEG, __noreturn__);
+#else
+LS void sig_segv(int)						__attr(RARE_SEG, __noreturn__);
+#endif
 LS void sig_term(int)						__attr(RARE_SEG, __noreturn__);	/* rare */
 LS void doit(void);
 LS int main(int argc, char **argv, char **envp);
@@ -579,13 +583,15 @@ LS void do_banlist(COMMAND_ARGS)					__page(CMD1_SEG);
 PyObject *python_hook(PyObject *self, PyObject *args, PyObject *keywds);
 PyObject *python_unhook(PyObject *self, PyObject *args, PyObject *keywds);
 #endif
-//char *python_unicode2char(PyUnicodeObject *obj);
-//PyObject *python_userlevel(PyObject *self, PyObject *args, PyObject *keywds);
-//PyObject *python_to_server(PyObject *self, PyObject *args, PyObject *keywds);
-//PyObject *python_to_file(PyObject *self, PyObject *args, PyObject *keywds);
-//static PyObject *python_dcc_sendfile(PyObject *self, PyObject *args, PyObject *keywds);
-//PyObject *python_debug(PyObject *self, PyObject *args);
-//PyMODINIT_FUNC pythonInit(void);
+/*
+char *python_unicode2char(PyUnicodeObject *obj);
+PyObject *python_userlevel(PyObject *self, PyObject *args, PyObject *keywds);
+PyObject *python_to_server(PyObject *self, PyObject *args, PyObject *keywds);
+PyObject *python_to_file(PyObject *self, PyObject *args, PyObject *keywds);
+static PyObject *python_dcc_sendfile(PyObject *self, PyObject *args, PyObject *keywds);
+PyObject *python_debug(PyObject *self, PyObject *args);
+PyMODINIT_FUNC pythonInit(void);
+*/
 int python_parse_jump(char *, char *, Hook *);
 int python_timer_jump(Hook *hook);
 void python_dcc_complete(Client *client, int cps);
@@ -649,22 +655,26 @@ LS void do_urlhist(COMMAND_ARGS)					__page(CMD1_SEG);
 /* tcl.c */
 #ifdef TCL
 
-//LS char *tcl_var_read(Tcl_TVInfo *vinfo, Tcl_Interp *I, char *n1, char *n2, int flags);
-//LS char *tcl_var_write(Tcl_TVInfo *vinfo, Tcl_Interp *I, char *n1, char *n2, int flags);
+/*
+LS char *tcl_var_read(Tcl_TVInfo *vinfo, Tcl_Interp *I, char *n1, char *n2, int flags);
+LS char *tcl_var_write(Tcl_TVInfo *vinfo, Tcl_Interp *I, char *n1, char *n2, int flags);
+*/
 LS int tcl_timer_jump(Hook *hook);
 LS int tcl_parse_jump(char *from, char *rest, Hook *hook);
 LS void tcl_dcc_complete(Client *client, int cps);
 #if defined(DEBUG_C) || defined(MEGA_C)
 LS int tcl_hook(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[]);
 #endif
-//LS int tcl_unhook(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[]);
-//LS int tcl_userlevel(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[]);
-//LS int tcl_debug(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[]);
-//LS int tcl_to_server(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[]);
-//LS int tcl_to_file(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[]);
-//LS int tcl_dcc_sendfile(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[]);
-//LS int tcl_dns_jump(char *host, char *resolved, Hook *hook);
-//LS int tcl_dns(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[]);
+/*
+LS int tcl_unhook(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[]);
+LS int tcl_userlevel(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[]);
+LS int tcl_debug(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[]);
+LS int tcl_to_server(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[]);
+LS int tcl_to_file(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[]);
+LS int tcl_dcc_sendfile(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[]);
+LS int tcl_dns_jump(char *host, char *resolved, Hook *hook);
+LS int tcl_dns(void *foo, Tcl_Interp *I, int objc, Tcl_Obj *CONST objv[]);
+*/
 LS void init_tcl(void);
 LS void do_tcl(COMMAND_ARGS)						__page(CMD1_SEG);
 
