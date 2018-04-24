@@ -53,7 +53,7 @@ int main(int argc, char **argv)
 	strcpy(CurrentNick,"noob");
 	if (format == NULL)
 	{
-		// testcases
+		/* testcases */
 		testcase("cmd","cmd");
 		testcase("cmd cmd","cmd cmd");
 		testcase("cmd $$","cmd $");
@@ -132,7 +132,7 @@ void afmt(char *copy_to, const char *src, const char *input)
 			{
 				if (*argstart == ' ')
 				{
-					while(*argstart == ' ') // skip multiple spaces
+					while(*argstart == ' ') /* skip multiple spaces */
 						argstart++;
 					if (++spc >= startnum)
 						break;
@@ -145,7 +145,7 @@ void afmt(char *copy_to, const char *src, const char *input)
 				{
 					if (++spc > endnum)
 						break;
-					while(*argend == ' ') // skip multiple spaces
+					while(*argend == ' ') /* skip multiple spaces */
 						argend++;
 				}
 			}

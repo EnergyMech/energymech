@@ -48,7 +48,7 @@ char *recover_client(char *env)
 	if (env[8] != ':')
 		return(env);
 
-	memcpy(axx.asc,env,8); // compiler is not stupid and will optimize the shit out of this
+	memcpy(axx.asc,env,8); /* compiler is not stupid and will optimize the shit out of this */
 	guid = getaxx(axx.num[0]);
 	fd = getaxx(axx.num[1]);
 
@@ -150,7 +150,7 @@ char *recover_debug(char *env)
 	/*
 	 *  get the fd number
 	 */
-	memcpy(axx.asc,env,4); // compiler is not stupid and will optimize the shit out of this
+	memcpy(axx.asc,env,4); /* compiler is not stupid and will optimize the shit out of this */
 	debug_fd = getaxx(axx.num);
 
 	if (fstat(debug_fd,&s) < 0)
@@ -207,7 +207,7 @@ char *recover_server(char *env)
 	if (env[sz] != ' ' && env[sz] != 0)
 		return(env);
 
-	memcpy(axx.asc,env,sz); // compiler is not stupid and will optimize the shit out of this
+	memcpy(axx.asc,env,sz); /* compiler is not stupid and will optimize the shit out of this */
 	env += sz;
 	guid = getaxx(axx.num[0]);
 	fd = getaxx(axx.num[1]);
@@ -247,8 +247,8 @@ char *recover_server(char *env)
 			break;
 		}
 	}
-	// if we recover a guid:socket without a matching bot in config, it got removed or changed guid
-	// if the guid changed, we cant guess which old<-->new is the matching one so
+	/* if we recover a guid:socket without a matching bot in config, it got removed or changed guid */
+	/* if the guid changed, we cant guess which old<-->new is the matching one so */
 	if (fd != -1)
 	{
 		to_file(fd,"QUIT :I'm no longer wanted *cry*\n");
@@ -257,8 +257,10 @@ char *recover_server(char *env)
 	return(env);
 }
 
-//(do_reset) MECHRESET=dC@@@ fXIGE@A@@@L@@@ tIGE@F@@@:joo [44]
-//execve( ./energymech, argv = { ./energymech <NULL> <NULL> <NULL> <NULL> }, envp = { MECHRESET=dC@@@ fXIGE@A@@@L@@@ tIGE@F@@@:joo } )
+/*
+(do_reset) MECHRESET=dC@@@ fXIGE@A@@@L@@@ tIGE@F@@@:joo [44]
+execve( ./energymech, argv = { ./energymech <NULL> <NULL> <NULL> <NULL> }, envp = { MECHRESET=dC@@@ fXIGE@A@@@L@@@ tIGE@F@@@:joo } )
+ */
 
 void recover_reset(void)
 {

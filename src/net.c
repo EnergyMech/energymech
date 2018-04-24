@@ -82,7 +82,7 @@ LS const LinkCmd basicProto[] =
 { "BQ", basicQuit,		RELAY_NO	},
 { "CO", netchanNeedop,		RELAY_YES	},
 #ifdef SUPPRESS
-{ "CS", netchanSuppress,	RELAY_YES	}, // experimental command supression
+{ "CS", netchanSuppress,	RELAY_YES	}, /* experimental command supression */
 #endif /* SUPPRESS */
 { "PA", partyAuth,		RELAY_YES	},
 #ifdef REDIRECT
@@ -103,7 +103,7 @@ LS int deadlinks = FALSE;
  *
  */
 
-Mech *get_netbot(void) //get local bot with the lowes guid to act as local master
+Mech *get_netbot(void) /*get local bot with the lowes guid to act as local master */
 {
 	Mech	*netbot,*bot;
 	int	uid;
@@ -422,7 +422,7 @@ void basicAuth(BotNet *bn, char *rest)
 #ifdef SHACRYPT
 	case BNAUTH_SHA:
 		{
-		char	*enc,temppass[24 + Strlen2(pass,linkpass)]; // linkpass is never NULL
+		char	*enc,temppass[24 + Strlen2(pass,linkpass)]; /* linkpass is never NULL */
 
 		/* "mypass theirpass REMOTEsid LOCALsid" */
 		sprintf(temppass,"%s %s %i %i",linkpass,pass,bn->rsid,bn->lsid);
@@ -441,7 +441,7 @@ void basicAuth(BotNet *bn, char *rest)
 #ifdef MD5CRYPT
 	case BNAUTH_MD5:
 		{
-		char	*enc,temppass[24 + Strlen2(pass,linkpass)]; // linkpass is never NULL
+		char	*enc,temppass[24 + Strlen2(pass,linkpass)]; /* linkpass is never NULL */
 
 		/* "mypass theirpass REMOTEsid LOCALsid" */
 		sprintf(temppass,"%s %s %i %i",linkpass,pass,bn->rsid,bn->lsid);
@@ -657,7 +657,7 @@ void basicBanner(BotNet *bn, char *rest)
 			if (cfg->pass && *cfg->pass)
 			{
 				char	*enc,salt[8];
-				char	temppass[24 + Strlen2(cfg->pass,linkpass)]; // linkpass(procvar) is not NULL
+				char	temppass[24 + Strlen2(cfg->pass,linkpass)]; /* linkpass(procvar) is not NULL */
 
 				/* "theirpass mypass LOCALsid REMOTEsid" */
 				sprintf(temppass,"%s %s %i %i",cfg->pass,linkpass,bn->lsid,bn->rsid);
@@ -678,7 +678,7 @@ void basicBanner(BotNet *bn, char *rest)
 			if (cfg->pass && *cfg->pass)
 			{
 				char	*enc,salt[8];
-				char	temppass[24 + Strlen2(cfg->pass,linkpass)]; // linkpass(procvar) is not NULL
+				char	temppass[24 + Strlen2(cfg->pass,linkpass)]; /* linkpass(procvar) is not NULL */
 
 				/* "theirpass mypass LOCALsid REMOTEsid" */
 				sprintf(temppass,"%s %s %i %i",cfg->pass,linkpass,bn->lsid,bn->rsid);
@@ -869,7 +869,7 @@ void netchanSuppress(BotNet *source, char *rest)
 
 	cmd = chop(&rest);
 
-	// convert command to const command
+	/* convert command to const command */
 	for(i=0;mcmd[i].name;i++)
 	{
 		j = stringcasecmp(mcmd[i].name,cmd);
@@ -886,7 +886,7 @@ void netchanSuppress(BotNet *source, char *rest)
 
 	crc = asc2int(rest);
 
-	// to all local bots
+	/* to all local bots */
 	for(backup=botlist;backup;backup=backup->next)
 	{
 		backup->supres_cmd = cmd;
@@ -1193,7 +1193,7 @@ void ushareUser(BotNet *bn, char *rest)
 				if (user->guid == bn->guid && user->addsession)
 				{
 					user->addsession = 0;
-					mirror_user(user); // copy to other local bots
+					mirror_user(user); /* copy to other local bots */
 				}
 		bn->addsession = 0;
 		bn->tick++;
@@ -1356,8 +1356,6 @@ void parse_botnet(BotNet *bn, char *rest)
 			basicBanner(bn,rest+2);
 			return;
 		}
-		//if (!stringcmp(rest,telnetprompt)) // another bot sent me its telnetprompt // dont assume identical prompts
-		//	return;
 #ifdef NETCFG
 		if (strncmp(rest,"netcfg ",7) == 0)
 		{
@@ -1704,7 +1702,7 @@ usage:
 			goto usage;
 
 		set_mallocdoer(do_link);
-		cfg = (NetCfg*)Calloc(sizeof(NetCfg) + StrlenX(pass,host,NULL)); // host might be NULL, StrlenX() handles NULLs, Strlen2() does not.
+		cfg = (NetCfg*)Calloc(sizeof(NetCfg) + StrlenX(pass,host,NULL)); /* host might be NULL, StrlenX() handles NULLs, Strlen2() does not. */
 
 		cfg->guid = iguid;
 		cfg->port = iport;

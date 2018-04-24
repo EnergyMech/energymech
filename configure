@@ -379,7 +379,11 @@ __EOT__
       exit 0
       ;;
     CC=*)
-      CC=`echo $opt | sed 's/.*=//;'`
+      CC=`echo $opt | sed 's/CC=//;'`
+      ;;
+    CFLAGS=*)
+      CFLAGS=`echo $opt | sed 's/CFLAGS=//;'`
+     echo "cflags is $CFLAGS"
       ;;
     *)
       echo "unknown option: $opt"
@@ -441,44 +445,13 @@ fi
 
 echo $ac_t "$cf_SYSMACH"
 
-#
-#
-#
-
-echo $ac_n "checking for C compiler ... "$ac_c
-if [ "$CC" ]; then
-  CCshort="$CC"
-  CC=`config/which $CC`
-else
-  CCshort=gcc
-  CC=`config/which gcc`
-fi
-if [ ! -x "$CC" ]; then
-  CCshort=cc
-  CC=`config/which cc`
-  if [ ! -x "$CC" ]; then
-    echo $ac_t "not found"
-    echo "A working C compiler is needed to compile the EnergyMech"
-    echo "exiting ..."
-    exit 1
-  fi
-fi
-CClong="$CC"
-CC="$CCshort"
-echo $ac_t "$CC"
-
-# set up things for test compiling
-
-TESTO=./test$$.o
-TESTP=./test$$
-rm -f $TESTO $TESTP
-
+CCshort=
 has_musl=no
 #
 #  if directed to use libmusl instead of (g)libc ...
 #
 if [ ! "$try_libmusl" = no ]; then
-  echo $ac_n "checking for libmusl ... "$ac_c
+  echo $ac_n "checking for libmusl gcc wrapper ... "$ac_c
   mgcc=`config/which musl-gcc`
   if [ -x "$mgcc" ]; then
     CC="$mgcc"
@@ -496,15 +469,47 @@ if [ ! "$try_libmusl" = no ]; then
     CC=/opt/musl/bin/musl-gcc
   fi
   CCshort=$CC
-  echo $ac_t yes
 fi
+
+#
+#  a C compiler is good to have
+#
+if [ -z "$CCshort" ]; then
+  echo $ac_n "checking for C compiler ... "$ac_c
+  if [ "$CC" ]; then
+    CCshort="$CC"
+    CC=`config/which $CC`
+  fi
+  if [ ! -x "$CC" ]; then
+    CCshort=gcc
+    CC=`config/which gcc`
+  fi
+  if [ ! -x "$CC" ]; then
+    CCshort=cc
+    CC=`config/which cc`
+    if [ ! -x "$CC" ]; then
+      echo $ac_t "not found"
+      echo "A working C compiler is needed to compile the EnergyMech"
+      echo "exiting ..."
+      exit 1
+    fi
+  fi
+fi
+CClong="$CC"
+CC="$CCshort"
+echo $ac_t "$CC"
+
+#
+# set up things for test compiling
+#
+TESTO=./test$$.o
+TESTP=./test$$
+rm -f $TESTO $TESTP
 
 #
 #  does the C compile work?
 #
-
 TESTC=config/cc.c
-
 echo $ac_n "checking whether $CC works or not ... "$ac_c
 $CC -o $TESTP $TESTC 1> /dev/null 2> /dev/null
 WORK=no
@@ -543,13 +548,23 @@ fi
 #
 #  compiler flags
 #
-
 echo $ac_n "checking C compiler flags ... "$ac_c
+
+#
+#  user defined CFLAGS
+#
+cf_cflags=
+if [ -n "$CFLAGS" ]; then
+  if $CC $CFLAGS -c -o $TESTO $TESTC 1> /dev/null 2> /dev/null && test -r $TESTO; then
+    cf_cflags="$CFLAGS"
+    echo $ac_n "$CFLAGS "$ac_c
+  fi
+fi
 
 #
 #  -g
 #
-if [ -z "$cc_g_opt" ]; then
+if [ -z "$cf_cflags" -a -z "$cc_g_opt" ]; then
   cc_g_opt=no
   if $CC -g -c -o $TESTO $TESTC 1> /dev/null 2> /dev/null && test -r $TESTO; then
     cc_g_opt=yes
@@ -557,10 +572,11 @@ if [ -z "$cc_g_opt" ]; then
     echo $ac_n "-g "$ac_c
   fi
 fi
+
 #
 # GNU GCC
 #
-if [ -n "$cf_GNUCC" ]; then
+if [ -z "$cf_cflags" -a -n "$cf_GNUCC" ]; then
   #
   #  -Wall -Wshadow
   #
@@ -611,7 +627,7 @@ if [ -n "$cf_GNUCC" ]; then
   fi
 fi
 
-if [ -z "$cc_pipe_opt" ]; then
+if [ -z "$cf_cflags" -a -z "$cc_pipe_opt" ]; then
   if $CC -pipe -c -o $TESTO $TESTC 1> /dev/null 2> /dev/null && test -r $TESTO; then
     cc_pipe_flag="-pipe"
     echo $ac_n "-pipe "$ac_c
@@ -623,7 +639,7 @@ if [ "$optitype" = size ]; then
   oflag="-Os"
 fi
 
-if [ -z "$cc_optimize_opt" ]; then
+if [ -z "$cf_cflags" -a -z "$cc_optimize_opt" ]; then
   if $CC $oflag -o $TESTO $TESTC 1> /dev/null 2> /dev/null; then
     cc_optimize_flag="$oflag"
     echo $ac_n "$oflag "$ac_c
@@ -1413,22 +1429,27 @@ lflags="$cc_g_flag -o"
 cprof="$cc_pg_flag $cc_pg_define"
 lprof="$cc_pg_flag $cc_pg_define $libpgdl"
 
+if [ -z "$cf_cflags" ]; then
+  cf_cflags='$(PIPEFLAG) $(GDBFLAG) $(WARNFLAG) $(OPTIMIZE)'
+fi
+
 echo '# This file is generated from Makefile.in' > src/Makefile
 sed "
 s%@CC@%$CCshort%;
 s%@ldscript@%$ldscript%;
 s%@pipeflag@%$cc_pipe_flag%;
 s%@gdbflag@%$cc_g_flag%;
-/@cprof@/     { s,@cprof@,$cprof,;         };
-/@lprof@/     { s,@lprof@,$lprof,;         };
-/@lflags@/    { s,@lflags@,$lflags,;       };
-/@libflags@/  { s,@libflags@,$libflags,;   };
-/@W_FLAGS@/   { s/@W_FLAGS@/$W_FLAGS/;     };
-/@O_FLAGS@/   { s/@O_FLAGS@/$O_FLAGS/;     };
-/@I_PERL@/ { s,@I_PERL@,$I_PERL,; };
-/@L_PERL@/ { s,@L_PERL@,$L_PERL,; };
-/@PYINCLUDE@/ { s,@PYINCLUDE@,$incpython,; };
-/@TCLINCLUDE@/ { s,@TCLINCLUDE@,$inctcl,; };
+/@cprof@/      { s,@cprof@,$cprof,;         };
+/@lprof@/      { s,@lprof@,$lprof,;         };
+/@lflags@/     { s,@lflags@,$lflags,;       };
+/@libflags@/   { s,@libflags@,$libflags,;   };
+/@W_FLAGS@/    { s/@W_FLAGS@/$W_FLAGS/;     };
+/@O_FLAGS@/    { s/@O_FLAGS@/$O_FLAGS/;     };
+/@CFLAGS@/     { s/@CFLAGS@/$cf_cflags/;    };
+/@I_PERL@/     { s,@I_PERL@,$I_PERL,;       };
+/@L_PERL@/     { s,@L_PERL@,$L_PERL,;       };
+/@PYINCLUDE@/  { s,@PYINCLUDE@,$incpython,; };
+/@TCLINCLUDE@/ { s,@TCLINCLUDE@,$inctcl,;   };
 s|@MD5_C@|$MD5_C|;
 s|@SHA_C@|$SHA_C|;
 s|@MD5_O@|$MD5_O|;
@@ -1552,5 +1573,3 @@ $out 'Submit your bugreports at https://github.com/MadCamel/energymech/issues'
 $out ''
 $out 'You have read the README file I hope?'
 $out ''
-
-

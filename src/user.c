@@ -306,7 +306,7 @@ int read_userlist(char *filename)
 		debug("(read_userlist) filename is NULL\n");
 		return(FALSE);
 	}
-	if (*filename == '<') // read only userfile
+	if (*filename == '<') /* read only userfile */
 		filename++;
 	if ((r = is_safepath(filename,FILE_MAY_EXIST)) != FILE_IS_SAFE)
 	{
@@ -335,7 +335,7 @@ int read_userlist(char *filename)
 #endif /* NEWBIE */
 		return(FALSE);
 	}
-	if (*filename == '<') // read only userfile
+	if (*filename == '<') /* read only userfile */
 		filename++;
 	if (is_safepath(filename,FILE_MAY_EXIST) != FILE_IS_SAFE)
 	{
@@ -410,7 +410,7 @@ int write_userlist(char *filename)
 		return(TRUE);
 
 #ifdef DEBUG
-	if (*filename == '<') // we dont write to read only userfiles
+	if (*filename == '<') /* we dont write to read only userfiles */
 	{
 		debug("(write_userlist) %s: writing to read only userfile is prohibited...\n",filename);
 		return(FALSE);
@@ -421,7 +421,7 @@ int write_userlist(char *filename)
 		return(FALSE);
 	}
 #else
-	if (*filename == '<') // we dont write to read only userfiles
+	if (*filename == '<') /* we dont write to read only userfiles */
 		return(FALSE);
 	if (is_safepath(filename,FILE_MAY_EXIST) != FILE_IS_SAFE)
 		return(FALSE);
@@ -574,7 +574,7 @@ void mirror_user(User *user)
 	backup = current;
 	for(anybot=botlist;anybot;anybot=anybot->next)
 	{
-		if (anybot == backup) // dont try to copy to myself, bad things will happen
+		if (anybot == backup) /* dont try to copy to myself, bad things will happen */
 			continue;
 		for(olduser=anybot->userlist;olduser;olduser=olduser->next)
 		{
@@ -604,10 +604,10 @@ void mirror_user(User *user)
 			notes = olduser->note;
 			olduser->note = NULL;
 #endif /* NOTE */
-			remove_user(olduser); // uses current->userlist
-			// authlist/chanuserlist/dcclist is now a minefield
+			remove_user(olduser); /* uses current->userlist */
+			/* authlist/chanuserlist/dcclist is now a minefield */
 		}
-		newuser = add_user(user->name,user->pass,user->x.x.access); // uses current->userlist
+		newuser = add_user(user->name,user->pass,user->x.x.access); /* uses current->userlist */
 		if (olduser)
 		{
 #ifdef NOTE
@@ -616,26 +616,26 @@ void mirror_user(User *user)
 #ifdef DEBUG
 			debug("(1)\n");
 #endif /* DEBUG */
-			reset_userlink(olduser,newuser); // uses current->userlist
-			// authlist/chanuserlist/dcclist should now be safe again.
+			reset_userlink(olduser,newuser); /* uses current->userlist */
+			/* authlist/chanuserlist/dcclist should now be safe again. */
 		}
 #ifdef DEBUG
 		debug("(2)\n");
 #endif /* DEBUG */
-		dupe_strp(user->mask,&newuser->mask); // copy masks
-		dupe_strp(user->chan,&newuser->chan); // copy channels
-		// do not copy notes (creates spam)
+		dupe_strp(user->mask,&newuser->mask); /* copy masks */
+		dupe_strp(user->chan,&newuser->chan); /* copy channels */
+		/* do not copy notes (creates spam) */
 #ifdef DEBUG
 		debug("(3)\n");
 #endif /* DEBUG */
 		newuser->x.comboflags = user->x.comboflags;
 #ifdef BOTNET
-		newuser->x.x.readonly = 0; // dont copy the RO flag
+		newuser->x.x.readonly = 0; /* dont copy the RO flag */
 		newuser->modcount = user->modcount;
-		newuser->tick = user->tick; // is this proper???
+		newuser->tick = user->tick; /* is this proper??? */
 #endif /* BOTNET */
 	}
-	current = backup; // assume my old identity
+	current = backup; /* assume my old identity */
 #ifdef DEBUG
 	debug("(mirror_user) %s[%i] finished\n",user->name,user->x.x.access);
 #endif /* DEBUG */
@@ -772,7 +772,7 @@ User *add_user(char *handle, char *pass, int axs)
 #endif /* DEBUG */
 
 	set_mallocdoer(add_user);
-	user = (User*)Calloc(sizeof(User) + StrlenX(handle,pass,NULL)); // StrlenX() tolerates pass being NULL, Strlen2() does not.
+	user = (User*)Calloc(sizeof(User) + StrlenX(handle,pass,NULL)); /* StrlenX() tolerates pass being NULL, Strlen2() does not. */
 	user->x.x.access = axs;
 	user->next = current->userlist;
 	current->userlist = user;
@@ -1266,7 +1266,7 @@ void do_user(COMMAND_ARGS)
 		/*
 		 *  convert and check nick/mask
 		 */
-		if ((mask = nick2uh(from,nick)) == NULL) // nick2uh uses nuh_buf
+		if ((mask = nick2uh(from,nick)) == NULL) /* nick2uh uses nuh_buf */
 			return;
 		stringcpy(tmpmask,mask);
 #ifdef DEBUG
@@ -1279,7 +1279,7 @@ void do_user(COMMAND_ARGS)
 			return;
 		}
 #endif /* NEWBIE */
-		format_uh(tmpmask,FUH_USERHOST); // format_uh uses local temporary buffer but copies result back into tmpmask
+		format_uh(tmpmask,FUH_USERHOST); /* format_uh uses local temporary buffer but copies result back into tmpmask */
 		/*
 		 *  dont duplicate users
 		 */
@@ -1302,8 +1302,8 @@ void do_user(COMMAND_ARGS)
 		 *  add_user() touches current->ul_save for us
 		 */
 		user = add_user(handle,encpass,newaccess);
-		addtouser(&user->mask,tmpmask,FALSE);	// does not run rehash_chanusers(), does not clobber nuh_buf
-		addtouser(&user->chan,chan,TRUE);	// clobbers nuh_buf
+		addtouser(&user->mask,tmpmask,FALSE);	/* does not run rehash_chanusers(), does not clobber nuh_buf */
+		addtouser(&user->chan,chan,TRUE);	/* clobbers nuh_buf */
 #ifdef DEBUG
 		debug("(do_user) from %s, handle %s,\n\tmask %s, chan %s\n",from,handle,tmpmask,chan);
 #endif /* DEBUG */
@@ -1505,9 +1505,8 @@ usage:
 			to_user(from,"Problem adding %s (global mask)",mask);
 			return;
 		}
+/* With ipv6 and other funky crap, this is no longer suitable */
 /*
-// With ipv6 and other funky crap, this is no longer suitable
-
 		if (matches("*@?*.?*",mask))
 		{
 			to_user(from,"Problem adding %s (invalid mask)",mask);

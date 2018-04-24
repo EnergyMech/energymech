@@ -473,7 +473,7 @@ char *random_question(char *triv_rand)
 
 	} entry;
 
-	if (STRCHR(triv_qfile,'/') || strlen(triv_qfile) > 100) // really bad filenames...
+	if (STRCHR(triv_qfile,'/') || strlen(triv_qfile) > 100) /* really bad filenames... */
 		return(NULL);
 
 	stringcat(stringcpy(tmpname,"trivia/"),triv_qfile);
@@ -727,11 +727,11 @@ void do_bigsay(COMMAND_ARGS)
 	{
 		temp = chop(&rest);
 		if (temp[1] == '-')
-			; // allow .bigsay -- -dash-
+			; /* allow .bigsay -- -dash- */
 		else
-		if (STRCHR(temp,'/') == NULL) // no filesystem perversions...
+		if (STRCHR(temp,'/') == NULL) /* no filesystem perversions... */
 		{
-			stringcat(stringcpy(output,temp+1),".bigchars"); // temp+1 = skip initial '-'
+			stringcat(stringcpy(output,temp+1),".bigchars"); /* temp+1 = skip initial '-' */
 		}
 	}
 #ifdef DEBUG

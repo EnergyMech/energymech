@@ -155,7 +155,7 @@ int make_query(char *packet, const char *hostname)
 	memset(packet,0,12);
 	h = (dnsQuery*)packet;
 	h->qid = rand() & 0xffff;
-	h->flags = htons(0x0100);; // Query = 0, Recursion Desired = 1
+	h->flags = htons(0x0100);; /* Query = 0, Recursion Desired = 1 */
 	h->questions = htons(1);
 	size = packet + 12;
 	dst  = size + 1;
@@ -244,7 +244,7 @@ void parse_query(int psz, dnsQuery *query)
 	n = ntohs(query->flags);
 	debug("(parse_query) %i: flags = %i { %s %i %s%s%s%s%s }\n",
 		sz,n,token,
-		(n&15), // result code
+		(n&15), /* result code */
 		(n&32768)  ? "QR 1 (Answer) ":"QR 0 (Question) ",
 		(n&1024) ? "AA ":"",
 		(n&512) ? "TC ":"",
@@ -879,8 +879,8 @@ void do_dns(COMMAND_ARGS)
 	if ((ip = inet_addr(host)) != INADDR_NONE)
 	{
 		/* flip an IP backwards to resolve hostname */
-		// a11.b22.c33.d44
-		// d44.c33.b22.a11.in-addr.arpa
+		/* a11.b22.c33.d44 */
+		/* d44.c33.b22.a11.in-addr.arpa */
 		dst = globaldata;
 flipstep:
 		src = host;
@@ -894,7 +894,7 @@ flipstep:
 		}
 		if (dot)
 		{
-			*dot++ = 0; // safe to modify buffer?
+			*dot++ = 0; /* safe to modify buffer? */
 			while(*dot)
 				*dst++ = *dot++;
 			*dst++ = '.';
@@ -909,7 +909,7 @@ flipstep:
 	/* check if its in cache now */
 	if ((res = poll_rawdns(host)))
 	{
-		//Resolved: irc.dal.net (194.68.45.50)
+		/* Resolved: irc.dal.net (194.68.45.50) */
 		send_pa(PA_DNS|PA_END,NULL,"Resolved: %s (%s)",host,res);
 		return;
 	}

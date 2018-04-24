@@ -292,7 +292,7 @@ Ban *make_ban(Ban **banlist, char *from, char *banmask, time_t when)
 			return(NULL);
 	}
 
-	sz = sizeof(Ban) + Strlen2(from,banmask); // banmask is never NULL
+	sz = sizeof(Ban) + Strlen2(from,banmask); /* banmask is never NULL */
 
 	set_mallocdoer(make_ban);
 	new = (Ban*)Calloc(sz);
@@ -460,7 +460,7 @@ void channel_massmode(const Chan *chan, char *pattern, int filtmode, char mode, 
 
 		if (i)
 		{
-			if ((Strlen2(deopstring,burst)) >= MSGLEN-2) // burst is never NULL
+			if ((Strlen2(deopstring,burst)) >= MSGLEN-2) /* burst is never NULL */
 			{
 				if (write(current->sock,burst,strlen(burst)) == -1)
 					return;

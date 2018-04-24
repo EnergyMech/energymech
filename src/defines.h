@@ -72,10 +72,10 @@
 #define CU_KSWARN		0x1000
 #define CU_CHANBAN		0x2000
 
-#define SHIT_NOOP		0		// do nothing
-#define SHIT_CHANOP		1		// not allowed to be chanop
-#define SHIT_KB			2		// simple kick and ban
-#define SHIT_PERMABAN		3		// permanent ban, re-ban if unbanned
+#define SHIT_NOOP		0		/* do nothing */
+#define SHIT_CHANOP		1		/* not allowed to be chanop */
+#define SHIT_KB			2		/* simple kick and ban */
+#define SHIT_PERMABAN		3		/* permanent ban, re-ban if unbanned */
 #define SHIT_CHANBAN		4
 
 #define MAXSHITLEVEL		4

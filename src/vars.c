@@ -404,7 +404,7 @@ second_pass:
 
 			varval = (IsProc(i)) ? current->setting[i].proc_var : &univar[i];
 
-			sz = Strlen2(tmp,VarName[i].name); // VarName[i].name is never NULL
+			sz = Strlen2(tmp,VarName[i].name); /* VarName[i].name is never NULL */
 
 			if (IsStr(i))
 			{

@@ -45,7 +45,7 @@ LS const struct
 
 } StructList[] =
 {
-{ "aME\t",		sizeof(aME)		}, // for memory allocation debugging
+{ "aME\t",		sizeof(aME)		}, /* for memory allocation debugging */
 { "aMEA",		sizeof(aMEA)		},
 #ifdef ALIAS
 { "Alias",		sizeof(Alias)		},
@@ -524,7 +524,7 @@ void debug_settings(UniVar *setting, int type)
 		}
 
 		tpad = STREND(tabs);
-		n = 24 - (Strlen2(pad,VarName[i].name) + 2); // VarName[i].name is never NULL
+		n = 24 - (Strlen2(pad,VarName[i].name) + 2); /* VarName[i].name is never NULL */
 		while(n >= 8)
 		{
 			n = n - 8;
@@ -1250,12 +1250,12 @@ typedef struct
 {
         time_t          last;
         time_t          next;
-        uint32_t        second1;        //:30;
-        uint32_t        second2;        //:30;
-        uint32_t        minute1;        //:30;
-        uint32_t        minute2;        //:30;
-        uint32_t        hour;           //:24;
-        uint32_t        weekday;        //:7;
+        uint32_t        second1;        /*:30;*/
+        uint32_t        second2;        /*:30;*/
+        uint32_t        minute1;        /*:30;*/
+        uint32_t        minute2;        /*:30;*/
+        uint32_t        hour;           /*:24;*/
+        uint32_t        weekday;        /*:7;*/
 
 } HookTimer;
 #endif /* 0 */
