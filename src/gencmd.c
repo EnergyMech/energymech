@@ -510,12 +510,50 @@ void datestamp(void)
 		t->tm_year + 1900,hourampm[t->tm_hour],t->tm_min,(t->tm_hour <= 11) ? "am" : "pm");
 }
 
+#ifndef HAVE_GIT
+
+const char *srcfile[] = { "../configure", "../Makefile", "Makefile.in", "alias.c", "auth.c", "bounce.c", //"calc.c",
+	"channel.c", "config.h", "config.h.in", "core.c", "ctcp.c", "debug.c", "defines.h", "dns.c", "function.c",
+	"gencmd.c", "global.h", "greet.c", "h.h", "help.c", "hostinfo.c", "io.c", "irc.c", "lib/string.c", "main.c",
+	"net.c", "note.c", "ons.c", "parse.c", "partyline.c", "perl.c", "prot.c", "python.c", "reset.c", "seen.c",
+	"settings.h", "shit.c", "spy.c", "structs.h", "tcl.c", "text.h", "toybox.c", "uptime.c", "usage.h", "user.c",
+	"vars.c", "web.c", NULL };
+
+int linecount;
+
+int countcallback(char *line)
+{
+	linecount++;
+	return(FALSE);
+}
+
+int countlines(const char *filename)
+{
+	int	fd;
+
+	linecount = 0;
+	if ((fd = open(filename,O_RDONLY)) < 0)
+		return(0);
+	readline(fd,&countcallback); /* readline closes fd */
+	return(linecount);
+}
+
+#endif
+
 void githash(void)
 {
+	int	i,fd,verlines,sloc;
+
 #ifdef HAVE_GIT
 	system("./lib/git.sh > githash.h");
 #else
-	system("echo '#define GITHASH \"\"' > githash.h");
+	sloc = verlines = countlines("../VERSIONS");
+	for(i=0;srcfile[i];i++)
+		sloc += countlines(srcfile[i]);
+
+	fd = open("githash.h",O_WRONLY|O_CREAT|O_TRUNC,0644);
+	to_file(fd,"#define GITHASH \" (src:%i/%i)\"\n",verlines,sloc);
+	close(fd);
 #endif
 }
 
