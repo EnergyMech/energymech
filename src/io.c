@@ -496,6 +496,8 @@ void to_user(const char *target, const char *format, ...)
 #endif /* DEBUG */
 }
 
+#endif /* ifndef GENCMD_C */
+
 /*
  *  Read any data waiting on a socket or file descriptor
  *  and return any complete lines to the caller
@@ -522,7 +524,7 @@ char *sockread(int s, char *rest, char *line)
 			while(*src)
 				*(dst++) = *(src++);
 			*dst = 0;
-#ifdef DEBUG
+#if defined(DEBUG) && !defined(GENCMD_C)
 			debug("(in)  {%i} %s\n",s,line);
 #endif /* DEBUG */
 			return((*line) ? line : NULL);
@@ -583,10 +585,12 @@ void readline(int fd, int (*callback)(char *))
 
 	close(fd);
 
-#ifdef DEBUG
+#if defined(DEBUG) && !defined(GENCMD_C)
 	debug("(readline) done reading lines\n");
 #endif /* DEBUG */
 }
+
+#ifndef GENCMD_C
 
 void remove_ks(KillSock *ks)
 {
