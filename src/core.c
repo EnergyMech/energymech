@@ -1106,7 +1106,7 @@ void update(SequenceTime *this)
 /*
  *  Read data from server socket
  */
-void parse_server_input(void)
+void process_server_input(void)
 {
 #ifdef WINGATE
 	Server	*sp;
@@ -1190,7 +1190,8 @@ get_line:
 				}
 			}
 #endif /* WINGATE */
-			parseline(linebuf);
+			current->conntry = now;
+			parse_server_input(linebuf);
 			goto get_line;
 		}
 		switch(errno)

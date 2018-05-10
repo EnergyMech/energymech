@@ -1,5 +1,6 @@
-3.1 -- WORK IN PROGRESS (~April, 2018)
+3.1 -- WORK IN PROGRESS (~May, 2018)
 
+ * Added: SERVERSILENCETIMEOUT, maximum idle timer for server connection. in case of lost FIN packets
  * Fixed: Compiles clean with -std=c89
  * Added: $guid to esay variables
  * Added: New bigsay font: spider, use with .bigsay -spider cowabunga!

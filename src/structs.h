@@ -578,6 +578,7 @@ typedef struct Mech
 #endif /* CHANBAN */
 
 	time_t		conntry;		/* when connect try started		*/
+						/* re-used for server activity once connected */
 	time_t		activity;		/* Away timer (AAWAY)			*/
 
 	time_t		ontime;			/* how long the bot has been connected	*/
