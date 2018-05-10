@@ -1459,7 +1459,7 @@ uint32_t stringhash(char *s)
 	return(hash);
 }
 
-void parseline(char *rest)
+void parse_server_input(char *rest)
 {
 #ifdef SCRIPTING
 	Hook	*hook;

@@ -169,7 +169,7 @@ void send_uptime(int type)
 	if (botlist)
 	{
 		nick = botlist->nick;
-		upPack.ontime = htonl(botlist->conntry);
+		upPack.ontime = htonl(botlist->ontime);
 		if ((sp = find_server(botlist->server)))
 		{
 			server = (*sp->realname) ? sp->realname : sp->name;

@@ -334,6 +334,8 @@ enum {
 #define CN_WINGATEWAIT		8
 #define CN_SPINNING		9	/* after exhausting serverlist */
 
+#define SERVERSILENCETIMEOUT	360	/* server connection idle timeout */
+
 /* DCC Kill flags (BYE command) */
 
 #define DCC_NULL		0

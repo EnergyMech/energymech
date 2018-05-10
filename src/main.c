@@ -780,10 +780,22 @@ restart_dcc:
 			process_dcc();
 
 		if (current->sock != -1)
-			parse_server_input();
+			process_server_input();
 
 		if (current->connect == CN_ONLINE)
 		{
+			/*
+			 *  Its possible to get stuck waiting forever if a FIN packet is lost
+			 *  unless you do this...
+			 */
+			if ((current->conntry - now) > SERVERSILENCETIMEOUT)
+			{
+				to_server("PING :%lu\n",now);
+				current->conntry += 10; /* send more unless an answer is received in <10 seconds */
+			}
+			/*
+			 *  Keep server idle-timer low to seem like you are chatting
+			 */
 			if (current->setting[TOG_NOIDLE].int_var)
 			{
 				if ((now - current->lastantiidle) > PINGSENDINTERVAL)

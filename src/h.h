@@ -196,7 +196,7 @@ void register_with_server(void);
 int sub_compile_timer(int, uint32_t *, uint32_t *, char *);
 int compile_timer(HookTimer *, char *);
 void update(SequenceTime *this);
-void parse_server_input(void);
+void process_server_input(void);
 void do_version(COMMAND_ARGS)					__page(CMD1_SEG);
 void do_core(COMMAND_ARGS)					__page(CMD1_SEG);
 void do_die(COMMAND_ARGS)					__page(RARE_SEG);
@@ -533,7 +533,7 @@ LS void parse_348(char *from, char *rest);
 LS void parse_368(char *from, char *rest);
 LS void parse_005(char *from, char *rest);
 LS uint32_t stringhash(char *s);
-LS void parseline(char *rest);
+LS void parse_server_input(char *rest);
 
 /* partyline.c */
 
