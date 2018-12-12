@@ -1,5 +1,8 @@
 3.1 -- WORK IN PROGRESS (~May, 2018)
 
+ * Changed: Session config is saved to "filename.sessiontemp" and once the save is complete
+   its moved to "filename.session", just in case something happens that might create a corrupt
+   session file (eg, SIGSEGV).
  * Added: SERVERSILENCETIMEOUT, maximum idle timer for server connection. in case of lost FIN packets
  * Fixed: Compiles clean with -std=c89
  * Added: $guid to esay variables

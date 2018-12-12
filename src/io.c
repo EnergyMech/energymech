@@ -355,7 +355,7 @@ void to_user_q(const char *target, const char *format, ...)
 
 	stringcat(message,"\n");
 
-	if (startup > 0)
+	if (STARTUP_ECHOTOCONSOLE)
 	{
 		write(1,message,strlen(message));
 		return;
