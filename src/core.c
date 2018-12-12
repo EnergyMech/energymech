@@ -148,7 +148,8 @@ int write_session(void)
 	UniVar	*varval;
 	int	j,sf;
 
-	if ((sf = open(SESSIONFILE,O_WRONLY|O_CREAT|O_TRUNC,NEWFILEMODE)) < 0)
+	/* save to filename.sessiontemp at first, in case SIGSEGV happens */
+	if ((sf = open(SESSIONTEMPFILE,O_WRONLY|O_CREAT|O_TRUNC,NEWFILEMODE)) < 0)
 		return(FALSE);
 
 #ifdef RAWDNS
@@ -311,6 +312,8 @@ int write_session(void)
 	}
 
 	close(sf);
+	unlink(SESSIONFILE);
+	rename(SESSIONTEMPFILE,SESSIONFILE);
 	return(TRUE);
 }
 

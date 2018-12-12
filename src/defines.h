@@ -31,6 +31,16 @@
 #endif /* LIBRARY */
 
 /*
+ *  startup ==
+ */
+#define STARTUP_RUNNING		0
+#define STARTUP_ECHOTOCONSOLE	(startup > 1 && startup < 1000)
+#define STARTUP_COMMANDANDEXIT	3
+#define STARTUP_TESTRUN		6
+#define STARTUP_NORMALSTART	1000
+#define STARTUP_SIGSEGV		31337
+
+/*
  *  Channel Crap
  */
 

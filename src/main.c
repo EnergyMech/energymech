@@ -448,6 +448,7 @@ void sig_segv(int crap, siginfo_t *si, void *uap)
 	greg_t	*rsp,*rip; /* general registers */
 
 	time(&now);
+	startup = STARTUP_SIGSEGV;
 
 	debug("(sigsegv) trying to access "mx_pfmt"\n",(mx_ptr)si->si_addr);
 	mctx = &((ucontext_t *)uap)->uc_mcontext;
@@ -919,6 +920,7 @@ int main(int argc, char **argv, char **envp)
 #endif
 
 	uptime = time(&now);
+	startup = STARTUP_NORMALSTART;
 
 	if ((getuid() == 0) || (geteuid() == 0))
 	{
@@ -1060,7 +1062,7 @@ int main(int argc, char **argv, char **envp)
 				to_file(1,"error: Missing argument for -e <command string>\n");
 			_exit(0);
 		case 't':
-			startup = 666;
+			startup = STARTUP_TESTRUN;
 			break;
 		case 'f':
 			if (opt[2] != 0)
@@ -1276,12 +1278,12 @@ int main(int argc, char **argv, char **envp)
 	monitor_fs(executable);
 #endif
 
-	if (startup == 666)
+	if (startup == STARTUP_TESTRUN)
 	{
 		to_file(1,"init: test run completed, exiting...\n");
 		_exit(0);
 	}
-	startup = FALSE;
+	startup = STARTUP_RUNNING;
 #ifdef DEBUG
 	debug("(main) entering doit()...\n");
 #endif
