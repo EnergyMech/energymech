@@ -299,6 +299,7 @@
 #define MSGFILE				BOTDIR MECHBASENAME ".msg"
 #define SESSIONFILE			BOTDIR MECHBASENAME ".session"
 #define TRIVIASCOREFILE			BOTDIR MECHBASENAME ".trivscore"
+#define TEMP				".temp"
 
 #define AWAYFILE 			RANDDIR "away.txt"
 #define NICKSFILE			RANDDIR "nick.txt"

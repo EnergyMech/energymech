@@ -991,7 +991,7 @@ void do_access(COMMAND_ARGS)
 	{
 		if (*nuh == current->setting[CHR_CMDCHAR].char_var)
 		{
-			nuh++; 
+			nuh++;
 			level = access_needed(nuh);
 			if (level < 0)
 				return;
