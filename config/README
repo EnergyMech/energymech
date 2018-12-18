@@ -1,0 +1,1 @@
+Files needed by ./configure to test compiler environment. Not needed after compilation is done (but save if you think you might recompile again later on).
