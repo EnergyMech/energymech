@@ -292,7 +292,7 @@
 #define BOTDIR				""
 #define MECHBASENAME			"mech"
 
-#define RANDDIR				"common/"
+#define COMMONDIR			"common/"
 #define HELPDIR				"help/"
 #define CFGFILE				BOTDIR MECHBASENAME ".conf"
 #define PIDFILE				BOTDIR MECHBASENAME ".pid"
@@ -301,16 +301,16 @@
 #define TRIVIASCOREFILE			BOTDIR MECHBASENAME ".trivscore"
 #define TEMP				".temp"
 
-#define AWAYFILE 			RANDDIR "away.txt"
-#define NICKSFILE			RANDDIR "nick.txt"
-#define RANDKICKSFILE			RANDDIR "kick.txt"
-#define RANDTOPICSFILE			RANDDIR "say.txt"
-#define RANDSAYFILE 			RANDDIR "say.txt"
-#define RANDINSULTFILE			RANDDIR "insult.txt"
-#define RANDPICKUPFILE			RANDDIR	"pickup.txt"
-#define RAND8BALLFILE			RANDDIR "8ball.txt"
-#define SIGNOFFSFILE			RANDDIR "signoff.txt"
-#define VERSIONFILE			RANDDIR "version.txt"
+#define AWAYFILE 			COMMONDIR "away.txt"
+#define NICKSFILE			COMMONDIR "nick.txt"
+#define RANDKICKSFILE			COMMONDIR "kick.txt"
+#define RANDTOPICSFILE			COMMONDIR "say.txt"
+#define RANDSAYFILE 			COMMONDIR "say.txt"
+#define RANDINSULTFILE			COMMONDIR "insult.txt"
+#define RANDPICKUPFILE			COMMONDIR "pickup.txt"
+#define RAND8BALLFILE			COMMONDIR "8ball.txt"
+#define SIGNOFFSFILE			COMMONDIR "signoff.txt"
+#define VERSIONFILE			COMMONDIR "version.txt"
 
 #define DEFAULT_IRC_PORT		6667
 
