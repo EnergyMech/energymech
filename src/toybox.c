@@ -721,7 +721,7 @@ void do_bigsay(COMMAND_ARGS)
 	if (fontname && *rest != '-')
 		goto reuse_font;
 
-	stringcpy(output,BIGSAY_DEFAULTFONT);
+	stringcat(stringcpy(output,COMMONDIR),BIGSAY_DEFAULTFONT);
 
 	if (rest[0] == '-')
 	{
@@ -731,7 +731,7 @@ void do_bigsay(COMMAND_ARGS)
 		else
 		if (STRCHR(temp,'/') == NULL) /* no filesystem perversions... */
 		{
-			stringcat(stringcpy(output,temp+1),".bigchars"); /* temp+1 = skip initial '-' */
+			stringcat(stringcat(stringcpy(output,COMMONDIR),temp+1),".bigchars"); /* temp+1 = skip initial '-' */
 		}
 	}
 #ifdef DEBUG
