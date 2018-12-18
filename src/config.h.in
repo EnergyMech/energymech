@@ -292,7 +292,7 @@
 #define BOTDIR				""
 #define MECHBASENAME			"mech"
 
-#define RANDDIR				"messages/"
+#define RANDDIR				"common/"
 #define HELPDIR				"help/"
 #define CFGFILE				BOTDIR MECHBASENAME ".conf"
 #define PIDFILE				BOTDIR MECHBASENAME ".pid"
