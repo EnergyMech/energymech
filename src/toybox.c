@@ -721,7 +721,6 @@ void do_bigsay(COMMAND_ARGS)
 	if (fontname && *rest != '-')
 		goto reuse_font;
 
-	stringcpy(output,COMMONDIR);
 	stringcat(stringcpy(output,COMMONDIR),BIGSAY_DEFAULTFONT);
 
 	if (rest[0] == '-')
