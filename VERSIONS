@@ -1,5 +1,6 @@
 3.1 -- WORK IN PROGRESS (~May, 2018)
 
+ * Fixed: Bug with bigsay characters defined with blank lines.
  * Changed: Session config is saved to "filename.sessiontemp" and once the save is complete
    its moved to "filename.session", just in case something happens that might create a corrupt
    session file (eg, SIGSEGV).
