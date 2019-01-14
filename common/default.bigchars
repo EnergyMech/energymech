@@ -14,12 +14,12 @@ chars !
 \__/
 
 chars .
- 
- 
- 
- 
- 
- 
+-blank-
+-blank-
+-blank-
+-blank-
+-blank-
+-blank-
 ,--,
 \__/
 
@@ -34,11 +34,11 @@ chars |
 `--'
 
 chars :
-
+-blank-
 ,--.
 |  |
 `--'  
-
+-blank-
 ,--.
 |  |
 `--'

@@ -77,9 +77,14 @@ int read_bigcharset_callback(char *rest)
 	if (charlines)
 	{
 		charlines--;
-		sz = strlen(rest);
-		if (sz > newchar->width)
-			newchar->width = sz;
+		if (stringcmp("-blank-",rest) == 0)
+			rest = "";
+		else
+		{
+			sz = strlen(rest);
+			if (sz > newchar->width)
+				newchar->width = sz;
+		}
 		append_strp(&newchar->data,rest);
 		return(FALSE);
 	}
@@ -92,6 +97,9 @@ int read_bigcharset_callback(char *rest)
 		charlines = charheight;
 		opt = chop(&rest);
 
+#ifdef DEBUG
+		debug("(read_bigcharset_callback) New character definition: %s\n",opt);
+#endif /* DEBUG */
 		set_mallocdoer(read_bigcharset_callback);
 		newchar = (BigC*)Calloc(sizeof(BigC) + strlen(opt));
 
@@ -783,6 +791,12 @@ reuse_font:
 					break;
 				}
 			}
+#ifdef DEBUG
+			if (bigc == NULL)
+			{
+				debug("(do_bigsay) no matching character found for '%c'\n",*pt);
+			}
+#endif /* DEBUG */
 		}
 		temp = NULL;
 		for(tail=output;*tail;tail++)
