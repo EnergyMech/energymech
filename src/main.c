@@ -665,6 +665,7 @@ doit_jumptonext:
 			}
 #endif /* RAWDNS */
 		}
+		/* not an else block since previous block might set sock to != -1 */
 		if (current->sock != -1)
 		{
 			if (current->ip.s_addr == 0)
@@ -785,15 +786,6 @@ restart_dcc:
 
 		if (current->connect == CN_ONLINE)
 		{
-			/*
-			 *  Its possible to get stuck waiting forever if a FIN packet is lost
-			 *  unless you do this...
-			 */
-			if ((current->conntry - now) > SERVERSILENCETIMEOUT)
-			{
-				to_server("PING :%lu\n",now);
-				current->conntry += 10; /* send more unless an answer is received in <10 seconds */
-			}
 			/*
 			 *  Keep server idle-timer low to seem like you are chatting
 			 */

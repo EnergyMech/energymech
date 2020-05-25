@@ -1,5 +1,7 @@
 3.1 -- WORK IN PROGRESS (~May, 2018)
 
+ * Fixed: If the network interface goes down, the mech will mark all servers as unconnectable,
+          permanently, so even when the network comes back up... Fixed!
  * Fixed: Bug with bigsay characters defined with blank lines.
  * Changed: Session config is saved to "filename.sessiontemp" and once the save is complete
    its moved to "filename.session", just in case something happens that might create a corrupt

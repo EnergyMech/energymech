@@ -216,7 +216,7 @@ int write_session(void)
 
 #ifdef DYNCMD
 	/*
-	 *  because of "chaccess XXX disable" its best to save chaccess last
+	 *  because of "chaccess ___ disable" its best to save chaccess last
 	 */
 	for(j=0;mcmd[j].name;j++)
 	{
@@ -689,7 +689,7 @@ void connect_to_server(void)
 		{
 			if ((!sptry) || (sp->usenum < sptry->usenum))
 			{
-				if (sp->err == 0)
+				if (sp->err == 0 || sp->err == SP_ERRCONN)
 					sptry = sp;
 				else
 				if (
@@ -1130,12 +1130,7 @@ void process_server_input(void)
 			sp = find_server(current->server);
 			if (!sp)
 			{
-#ifdef IDWRAP
-				unlink_identfile();
-#endif /* IDWRAP */
-				close(current->sock);
-				current->sock = -1;
-				return;
+				goto breaksock2;
 			}
 #ifdef DEBUG
 			debug("[PSI] Connecting via WinGate proxy...\n");
@@ -1152,6 +1147,7 @@ void process_server_input(void)
 			}
 			current->connect = CN_WINGATEWAIT;
 			current->conntry = now;
+			current->heartbeat = 0;
 			return;
 		}
 #endif /* WINGATE */
@@ -1184,16 +1180,12 @@ get_line:
 				}
 				else
 				{
-#ifdef IDWRAP
-					unlink_identfile();
-#endif /* IDWRAP */
-					close(current->sock);
-					current->sock = -1;
-					return;
+					goto breaksock2;
 				}
 			}
 #endif /* WINGATE */
 			current->conntry = now;
+			current->heartbeat = 0;
 			parse_server_input(linebuf);
 			goto get_line;
 		}
@@ -1203,19 +1195,47 @@ get_line:
 		case EAGAIN:
 			break;
 		default:
-#ifdef DEBUG
-			debug("[PSI] {%i} errno = %i; closing server socket\n",current->sock,errno);
-#endif /* DEBUG */
-			*current->sockdata = 0;
-#ifdef IDWRAP
-			unlink_identfile();
-#endif /* IDWRAP */
-			close(current->sock);
-			current->sock = -1;
-			current->connect = CN_NOSOCK;
-			break;
+			goto breaksock;
 		}
 	}
+
+	/* server has been quiet for too long */
+	if (current->conntry + SERVERSILENCETIMEOUT <= now && current->heartbeat == 0)
+	{
+#ifdef DEBUG
+		debug("[PSI] {%i} server has been quiet for too long (%is)...\n",current->sock,SERVERSILENCETIMEOUT);
+#endif /* DEBUG */
+		/* push something to the server to test the socket, this should break a zombie socket */
+		to_server("PING :LT%lu\n",current->conntry);
+		current->heartbeat = 1;
+	}
+
+	/* server has been quiet for WAY too long */
+	if (current->conntry + (SERVERSILENCETIMEOUT*2) <= now)
+	{
+#ifdef DEBUG
+		debug("[PSI] {%i} server has been quiet for WAY too long (%is), forcing reconnect...\n",current->sock,SERVERSILENCETIMEOUT*2);
+#endif /* DEBUG */
+		errno = 110; /* connection timed out */
+		goto breaksock;
+	}
+
+	/* situation normal */
+	return;
+
+breaksock:
+#ifdef DEBUG
+	debug("[PSI] {%i} errno = %i; closing server socket\n",current->sock,errno);
+#endif /* DEBUG */
+breaksock2:
+	*current->sockdata = 0;
+#ifdef IDWRAP
+	unlink_identfile();
+#endif /* IDWRAP */
+	close(current->sock);
+	current->sock = -1;
+	current->connect = CN_NOSOCK;
+	return;
 }
 
 /*
