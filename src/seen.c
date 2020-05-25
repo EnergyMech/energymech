@@ -884,9 +884,9 @@ void do_seen(COMMAND_ARGS)
 			}
 			if (h || d)
 			{
-				sprintf(ago,"%s%i hour%s and ",ago,h,EXTRA_CHAR(h));
+				sprintf(ago+strlen(ago),"%i hour%s and ",h,EXTRA_CHAR(h));
 			}
-			sprintf(ago,"%s%i minute%s",ago,m,EXTRA_CHAR(m));
+			sprintf(ago+strlen(ago),"%i minute%s",m,EXTRA_CHAR(m));
 
 			n = seen->nick;
 			u = seen->userhost;

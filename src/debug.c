@@ -260,6 +260,8 @@ LS const DEFstruct CNdefs[] =
 { CN_DISCONNECT,	"CN_DISCONNECT"		},
 { CN_BOTDIE,		"CN_BOTDIE"		},
 { CN_NEXTSERV,		"CN_NEXTSERV"		},
+{ CN_WINGATEWAIT,	"CN_WINGATEWAIT"	},
+{ CN_SPINNING,		"CN_SPINNING"		},
 { 0, }};
 
 LS const DEFstruct SPdefs[] =

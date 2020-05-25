@@ -579,6 +579,7 @@ typedef struct Mech
 
 	time_t		conntry;		/* when connect try started		*/
 						/* re-used for server activity once connected */
+	int		heartbeat;		/* handle server timeout stuff		*/
 	time_t		activity;		/* Away timer (AAWAY)			*/
 
 	time_t		ontime;			/* how long the bot has been connected	*/
