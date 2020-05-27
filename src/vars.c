@@ -313,7 +313,7 @@ void do_esay(COMMAND_ARGS)
 	char	c,*chp;
 	int	i,n;
 
-	ec_end = output + MSGLEN - 20;
+	ec_end = output + MSGLEN - 50;
 	ec_src = rest;
 	rest = STREND(rest);
 	ec_dest = output;
@@ -324,7 +324,9 @@ void do_esay(COMMAND_ARGS)
 	{
 		if (*ec_src != '$')
 		{
-			*(ec_dest++) = *(ec_src++);
+			if (ec_dest < ec_end)
+				*(ec_dest++) = *(ec_src);
+			ec_src++;
 			continue;
 		}
 		for(i=0;ecmd[i].len;i++)
@@ -350,7 +352,9 @@ void do_esay(COMMAND_ARGS)
 		}
 		if (!ecmd[i].len)
 		{
-			*(ec_dest++) = *(ec_src++);
+			if (ec_dest < ec_end)
+				*(ec_dest++) = *(ec_src);
+			ec_src++;
 		}
 	}
 	*ec_dest = 0;
