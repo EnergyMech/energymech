@@ -1,5 +1,5 @@
 As I see it, yes.
-Definitly!
+Definitely!
 I'm leaning toward yes.
 It is certain.
 It is decidedly so.
@@ -8,18 +8,19 @@ It's likely.
 Most likely.
 My sources say yes.
 Outlook good.
-Signs point to yes.
+All signs point to yes.
 Without a doubt.
 Yes
 Yes
-Yes definitly.
-Yes definitly.
+Yes definitely.
+Yes definitely.
 You may rely on it.
 Dont count on it.
 I'm leaning toward no.
 My reply is no.
 My reply is no.
 My sources say no.
+All signs point to no.
 No
 No
 No chance at all!
@@ -33,5 +34,7 @@ Dont ask me, ask yourself that one.
 I better not tell you now.
 I think you should ask yourself that question.
 Maybe
-Reply hazy try agian.
-Reply is hazy please try again.
+Reply hazy, try again.
+Reply is hazy, please try again.
+Definitely maybe.
+As certain as death and taxes.
