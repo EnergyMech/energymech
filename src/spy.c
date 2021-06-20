@@ -1,7 +1,7 @@
 /*
 
     EnergyMech, IRC bot software
-    Parts Copyright (c) 1997-2018 proton
+    Parts Copyright (c) 1997-2021 proton
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -45,9 +45,30 @@ LS const char SPY_DEFS[][12] =
 	"SPY_BOTNET",
 	"SPY_URL",
 	"SPY_SYSMON",
+	"SPY_RANDSRC",
 };
 
 #endif /* DEBUG */
+
+static int basepos(char c)
+{
+/*
+ -lcrypt converts to [a-zA-Z0-9./]
+ included sha1 converts to hex
+ included md5 converts to [./0-9A-Za-z]
+*/
+	if (c >= 'a' && c <= 'z')
+		return(c - 'a');
+	if (c >= 'A' && c <= 'Z')
+		return(c - 'A' + 26);
+	if (c >= '0' && c <= '9')
+		return(c - '0' + 52);
+	if (c == '.')
+		return(62);
+	if (c == '/')
+		return(63);
+	return(0);
+}
 
 void send_spy(const char *src, const char *format, ...)
 {
@@ -56,11 +77,26 @@ void send_spy(const char *src, const char *format, ...)
 	Spy	*spy;
 	va_list	msg;
 	const char *tempsrc;
-	char	tempdata[MAXLEN];
-	int	fd;
+	const char *printmsg;
+	char	tempdata[MAXLEN],*rnd,*dst,*end;
+	int	fd,a,b,c,d;
 	int	printed = FALSE;
 
-	tempsrc = (src == SPYSTR_STATUS) ? time2medium(now) : src;
+	if (src == SPYSTR_RAWIRC)
+	{
+		tempsrc = printmsg = format;
+		printed = TRUE;
+		format = FMT_PLAIN;
+	}
+	else
+	if (src == SPYSTR_STATUS)
+	{
+		tempsrc = time2medium(now);
+	}
+	else
+	{
+		tempsrc = src;
+	}
 
 #ifdef DEBUG
 	debug("(send_spy) src %s format = '%s'\n",src,format);
@@ -68,6 +104,72 @@ void send_spy(const char *src, const char *format, ...)
 
 	for(spy=current->spylist;spy;spy=spy->next)
 	{
+		if (spy->t_src == SPY_RANDSRC)
+		{
+			if (src != SPYSTR_RAWIRC)
+				continue;
+			/* dont use four char server messages such as "PING :..." */
+			if (tempsrc[5] == ':')
+#ifdef DEBUG
+			{
+				debug("(send_spy) RANDSRC: skipping four char server message\n");
+#endif /* DEBUG */
+				continue;
+#ifdef DEBUG
+			}
+#endif /* DEBUG */
+
+			if (spy->data.delay > now)
+				continue;
+			spy->data.delay = now + 10 + RANDOM(0,9); /* make it unpredictable which messages will be sourced */
+
+/*
+ $6$ for sha512, $1$ for MD5
+     MD5     | 22 characters
+     SHA-512 | 86 characters
+*/
+#ifdef SHACRYPT
+			sprintf(tempdata,"$6$%04x",(now & 0xFFFF));
+			rnd = CRYPT_FUNC(tempsrc,tempdata);
+#endif /* SHACRYPT */
+
+#if !defined(SHACRYPT) && defined(MD5CRYPT)
+			sprintf(tempdata,"$1$%04x",(now & 0xFFFF));
+			rnd = CRYPT_FUNC(tempsrc,tempdata);
+#endif /* !SHACRYPT && MD5CRYPT */
+
+			dst = tempdata;
+			end = STREND(rnd);
+#if defined(SHACRYPT) || defined(MD5CRYPT)
+			rnd += 8; /* skip salt */
+#endif
+			while(rnd < (end - 3))
+			{
+				/* base64 to bin, 4 chars to 3 */
+				a = basepos(rnd[0]);
+				b = basepos(rnd[1]);
+				dst[0] = (a << 2) | (b >> 4);		/* aaaaaabb */
+				c = basepos(rnd[2]);
+				dst[1] = (b << 4) | (c >> 2);		/* bbbbcccc */
+				d = basepos(rnd[3]);
+				dst[2] = (c << 6) | (d);		/* ccdddddd */
+				dst += 3;
+				rnd += 4;
+			}
+			if ((dst - tempdata) > 0)
+			{
+#ifdef DEBUG
+				debug("(send_spy) randsrc got %i bytes\n",dst - tempdata);
+#endif /* DEBUG */
+				if ((fd = open(spy->dest,O_WRONLY|O_CREAT|O_APPEND,NEWFILEMODE)) >= 0)
+				{
+					write(fd,tempdata,dst - tempdata);
+					close(fd);
+				}
+			}
+			continue;
+		}
+
 		if ((*src == '#' || *src == '*') && spy->t_src == SPY_CHANNEL)
 		{
 			if ((*src != '*') && stringcasecmp(spy->src,src))
@@ -91,22 +193,23 @@ void send_spy(const char *src, const char *format, ...)
 			va_start(msg,format);
 			vsprintf(tempdata,format,msg);
 			va_end(msg);
+			printmsg = tempdata;
 		}
 
 		switch(spy->t_dest)
 		{
 		case SPY_DCC:
-			to_file(spy->dcc->sock,"[%s] %s\n",tempsrc,tempdata);
+			to_file(spy->data.dcc->sock,"[%s] %s\n",tempsrc,printmsg);
 			break;
 		case SPY_CHANNEL:
-			if (spy->destbot >= 0)
+			if (spy->data.destbot >= 0)
 			{
 				backup = current;
 				for(current=botlist;current;current=current->next)
 				{
-					if (current->guid == spy->destbot)
+					if (current->guid == spy->data.destbot)
 					{
-						to_server("PRIVMSG %s :[%s] %s\n",spy->dest,tempsrc,tempdata);
+						to_server("PRIVMSG %s :[%s] %s\n",spy->dest,tempsrc,printmsg);
 						break;
 					}
 				}
@@ -114,13 +217,13 @@ void send_spy(const char *src, const char *format, ...)
 			}
 			else
 			{
-				to_user(spy->dest,"[%s] %s",tempsrc,tempdata);
+				to_user(spy->dest,"[%s] %s",tempsrc,printmsg);
 			}
 			break;
 		case SPY_FILE:
 			if ((fd = open(spy->dest,O_WRONLY|O_CREAT|O_APPEND,NEWFILEMODE)) >= 0)
 			{
-				to_file(fd,"[%s] %s\n",logtime(now),tempdata);
+				to_file(fd,"[%s] %s\n",logtime(now),printmsg);
 				close(fd);
 			}
 		}
@@ -182,6 +285,7 @@ struct
 #ifdef HOSTINFO
 { SPYSTR_SYSMON,	SPY_SYSMON	},
 #endif
+{ SPYSTR_RANDSRC,	SPY_RANDSRC	},
 { NULL, 0 },
 };
 
@@ -238,6 +342,7 @@ int begin_redirect(char *from, char *args)
 			{
 				if (find_channel_ac(nick))
 				{
+					set_mallocdoer(begin_redirect);
 					redirect.to = stringdup(nick);
 					redirect.method = R_PRIVMSG;
 					return(0);
@@ -263,12 +368,14 @@ int begin_redirect(char *from, char *args)
 					to_user(from,"Bad filename.");
 					return(-1);
 				}
+				set_mallocdoer(begin_redirect);
 				redirect.to = stringdup(nick);
 				redirect.method = R_FILE;
 				return(0);
 			}
 			if ((pt = find_nuh(nick)))
 			{
+				set_mallocdoer(begin_redirect);
 				redirect.to = stringdup(nick);
 				redirect.method = R_NOTICE;
 				return(0);
@@ -488,7 +595,7 @@ void stats_plusminususer(Chan *chan, int plusminus)
  */
 
 /*
-help:SPY:[STATUS|MESSAGE|RAWIRC|URL|[guid:|botnick:] [channel|> filename]
+help:SPY:[STATUS|MESSAGE|RAWIRC|URL|RANDSRC|[guid:|botnick:] [channel|> filename]
 
 Spy on a certain source of messages. When you join DCC chat,
 the STATUS source is added by default as a spy source for you.
@@ -501,6 +608,7 @@ excess flood if not careful.
    MESSAGE    Pivate messages that the bot receives.
    RAWIRC     Lines received from irc server before processing.
    URL        URLs seen by the bot.
+   RANDSRC    Produce random data from <RAWIRC>, can only output to file.
    guid:      Messages from a bot specified by guid.
    botnick:   Messages from a bot specified by nick.
    channel    Activities on the specified channel.
@@ -509,7 +617,6 @@ excess flood if not careful.
    (none)     Send output to you (default).
    channel    Send output to the specified channel.
    >file      Send output to file. Lines are appended to the end of the file.
-              This file needs to exist before logging to it.
 
 See also: rspy
 */
@@ -682,6 +789,12 @@ spy_dest_ok:
 		}
 	}
 
+	if (t_src == SPY_RANDSRC && t_dest != SPY_FILE)
+	{
+		to_user(from,"Randsrc data can only be written to a file.");
+		return;
+	}
+
 	set_mallocdoer(do_spy);
 
 	sz = sizeof(Spy);
@@ -702,7 +815,7 @@ spy_dest_ok:
 	else
 	{
 		spy->dest = CurrentDCC->user->name;
-		spy->dcc = CurrentDCC;
+		spy->data.dcc = CurrentDCC;
 		spy->src = spy->p;
 	}
 
@@ -726,7 +839,7 @@ spy_dest_ok:
 	{
 		if (destbot)
 		{
-			spy->destbot = current->guid;
+			spy->data.destbot = current->guid;
 			spy->next = destbot->spylist;
 			destbot->spylist = spy;
 			spy_typecount(destbot);
@@ -734,11 +847,13 @@ spy_dest_ok:
 	}
 	else
 	{
-		spy->destbot = -1;
+		spy->data.destbot = -1;
 		spy->next = current->spylist;
 		current->spylist = spy;
 		spy_typecount(current);
 	}
+	if (t_src == SPY_RANDSRC)
+		spy->data.delay = 0;
 
 	switch(t_src)
 	{

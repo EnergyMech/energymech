@@ -501,6 +501,10 @@ void to_user(const char *target, const char *format, ...)
 /*
  *  Read any data waiting on a socket or file descriptor
  *  and return any complete lines to the caller
+ *
+ *  1: Try to get a whole line from <rest> data
+ *  2: If <rest> data is insufficient, try to read in more
+ *  3: Try again to make a whole line
  */
 char *sockread(int s, char *rest, char *line)
 {

@@ -1,6 +1,6 @@
 #
 #   EnergyMech, IRC bot software
-#   Copyright (c) 1997-2018 proton
+#   Copyright (c) 1997-2021 proton
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -45,14 +45,14 @@ CHMOD =		chmod
 BASEINCLUDES =	config.h defines.h structs.h global.h h.h
 INCS =		$(BASEINCLUDES) mcmd.h text.h usercombo.h
 
-TESTFILES =	aliastest safepathtest
+TESTFILES =	aliastest calctest safepathtest
 
-OFILES =	alias.o auth.o bounce.o channel.o core.o ctcp.o debug.o dns.o function.o greet.o \
+OFILES =	alias.o auth.o bounce.o calc.o channel.o core.o ctcp.o debug.o dns.o function.o greet.o \
 		help.o hostinfo.o io.o irc.o main.o net.o note.o ons.o parse.o partyline.o \
 		perl.o prot.o python.o reset.o seen.o shit.o spy.o tcl.o toybox.o \
 		uptime.o user.o vars.o web.o lib/string.o @MD5_O@ @SHA_O@
 
-SRCFILES =	alias.c auth.c bounce.c channel.c core.c ctcp.c debug.c dns.c function.c greet.c \
+SRCFILES =	alias.c auth.c bounce.c calc.c channel.c core.c ctcp.c debug.c dns.c function.c greet.c \
 		help.c hostinfo.c io.c irc.c main.c net.c note.c ons.c parse.c partyline.c \
 		perl.c prot.c python.c reset.c seen.c shit.c spy.c tcl.c toybox.c \
 		uptime.c user.c vars.c web.c lib/string.c @MD5_C@ @SHA_C@
@@ -124,13 +124,17 @@ mega-static:	$(SRCFILES) $(INCS) usage.h
 
 test:		$(TESTFILES)
 		./aliastest
+		./calctest
 		./safepathtest
 
-aliastest:	alias.c
-		$(CROSS_COMPILE)$(CC) $(CFLAGS) -o aliastest $< $(LPROF) $(LIBS) $(LDSCRIPT) -DTEST
+aliastest:	alias.c githash.h lib/string.o
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -o aliastest $< lib/string.o $(LPROF) $(LIBS) -DTEST
 
-safepathtest:	function.c
-		$(CROSS_COMPILE)$(CC) $(CFLAGS) -o safepathtest $< $(LPROF) $(LIBS) $(LDSCRIPT) -DTEST
+calctest:	calc.c githash.h mcmd.h lib/string.o
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -o calctest $< lib/string.o $(LPROF) $(LIBS) -DTEST
+
+safepathtest:	function.c githash.h lib/string.o
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -o safepathtest $< lib/string.o $(LPROF) $(LIBS) -DTEST
 
 commands:
 		grep -E '(void do_.*\(COMMAND_ARGS\)|/*---Help:)' *c
@@ -155,6 +159,9 @@ auth.o:		auth.c $(INCS)
 		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
 bounce.o:	bounce.c $(INCS)
+		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
+
+calc.o:		calc.c $(INCS)
 		$(CROSS_COMPILE)$(CC) $(CFLAGS) -c $< $(CPROF)
 
 channel.o:	channel.c $(INCS)

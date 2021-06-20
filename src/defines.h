@@ -421,6 +421,7 @@ enum {
 #ifdef HOSTINFO
 #define SPY_SYSMON		9
 #endif /* HOSTINFO */
+#define SPY_RANDSRC		10
 
 #define SPYF_ANY		1
 #define SPYF_CHANNEL		(1 << SPY_CHANNEL)
@@ -429,7 +430,7 @@ enum {
 #define SPYF_RAWIRC		(1 << SPY_RAWIRC)
 #define SPYF_BOTNET		(1 << SPY_BOTNET)
 #define SPYF_URL		(1 << SPY_URL)
-
+#define SPYF_RANDSRC		(1 << SPY_RANDSRC)
 /*
  *  notify defines
  */

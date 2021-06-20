@@ -1,7 +1,7 @@
 /*
 
     EnergyMech, IRC bot software
-    Copyright (c) 1997-2018 proton
+    Copyright (c) 1997-2020 proton
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,6 +38,11 @@
 char result[MSGLEN];
 char *input = "alias one two three four five   six seven eight nine ten";
 
+void *Calloc(int size)
+{
+	return(calloc(1,size));
+}
+
 void testcase(const char *test, const char *expect)
 {
 	afmt(result,test,input);
@@ -45,12 +50,12 @@ void testcase(const char *test, const char *expect)
 	else debug("testcase FAIL: test \"%s\", expected \"%s\", got \"%s\"\n",test,expect,result);
 }
 
-int main(int argc, char **argv)
+int main(int argc, char **argv, char **envp)
 {
 	char *format = argv[1];
 
 	dodebug = 1;
-	strcpy(CurrentNick,"noob");
+	stringcpy(CurrentNick,"noob");
 	if (format == NULL)
 	{
 		/* testcases */

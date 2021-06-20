@@ -38,6 +38,7 @@
 #include "alias.c"
 #include "auth.c"
 #include "bounce.c"
+#include "calc.c"
 #include "channel.c"
 #include "core.c"
 #include "ctcp.c"

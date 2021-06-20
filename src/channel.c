@@ -376,7 +376,7 @@ void channel_massmode(const Chan *chan, char *pattern, int filtmode, char mode, 
 			s = deopstring;
 			while(*s) s++;
 			debug("(...) deopstring "mx_pfmt" uh "mx_pfmt" ("mx_pfmt")\n",(mx_ptr)deopstring,(mx_ptr)uh,(mx_ptr)s);
-			s = strchr(deopstring,0);
+			s = STRCHR(deopstring,0);
 			debug("(...) deopstring "mx_pfmt" uh "mx_pfmt" ("mx_pfmt")\n",(mx_ptr)deopstring,(mx_ptr)uh,(mx_ptr)s);
 		}
 #endif /* DEBUG */

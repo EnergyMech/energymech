@@ -1,7 +1,7 @@
 /*
 
     EnergyMech, IRC bot software
-    Copyright (c) 1997-2018 proton
+    Copyright (c) 1997-2021 proton
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -182,6 +182,9 @@ LS struct
 {	cfg_greet,			"cfg_greet"			},
 {	do_greet,			"do_greet"			},
 #endif /* GREET */
+#ifdef HOSTINFO
+{	monitor_fs,			"monitor_fs"			},
+#endif /* HOSTINFO */
 #ifdef NOTE
 {	catch_note,			"catch_note"			},
 {	do_note,			"do_note"			},
@@ -200,6 +203,9 @@ LS struct
 {	parse_query,			"parse_query"			},
 {	read_dnsroot,			"read_dnsroot"			},
 #endif /* RAWDNS */
+#ifdef REDIRECT
+{	begin_redirect,			"begin_redirect"		},
+#endif /* REDIRECT */
 #ifdef SEEN
 {	make_seen,			"make_seen"			},
 #endif /* SEEN */
@@ -927,7 +933,7 @@ void debug_core(void)
 			debug("    ; next\t\t"mx_pfmt"\n",(mx_ptr)spy->next);
 			debug("    ; t_src\t\t%i\n",spy->t_src);
 			debug("    ; t_dest\t\t%i\n",spy->t_dest);
-			debug("    ; dcc\t\t"mx_pfmt"\n",(mx_ptr)spy->dcc);
+			debug("    ; dcc\t\t"mx_pfmt"\n",(mx_ptr)spy->data.dcc);
 			debug("    ; src\t\t"mx_pfmt" \"%s\"\n",(mx_ptr)spy->src,nullstr(spy->src));
 			debug("    ; dest\t\t"mx_pfmt" \"%s\"\n",(mx_ptr)spy->dest,nullstr(spy->dest));
 			debug("    ; ---\n");
