@@ -20,7 +20,6 @@ src/aliastest
 src/calctest
 src/safepathtest
 trivia/mkindex
-src/musl.c
 
 # mech typical user config files
 *~
@@ -36,7 +35,7 @@ trivia/megatrivia.txt
 .use_size
 conf
 debug*
-src/calc.c
+src/musl.c
 src/nostdlib
 src/x
 src/y
