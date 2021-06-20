@@ -520,6 +520,13 @@ const char __mx_opts[] =	""
 #undef	OPT_COREONLY
 #endif /* BOTNET */
 
+#ifdef HOSTINFO
+			OPT_COMMA "hostinfo"
+#undef	OPT_COMMA
+#define OPT_COMMA	", "
+#undef	OPT_COREONLY
+#endif /* HOSTINFO */
+
 #ifdef NETCFG
 			OPT_COMMA "netcfg"
 #undef	OPT_COMMA

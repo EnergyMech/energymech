@@ -664,6 +664,7 @@ recheck_alias:
 		{
 			if (mcmd[i].lbuf && ischannel(orig_to))
 			{
+				set_mallocdoer(on_msg);
 				redirect.to = stringdup(to);
 				redirect.method = R_PRIVMSG;
 			}

@@ -1,7 +1,7 @@
 /*
 
     EnergyMech, IRC bot software
-    Parts Copyright (c) 1997-2018 proton
+    Parts Copyright (c) 1997-2020 proton
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -477,8 +477,13 @@ typedef struct Spy
 	int		t_src;
 	int		t_dest;
 
-	Client		*dcc;
-	int		destbot;
+	union
+	{
+		Client		*dcc;		/* DCC */
+		int		destbot;	/* botnet */
+		time_t		delay;		/* randsrc */
+
+	} data;
 
 	const char	*src;
 	char		*dest;
@@ -513,6 +518,15 @@ typedef struct ServerGroup
 	char		name[1];
 
 } ServerGroup;
+
+typedef struct FileMon
+{
+	struct		FileMon *next;
+	int		fd;
+	time_t		nospam;
+	char		filename[1];
+
+} FileMon;
 
 typedef struct Mech
 {
@@ -559,17 +573,14 @@ typedef struct Mech
 	Shit		*shitlist;
 	KickSay		*kicklist;
 	IReq		*parselist;
-
-#ifdef NOTIFY
-	Notify		*notifylist;
-#endif /* NOTIFY */
-
 	Spy		*spylist;
 	int		spy;
 
 #ifdef NOTIFY
+	Notify		*notifylist;
 	time_t		lastnotify;		/* ... */
 #endif /* NOTIFY */
+
 	time_t		lastreset;		/* last time bot was reset		*/
 	time_t		lastantiidle;		/* avoid showing large idle times	*/
 	time_t		lastrejoin;		/* last time channels were reset	*/

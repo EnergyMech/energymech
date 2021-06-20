@@ -1,7 +1,7 @@
 /*
 
     EnergyMech, IRC bot software
-    Copyright (c) 1997-2018 proton
+    Copyright (c) 1997-2020 proton
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -69,6 +69,7 @@ struct
 	{ 0, "8BALL",		"do_8ball",		 0		| CBANG	| SUPRES		},
 	{ 0, "RAND",		"do_rand",		 0		| CBANG	| SUPRES		},
 #endif /* TOYBOX */
+	{ 0, "CV",		"do_convert",		 0		| CBANG | SUPRES		},
 
 	/*
 	 *  Level 10
@@ -240,6 +241,7 @@ struct
 	{ 0, "HOSTINFO",	"do_hostinfo",		100	| CCPW	| GAXS				},
 	{ 0, "MEMINFO",		"do_meminfo",		100	| CCPW	| GAXS				},
 	{ 0, "CPUINFO",		"do_cpuinfo",		100	| CCPW	| GAXS				},
+	{ 0, "FILEMON",		"do_filemon",		100	| CCPW	| GAXS | CARGS			},
 #endif /* HOSTINFO */
 #ifdef RAWDNS
 	{ 0, "DNSSERVER",	"do_dnsserver",		100	| CCPW  | GAXS				},

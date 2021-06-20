@@ -1,7 +1,7 @@
 /*
 
     EnergyMech, IRC bot software
-    Copyright (c) 1997-2018 proton
+    Copyright (c) 1997-2020 proton
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -135,6 +135,10 @@ void bounce_cleanup(void);
 void new_port_bounce(const struct Setting *);
 void select_bounce(void);
 void process_bounce(void);
+
+/* calc.c */
+
+LS void do_convert(COMMAND_ARGS)				__page(CMD1_SEG);
 
 /* channel.c */
 
@@ -326,7 +330,7 @@ void do_usage(COMMAND_ARGS)					__page(CMD1_SEG);
 
 /* hostinfo.c */
 
-void monitor_fs(const char *);
+int monitor_fs(const char *);
 void select_monitor();
 void process_monitor();
 int parse_proc_status(char *line)				__page(CMD1_SEG);
@@ -334,6 +338,7 @@ int parse_proc_cpuinfo(char *line)				__page(CMD1_SEG);
 void do_hostinfo(COMMAND_ARGS)					__page(CMD1_SEG);
 void do_meminfo(COMMAND_ARGS)					__page(CMD1_SEG);
 void do_cpuinfo(COMMAND_ARGS)					__page(CMD1_SEG);
+void do_filemon(COMMAND_ARGS)					__page(CMD1_SEG);
 
 /* io.c */
 
@@ -787,7 +792,7 @@ void web_raw(WebSock *, char *);
 void web_botstatus(WebSock *, char *);
 void web_debug(WebSock *, char *);
 void web_404(WebSock *, char *);
-void parse(WebSock *, char *);
+void parse_web(WebSock *, char *);
 void select_web(void);
 void process_web(void);
 

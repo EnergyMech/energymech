@@ -1,7 +1,7 @@
 /*
 
     EnergyMech, IRC bot software
-    Copyright (c) 1997-2001 proton
+    Copyright (c) 1997-2021 proton
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -291,6 +291,7 @@ void web_raw(WebSock *client, char *url)
 #ifdef DEBUG
 	debug("(web_raw) file open for reading `%s'\n",path);
 #endif /* DEBUG */
+	set_mallocdoer(web_raw);
 	src = Calloc(sz+1);
 	read(fd,src,sz);
 	if (eml)
@@ -390,7 +391,7 @@ void web_404(WebSock *client, char *url)
 		url);
 }
 
-void parse(WebSock *client, char *rest)
+void parse_web(WebSock *client, char *rest)
 {
 	char	*method,*url,*proto;
 	int	i;
@@ -415,6 +416,7 @@ void parse(WebSock *client, char *rest)
 				break;
 			}
 		}
+		set_mallocdoer(parse_web);
 		client->url = stringdup(url);
 		client->status = WEB_WAITCR;
 		break;
@@ -422,7 +424,7 @@ void parse(WebSock *client, char *rest)
 		if (*rest == 0)
 		{
 #ifdef DEBUG
-			debug("(web.c->parse) web document output\n");
+			debug("(parse_web) web document output\n");
 #endif /* DEBUG */
 			if (client->docptr)
 				client->docptr->proc(client,client->url);
@@ -441,7 +443,7 @@ void select_web(void)
 		websock = SockListener(webport);
 #ifdef DEBUG
 		if (websock != -1)
-			debug("(web_select) websock is active (%i)\n",webport);
+			debug("(select_web) websock is active (%i)\n",webport);
 #endif /* DEBUG */
 	}
 
@@ -487,7 +489,7 @@ read_again:
 			rest = webread(client->sock,client->sockdata,linebuf);
 			if (rest)
 			{
-				parse(client,rest);
+				parse_web(client,rest);
 				goto read_again;
 			}
 			switch(errno)

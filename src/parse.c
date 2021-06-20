@@ -1,7 +1,7 @@
 /*
 
     EnergyMech, IRC bot software
-    Parts Copyright (c) 1997-2018 proton
+    Parts Copyright (c) 1997-2021 proton
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -1468,8 +1468,8 @@ void parse_server_input(char *rest)
 	uint32_t cmdhash;
 	int	i;
 
-	if (current->spy & SPYF_RAWIRC)
-		send_spy(SPYSTR_RAWIRC,FMT_PLAIN,rest);
+	if (current->spy & (SPYF_RAWIRC|SPYF_RANDSRC))
+		send_spy(SPYSTR_RAWIRC,rest);
 
 /*new undernet amusements */
 /*(in)  {5} NOTICE AUTH :*** You have identd disabled (or broken), to continue to connect you must type /QUOTE PASS 17071 */

@@ -1,7 +1,7 @@
 /*
 
     EnergyMech, IRC bot software
-    Parts Copyright (c) 1997-2018 proton
+    Parts Copyright (c) 1997-2020 proton
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -729,9 +729,10 @@ int is_nick(const char *nick)
 	return(TRUE);
 }
 
+/* asc2int requires the whole string *anum to be a valid numeric */
 int asc2int(const char *anum)
 {
-	int	res = 0,neg;
+	int	res = 0, neg;
 
 	errno = EINVAL;
 
@@ -751,6 +752,7 @@ int asc2int(const char *anum)
 	return((neg) ? -res : res);
 }
 
+/* get_number returns as soon as a non numeric character is encountered */
 int get_number(const char *rest)
 {
 	const char *src = NULL;
@@ -758,7 +760,7 @@ int get_number(const char *rest)
 
 	while(*rest)
 	{
-		if (*rest >= '0' && *rest <= '9')
+		if (0 == (attrtab[(uchar)*rest] & NUM))
 			n = (n * 10) + (*(src = rest) - '0');
 		else
 		if (src)
@@ -944,6 +946,11 @@ int is_safepath(const char *path, int filemustexist)
 
 char *tostr[] = { "ZERO", "FILE_MUST_EXIST", "FILE_MAY_EXIST", "FILE_MUST_NOTEXIST" };
 
+void *Calloc(int size)
+{
+	return(calloc(1,size));
+}
+
 void testcase(const char *str, int expected, int filemustexist)
 {
 	int	r;
@@ -987,7 +994,7 @@ void teststring(void)
 		debug("teststring SUCCESS: stringcat(str,%s) == %s\n","free","dingxofree");
 }
 
-int main(int argc, char **argv)
+int main(int argc, char **argv, char **envp)
 {
 	struct stat st;
 	int	r;

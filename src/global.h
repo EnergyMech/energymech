@@ -71,6 +71,7 @@ BEG const char SPYSTR_URL[]		MDEF("url");
 #if defined URLCAPTURE || defined HOSTINFO
 BEG const char SPYSTR_SYSMON[]		MDEF("sysmon");
 #endif /* URLCAPTURE */
+BEG const char SPYSTR_RANDSRC[]		MDEF("randsrc");
 
 BEG const char STR_MECHRESET[]		MDEF("MECHRESET=");
 
@@ -191,6 +192,10 @@ BEG void	*mallocdoer;
 
 #endif /* DEBUG */
 
+#ifdef HOSTINFO
+BEG FileMon	*filemonlist		MDEF(NULL);
+#endif /* HOSTINFO */
+
 #ifdef NOTE
 
 BEG Note	*notelist		MDEF(NULL);
@@ -211,7 +216,7 @@ BEG Strp	*dnsrootfiles		MDEF(NULL);
 
 #ifdef REDIRECT
 
-LS struct
+BEG struct
 {
 	char	*to;
 	int	method;
@@ -297,7 +302,7 @@ BEG int		spawning_lamer		MDEF(0);
 #define FNICK	(NICK|FIRST)
 #define NNICK	(NICK|NUM)
 
-#ifdef MAIN_C
+#if defined(MAIN_C) || defined(MAKETABLES)
 
 /*
  *  tolowertab blatantly ripped from ircu2.9.32
@@ -412,6 +417,10 @@ LS const uchar attrtab[256] =
 	0,	0,	0,	0,	0,	0,	0,	0,	/* 0xF0 - 0xF7 */
 	0,	0,	0,	0,	0,	0,	0,	0,	/* 0xF8 - 0xFF */
 };
+
+#endif /* MAIN_C || MAKETABLES */
+
+#ifdef MAIN_C
 
 /*
  *  user struct for the core client
