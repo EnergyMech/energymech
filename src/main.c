@@ -1092,6 +1092,12 @@ int main(int argc, char **argv, char **envp)
 	}
 
 #ifdef NEWBIE
+#ifdef SESSION
+	if (stringcmp(CFGFILE,configfile) && stringcmp(SESSIONFILE,configfile))
+	{
+		to_file(1,"warning: current configuration file overrides session file\n");
+	}
+#endif /* SESSION */
 	if (stat(configfile,&st));
 	{
 		if ((st.st_mode & (S_IWGRP|S_IWOTH)) != 0)
