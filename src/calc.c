@@ -353,6 +353,17 @@ void do_convert(COMMAND_ARGS)
 	errno = EINVAL;
 	switch(*ops)
 	{
+	case 'b':
+		errno = 0;
+		for(num=0;*srcnum;)
+		{
+			num = num << 1;
+			if (*srcnum != '0' && *srcnum != '1')
+				return;
+			num += *srcnum - '0';
+			srcnum++;
+		}
+		break;
 	case 'c':
 		num = srcnum[0];
 		if (srcnum[1] != 0)
