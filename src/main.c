@@ -994,17 +994,25 @@ int main(int argc, char **argv, char **envp)
 			break;
 		case 'h':
 			to_file(1,TEXT_USAGE,executable);
-			to_file(1,TEXT_FSWITCH
-				  TEXT_CSWITCH
-				  TEXT_PSWITCH1
-				  TEXT_PSWITCH2
+			to_file(1,
+				TEXT_CSWITCH
 #ifdef DEBUG
-				  TEXT_DSWITCH
-				  TEXT_OSWITCH
-				  TEXT_XSWITCH
+				TEXT_DSWITCH
 #endif /* DEBUG */
-				  TEXT_HSWITCH
-				  TEXT_VSWITCH);
+				TEXT_ESWITCH
+				TEXT_FSWITCH
+				TEXT_HSWITCH
+#ifdef DEBUG
+				TEXT_OSWITCH
+				TEXT_PSWITCH1
+				TEXT_PSWITCH2
+#endif /* DEBUG */
+				TEXT_TSWITCH
+				TEXT_VSWITCH
+#ifdef DEBUG
+				TEXT_XSWITCH
+#endif /* DEBUG */
+				  );
 			_exit(0);
 		case 'c':
 			makecore = TRUE;
@@ -1092,6 +1100,12 @@ int main(int argc, char **argv, char **envp)
 	}
 
 #ifdef NEWBIE
+#ifdef SESSION
+	if (stringcmp(CFGFILE,configfile) && stringcmp(SESSIONFILE,configfile))
+	{
+		to_file(1,"warning: current configuration file overrides session file\n");
+	}
+#endif /* SESSION */
 	if (stat(configfile,&st));
 	{
 		if ((st.st_mode & (S_IWGRP|S_IWOTH)) != 0)

@@ -124,6 +124,7 @@ int passmatch(char *plain, char *encoded)
  *  use SHA512 to hash passwords
  */
 
+char *crypt(const char *, const char *);
 char *CRYPT_FUNC(const char *, const char *);
 
 char *makepass(char *plain)
@@ -153,6 +154,7 @@ int passmatch(char *plain, char *encoded)
  *  use MD5 to hash passwords
  */
 
+char *crypt(const char *, const char *);
 char *CRYPT_FUNC(const char *, const char *);
 
 char *makepass(char *plain)

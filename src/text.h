@@ -140,7 +140,16 @@
 #define TEXT_CSWITCH		" -c            make core file instead of coredebug/reset\n"
 #define TEXT_HSWITCH		" -h            show this help\n"
 #define TEXT_VSWITCH		" -v            show EnergyMech version\n"
-#define TEXT_PSWITCH1		" -p <string>   encrypt <string> using the password hashing algorithm,\n"
+#define TEXT_ESWITCH        " -e <command>  run a single command, then exit\n"
+#define TEXT_TSWITCH        " -t            run normal startup, but exit right before going into main loop\n"
+
+#ifdef SHACRYPT
+#define TEXT_PSWITCH1		" -p <string>   encrypt <string> using the password hashing algorithm (SHA-512),\n"
+#elif MD5CRYPT
+#define TEXT_PSWITCH1		" -p <string>   encrypt <string> using the password hashing algorithm (MD5),\n"
+#else
+#define TEXT_PSWITCH1		" -p <string>   encrypt <string> using the password hashing algorithm (EnergyMech internal),\n"
+#endif
 #define TEXT_PSWITCH2		"               output the result and then quit.\n"
 
 #define TEXT_DSWITCH		" -d            start mech in debug mode\n"
