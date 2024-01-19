@@ -1,7 +1,7 @@
 /*
 
     EnergyMech, IRC bot software
-    Parts Copyright (c) 1997-2021 proton
+    Parts Copyright (c) 1997-2024 proton
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -99,7 +99,8 @@ void send_spy(const char *src, const char *format, ...)
 	}
 
 #ifdef DEBUG
-	debug("(send_spy) src %s format = '%s'\n",src,format);
+	debug("(send_spy) src <%s> format = '%s', current = '%s' (%i)\n",src,format,
+		(current == NULL) ? "<NULL>" : nullstr(current->nick),(current == NULL) ? -1 : current->guid);
 #endif /* DEBUG */
 
 	for(spy=current->spylist;spy;spy=spy->next)
@@ -108,11 +109,11 @@ void send_spy(const char *src, const char *format, ...)
 		{
 			if (src != SPYSTR_RAWIRC)
 				continue;
-			/* dont use four char server messages such as "PING :..." */
+			/* dont use four-char server messages such as "PING :..." */
 			if (tempsrc[5] == ':')
 #ifdef DEBUG
 			{
-				debug("(send_spy) RANDSRC: skipping four char server message\n");
+				debug("(send_spy) RANDSRC: skipping four-char server message\n");
 #endif /* DEBUG */
 				continue;
 #ifdef DEBUG
@@ -195,7 +196,6 @@ void send_spy(const char *src, const char *format, ...)
 			va_end(msg);
 			printmsg = tempdata;
 		}
-
 		switch(spy->t_dest)
 		{
 		case SPY_DCC:
@@ -595,13 +595,12 @@ void stats_plusminususer(Chan *chan, int plusminus)
  */
 
 /*
-help:SPY:[STATUS|MESSAGE|RAWIRC|URL|RANDSRC|[guid:|botnick:] [channel|> filename]
+help:SPY:[STATUS|MESSAGE|RAWIRC|URL|RANDSRC|[guid: ]channel] [channel|> filename]
 
 Spy on a certain source of messages. When you join DCC chat,
 the STATUS source is added by default as a spy source for you.
 If no arguments are given, the current list of active spy
-channels is shown. Output is not line buffered and can cause
-excess flood if not careful.
+channels is shown.
 
   (sources)
    STATUS     Status messages.
@@ -610,7 +609,6 @@ excess flood if not careful.
    URL        URLs seen by the bot.
    RANDSRC    Produce random data from <RAWIRC>, can only output to file.
    guid:      Messages from a bot specified by guid.
-   botnick:   Messages from a bot specified by nick.
    channel    Activities on the specified channel.
 
   (destinations)
@@ -685,7 +683,7 @@ spy_usage:
 		if (*src != ':' && !ischannel(src+1))
 			goto spy_usage;
 		src++;
-		t_src = SPY_CHANNEL;
+		t_dest = t_src = SPY_CHANNEL;
 		/*
 		 *  TODO: check access
 		 */
@@ -702,13 +700,13 @@ spy_usage:
 			if (backup->guid == guid)
 			{
 				destbot = backup;
-				goto guid_ok;
 			}
 		}
-		to_user(from,"Unknown bot guid: %i",guid);
-		return;
-guid_ok:
-		;
+		if (destbot == NULL)
+		{
+			to_user(from,"Unknown bot guid: %i",guid);
+			return;
+		}
 	}
 	else
 	{
@@ -763,10 +761,10 @@ guid_ok:
 
 spy_dest_ok:
 #ifdef DEBUG
-	debug("(do_spy) src = `%s'; t_src = %i (%s); dest = `%s'; t_dest = %i (%s)\n",
-		src,t_src,SPY_DEFS[t_src-1],nullstr(dest),t_dest,SPY_DEFS[t_dest-1]);
+	debug("(do_spy) src = `%s'; t_src = %i (%s); dest = `%s'; t_dest = %i (%s), CurrentDCC "mx_pfmt"\n",
+		src,t_src,SPY_DEFS[t_src-1],nullstr(dest),t_dest,SPY_DEFS[t_dest-1],CurrentDCC);
 	if (guid >= 0)
-		debug("(do_spy) spying from remote bot guid %i (%s) channel %s\n",guid,(destbot) ? destbot->nick : "unknown",src);
+		debug("(do_spy) spying from remote bot guid %i (%s), channel %s\n",guid,(destbot) ? destbot->nick : "unknown",src);
 #endif /* DEBUG */
 
 	if (t_dest == SPY_DCC)
@@ -795,8 +793,6 @@ spy_dest_ok:
 		return;
 	}
 
-	set_mallocdoer(do_spy);
-
 	sz = sizeof(Spy);
 
 	if (t_dest != SPY_DCC)
@@ -805,6 +801,7 @@ spy_dest_ok:
 	if (t_src == SPY_CHANNEL)
 		sz += strlen(src);
 
+	set_mallocdoer(do_spy);
 	spy = Calloc(sz);
 
 	if (t_dest != SPY_DCC)
@@ -847,7 +844,8 @@ spy_dest_ok:
 	}
 	else
 	{
-		spy->data.destbot = -1;
+		if (t_dest != SPY_DCC)
+			spy->data.destbot = -1;
 		spy->next = current->spylist;
 		current->spylist = spy;
 		spy_typecount(current);
