@@ -463,7 +463,7 @@ enum {
 #define UPTIME_SIGTERM          5003
 #define UPTIME_SIGINT           5004
 
-#define UPTIMEHOST		"uptime.energymech.net"
+#define UPTIMEHOST		"uptime.eggheads.org"
 
 #ifdef __CYGWIN__
 #define UPTIME_BOTTYPE		UPTIME_WINMECH
